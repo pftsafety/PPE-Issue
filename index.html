@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPE Issue Register Dashboard</title>
+    
+    <!-- PWA Installation Requirements Matrix -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1255/1255421.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- CSS VARIABLE SYSTEM --- */
+        :root {
+            --bg-canvas: linear-gradient(to bottom right, #020617, #0f172a, #1e1b4b);
+            --text-main: #cbd5e1;       
+            --text-muted: #64748b;      
+            --text-title: #ffffff;      
+            --text-accent: #f1f5f9;     
+            --text-indigo: #a5b4fc;     
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: rgba(0, 0, 0, 0.4);
+            --nav-bg: rgba(15, 23, 42, 0.4);
+            --nav-border: rgba(255, 255, 255, 0.05);
+            --input-bg: rgba(255, 255, 255, 0.03);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --table-header: rgba(255, 255, 255, 0.04);
+            --table-row-hover: rgba(255, 255, 255, 0.04);
+            --table-row-border: rgba(255, 255, 255, 0.02);
+            --badge-bg: rgba(99, 102, 241, 0.1);
+            --badge-border: rgba(99, 102, 241, 0.2);
+            --badge-text: #a5b4fc;
+            --qty-bg: rgba(255, 255, 255, 0.05);
+            --qty-border: rgba(255, 255, 255, 0.05);
+            --size-text: #fbbf24;
+            --overlay-bg: rgba(2, 6, 23, 0.75);
+        }
+
+        [data-theme="light"] {
+            --bg-canvas: linear-gradient(to bottom right, #f8fafc, #eff6ff, #e0e7ff);
+            --text-main: #334155;       
+            --text-muted: #475569;      
+            --text-title: #0f172a;      
+            --text-accent: #0f172a;     
+            --text-indigo: #4f46e5;     
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shadow: rgba(148, 163, 184, 0.12);
+            --nav-bg: rgba(255, 255, 255, 0.75);
+            --nav-border: rgba(226, 232, 240, 0.8);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-border: rgba(203, 213, 225, 1);
+            --table-header: rgba(241, 245, 249, 0.9);
+            --table-row-hover: rgba(226, 232, 240, 0.5);
+            --table-row-border: rgba(226, 232, 240, 0.8);
+            --badge-bg: rgba(79, 70, 229, 0.08);
+            --badge-border: rgba(79, 70, 229, 0.2);
+            --badge-text: #4f46e5;
+            --qty-bg: #f1f5f9;
+            --qty-border: #cbd5e1;
+            --size-text: #b45309;
+            --overlay-bg: rgba(248, 250, 252, 0.8);
+        }
+
+        .dynamic-bg { background: var(--bg-canvas); }
+        .dynamic-text { color: var(--text-main); }
+        .dynamic-text-muted { color: var(--text-muted); }
+        .dynamic-text-title { color: var(--text-title); }
+        .text-accent-color { color: var(--text-accent); }
+        .text-indigo-color { color: var(--text-indigo); }
+        .dynamic-glass { background: var(--glass-bg); border-color: var(--glass-border); box-shadow: 0 25px 50px -12px var(--glass-shadow); }
+        .dynamic-nav { background: var(--nav-bg); border-color: var(--nav-border); }
+        .dynamic-input { background: var(--input-bg); border-color: var(--input-border); color: var(--text-accent); }
+        .dynamic-th { background: var(--table-header); border-color: var(--nav-border); }
+        .overlay-bg-custom { background: var(--overlay-bg); }
+        
+        .dynamic-tr:hover { background: var(--table-row-hover); }
+        .badge-custom { background: var(--badge-bg); border-color: var(--badge-border); color: var(--badge-text); }
+        .qty-custom { background: var(--qty-bg); border-color: var(--qty-border); color: var(--text-accent); }
+        .size-custom { color: var(--size-text); }
+
+        @keyframes glassFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes rowReveal {
+            from { opacity: 0; transform: translateX(-6px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .animate-glass { animation: glassFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-row { animation: rowReveal 0.25s ease-out forwards; }
+
+        @media (max-width: 768px) {
+            #table-container table thead { display: none; }
+        }
+    </style>
+</head>
+<body class="dynamic-bg min-h-screen dynamic-text font-sans selection:bg-indigo-500/20 transition-all duration-300">
+
+    <!-- Interaction Lock Full-Screen Overlay Box -->
+    <div id="loading-overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center overlay-bg-custom backdrop-blur-xl transition-all duration-500">
+        <div class="relative flex items-center justify-center mb-4">
+            <div class="animate-ping absolute inline-flex h-12 w-12 rounded-full bg-indigo-500 opacity-20"></div>
+            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-indigo-600 z-10"></i>
+        </div>
+        <h3 id="overlay-title" class="text-base font-bold tracking-wide dynamic-text-title">Syncing Cloud Database</h3>
+        <p id="overlay-subtitle" class="text-xs dynamic-text-muted mt-1 text-center px-6">Input fields are locked while records download and consolidate name listings...</p>
+    </div>
+
+    <!-- Navigation Header Bar -->
+    <nav class="sticky top-0 z-50 dynamic-nav backdrop-blur-md border-b px-6 py-4 flex justify-between items-center shadow-lg transition-all duration-300">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-xl shadow-md">
+                <i class="fa-solid fa-helmet-safety text-white text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-wide dynamic-text-title transition-colors duration-300">PPE ISSUE REGISTER</h1>
+                <p class="text-[10px] text-indigo-color font-bold tracking-wider uppercase">Standalone App Framework</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <!-- Theme Toggle Switch -->
+            <button onclick="toggleTheme()" class="relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-700 transition-colors duration-200 ease-in-out focus:outline-none" id="theme-toggle-btn">
+                <span id="toggle-thumb" class="pointer-events-none relative inline-block h-6 w-6 transform rounded-full bg-white shadow transition duration-200 ease-in-out translate-x-0 flex items-center justify-center text-[11px]">
+                    <i id="theme-icon" class="fa-solid fa-moon text-indigo-950"></i>
+                </span>
+            </button>
+
+            <div class="text-xs dynamic-input backdrop-blur-md px-3 py-2 rounded-xl border shadow-inner flex items-center space-x-2">
+                <span class="dynamic-text-muted font-medium">Active Records:</span> 
+                <span id="total-count" class="font-mono font-bold text-emerald-500">0</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        
+        <!-- Filter Engine Panel Card -->
+        <div class="animate-glass dynamic-glass backdrop-blur-xl border rounded-2xl p-6 relative overflow-hidden transition-all duration-300">
+            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent"></div>
+            <div class="flex items-center space-x-2 mb-4 text-indigo-color font-bold text-xs tracking-wide uppercase">
+                <i class="fa-solid fa-sliders"></i>
+                <h2>Multi-Query Filter Console</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold dynamic-text-muted uppercase tracking-wider mb-1.5">Card No</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                            <i class="fa-solid fa-id-card text-xs"></i>
+                        </span>
+                        <input type="text" id="search-card" oninput="debounceSearch()" placeholder="Filter Card No..." 
+                            class="w-full pl-9 pr-3 py-2 dynamic-input border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 placeholder-slate-400 transition-all text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold dynamic-text-muted uppercase tracking-wider mb-1.5">Employee Name</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                            <i class="fa-solid fa-user text-xs"></i>
+                        </span>
+                        <input type="text" id="search-name" oninput="debounceSearch()" placeholder="Filter Name..." 
+                            class="w-full pl-9 pr-3 py-2 dynamic-input border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 placeholder-slate-400 transition-all text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold dynamic-text-muted uppercase tracking-wider mb-1.5">Section / Dept</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                            <i class="fa-solid fa-building text-xs"></i>
+                        </span>
+                        <input type="text" id="search-dept" oninput="debounceSearch()" placeholder="Filter Section..." 
+                            class="w-full pl-9 pr-3 py-2 dynamic-input border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 placeholder-slate-400 transition-all text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold dynamic-text-muted uppercase tracking-wider mb-1.5">PPE Item Type</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                            <i class="fa-solid fa-shield-halved text-xs"></i>
+                        </span>
+                        <input type="text" id="search-item" list="item-options" oninput="debounceSearch()" placeholder="Select or type item..." 
+                            class="w-full pl-9 pr-3 py-2 dynamic-input border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 placeholder-slate-400 transition-all text-sm">
+                        <datalist id="item-options"></datalist>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end mt-4">
+                <button onclick="resetFilters()" class="text-xs font-semibold text-rose-500 hover:text-rose-400 flex items-center space-x-1.5 transition-colors px-3 py-1.5 rounded-lg hover:bg-rose-500/10">
+                    <i class="fa-solid fa-arrow-rotate-left text-[10px]"></i>
+                    <span>Reset Parameters</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Master Data Layout Window -->
+        <div class="animate-glass [animation-delay:150ms] dynamic-glass backdrop-blur-xl border rounded-2xl shadow-2xl relative overflow-hidden transition-all duration-300">
+            
+            <div id="inline-loader" class="flex flex-col items-center justify-center p-20 dynamic-text-muted">
+                <i class="fa-solid fa-folder-open text-3xl animate-pulse text-indigo-500"></i>
+                <p class="text-sm font-medium mt-2">Readying registry framework columns...</p>
+            </div>
+
+            <!-- Table Block -->
+            <div id="table-container" class="hidden">
+                
+                <!-- PC GRID TABLE VIEW -->
+                <table class="w-full text-left border-collapse hidden md:table">
+                    <thead>
+                        <tr class="dynamic-th border-b text-[11px] text-indigo-color font-bold uppercase tracking-wider">
+                            <th class="py-4 px-5 text-center">Si No</th>
+                            <th class="py-4 px-5"><i class="fa-regular fa-calendar-days mr-2"></i>Issued On</th>
+                            <th class="py-4 px-5">Card No</th>
+                            <th class="py-4 px-5">Name</th>
+                            <th class="py-4 px-5">Section</th>
+                            <th class="py-4 px-5">Item Issued</th>
+                            <th class="py-4 px-5 text-center">Qty</th>
+                            <th class="py-4 px-5 text-center">Size</th>
+                        </tr>
+                    </thead>
+                    <tbody id="register-rows" class="text-sm"></tbody>
+                </table>
+
+                <!-- MOBILE SMART CARDS VIEW CONTAINER -->
+                <div id="mobile-cards-view" class="block md:hidden space-y-4 p-4"></div>
+
+                <!-- Pagination Footer Navigation -->
+                <div class="bg-black/5 dark:bg-black/20 px-6 py-4 flex items-center justify-between border-t border-white/5 flex-wrap gap-y-3">
+                    <div class="text-xs dynamic-text-muted tracking-wide">
+                        Showing rows <span id="page-start" class="font-mono font-bold text-accent-color">0</span> to 
+                        <span id="page-end" class="font-mono font-bold text-accent-color">0</span> of 
+                        <span id="filtered-count" class="font-mono font-bold text-indigo-color">0</span> records found
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="btn-prev" onclick="changePage(-1)" class="px-3 py-1.5 text-xs font-semibold dynamic-text bg-white/5 hover:bg-black/5 border border-slate-300/30 rounded-lg disabled:opacity-30 transition-all flex items-center">
+                            <i class="fa-solid fa-chevron-left mr-1.5 text-[10px]"></i>Previous
+                        </button>
+                        <button id="btn-next" onclick="changePage(1)" class="px-3 py-1.5 text-xs font-semibold dynamic-text bg-white/5 hover:bg-black/5 border border-slate-300/30 rounded-lg disabled:opacity-30 transition-all flex items-center">
+                            Next<i class="fa-solid fa-chevron-right ml-1.5 text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="no-results" class="hidden flex flex-col items-center justify-center p-16 dynamic-text-muted">
+                <i class="fa-regular fa-folder-open text-4xl mb-3 opacity-40"></i>
+                <p class="text-sm font-semibold tracking-wide">No search entries match current filter settings</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiEndpoint = "https://script.google.com/macros/s/AKfycbydwxwb1CYJtjLcWG_OKpcKIBdl4KQ7xeKe12PvJzwOzxu3Mvwu-OU9kvybNTji3iIX/exec";
+
+        let allMasterData = [];
+        let currentFilteredData = [];
+        let currentPage = 1;
+        const rowsPerPage = 50; 
+        let searchTimeout = null;
+
+        function toggleTheme() {
+            const body = document.body;
+            const thumb = document.getElementById('toggle-thumb');
+            const icon = document.getElementById('theme-icon');
+            const toggleBtn = document.getElementById('theme-toggle-btn');
+            
+            if (body.getAttribute('data-theme') === 'light') {
+                body.removeAttribute('data-theme');
+                thumb.style.transform = 'translateX(0px)';
+                icon.className = 'fa-solid fa-moon text-indigo-950';
+                toggleBtn.style.backgroundColor = '';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                thumb.style.transform = 'translateX(28px)';
+                icon.className = 'fa-solid fa-sun text-amber-500';
+                toggleBtn.style.backgroundColor = '#4f46e5';
+            }
+        }
+
+        window.onload = function() {
+            fetch(apiEndpoint)
+                .then(response => {
+                    if (!response.ok) throw new Error("Network validation sequence failed.");
+                    return response.json();
+                })
+                .then(parsedData => {
+                    if(parsedData.error) throw new Error(parsedData.error);
+                    
+                    // --- INTELLIGENT NAME CONSOLIDATION ENGINE ---
+                    const cardNameRegistry = {};
+                    parsedData.forEach(row => {
+                        const card = row.cardNo ? row.cardNo.toString().trim() : "";
+                        const rawName = row.name ? row.name.toString().trim() : "";
+                        if (!card || !rawName) return;
+                        
+                        if (!cardNameRegistry[card]) {
+                            cardNameRegistry[card] = {};
+                        }
+                        cardNameRegistry[card][rawName] = (cardNameRegistry[card][rawName] || 0) + 1;
+                    });
+
+                    const canonicalCardNames = {};
+                    for (const cardNo in cardNameRegistry) {
+                        let topCount = -1;
+                        let winningNameString = "";
+                        for (const nameVariant in cardNameRegistry[cardNo]) {
+                            if (cardNameRegistry[cardNo][nameVariant] > topCount) {
+                                topCount = cardNameRegistry[cardNo][nameVariant];
+                                winningNameString = nameVariant;
+                            }
+                        }
+                        canonicalCardNames[cardNo] = winningNameString;
+                    }
+
+                    parsedData.forEach(row => {
+                        const card = row.cardNo ? row.cardNo.toString().trim() : "";
+                        if (canonicalCardNames[card]) {
+                            row.name = canonicalCardNames[card];
+                        }
+                    });
+
+                    // --- AUTOMATED RECOMMENDATIONS POPULATION ENGINE ---
+                    const datalistContainer = document.getElementById('item-options');
+                    datalistContainer.innerHTML = '';
+                    const uniquePpeItems = [...new Set(parsedData.map(row => row.item ? row.item.toString().trim() : "").filter(Boolean))];
+                    uniquePpeItems.sort();
+                    uniquePpeItems.forEach(itemString => {
+                        const optionNode = document.createElement('option');
+                        optionNode.value = itemString;
+                        datalistContainer.appendChild(optionNode);
+                    });
+
+                    allMasterData = parsedData.reverse(); 
+                    currentFilteredData = [...allMasterData];
+                    
+                    document.getElementById('total-count').innerText = allMasterData.length;
+                    document.getElementById('loading-overlay').classList.add('hidden');
+                    document.getElementById('inline-loader').classList.add('hidden');
+                    document.getElementById('table-container').classList.remove('hidden');
+                    
+                    goToPage(1);
+                })
+                .catch(errorObj => {
+                    document.getElementById('loading-overlay').innerHTML = `
+                        <div class="text-center p-6">
+                            <i class="fa-solid fa-triangle-exclamation text-rose-500 text-4xl mb-3"></i>
+                            <h3 class="text-lg font-bold text-rose-500">Database Connection Failed</h3>
+                            <p class="text-xs text-slate-400 mt-1 max-w-sm">${errorObj.message}</p>
+                        </div>
+                    `;
+                });
+        };
+
+        function renderTableMatrix() {
+            const tableBody = document.getElementById('register-rows');
+            const mobileCardsBody = document.getElementById('mobile-cards-view');
+            const noResults = document.getElementById('no-results');
+            
+            tableBody.innerHTML = '';
+            mobileCardsBody.innerHTML = '';
+
+            const totalRecords = currentFilteredData.length;
+            document.getElementById('filtered-count').innerText = totalRecords;
+
+            if (totalRecords === 0) {
+                noResults.classList.remove('hidden');
+                document.getElementById('page-start').innerText = "0";
+                document.getElementById('page-end').innerText = "0";
+                document.getElementById('btn-prev').disabled = true;
+                document.getElementById('btn-next').disabled = true;
+                return;
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            const startIdx = (currentPage - 1) * rowsPerPage;
+            const endIdx = Math.min(startIdx + rowsPerPage, totalRecords);
+            const pageSubset = currentFilteredData.slice(startIdx, endIdx);
+
+            document.getElementById('page-start').innerText = startIdx + 1;
+            document.getElementById('page-end').innerText = endIdx;
+            document.getElementById('btn-prev').disabled = (currentPage === 1);
+            document.getElementById('btn-next').disabled = (endIdx >= totalRecords);
+
+            const tableFragment = document.createDocumentFragment();
+            pageSubset.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'dynamic-tr animate-row';
+                tr.style.animationDelay = `${index * 4}ms`;
+                
+                tr.innerHTML = `
+                    <td class="py-3 px-5 text-center font-mono text-xs dynamic-text-muted opacity-60">${row.siNo}</td>
+                    <td class="py-3 px-5 font-bold font-mono text-xs text-accent-color">${row.issuedOn}</td>
+                    <td class="py-3 px-5 font-mono text-sm dynamic-text-muted">${row.cardNo}</td>
+                    <td class="py-3 px-5 font-semibold text-accent-color">${row.name}</td>
+                    <td class="py-3 px-5"><span class="px-2.5 py-0.5 text-xs font-bold rounded-md border badge-custom shadow-sm">${row.section}</span></td>
+                    <td class="py-3 px-5 dynamic-text font-medium">${row.item}</td>
+                    <td class="py-3 px-5 text-center"><span class="font-bold px-2 py-0.5 rounded border font-mono qty-custom">${row.qty}</span></td>
+                    <td class="py-3 px-5 text-center font-bold font-mono size-custom">${row.size || '-'}</td>
+                `;
+                tableFragment.appendChild(tr);
+            });
+            tableBody.appendChild(tableFragment);
+
+            const employeeMap = {};
+            const employeeOrder = []; 
+
+            pageSubset.forEach(row => {
+                const compoundKey = row.cardNo + "_" + row.name;
+                if (!employeeMap[compoundKey]) {
+                    employeeMap[compoundKey] = {
+                        name: row.name,
+                        cardNo: row.cardNo,
+                        section: row.section,
+                        ppeHistory: {}
+                    };
+                    employeeOrder.push(compoundKey);
+                }
+                
+                if (!employeeMap[compoundKey].ppeHistory[row.item]) {
+                    employeeMap[compoundKey].ppeHistory[row.item] = [];
+                }
+                
+                employeeMap[compoundKey].ppeHistory[row.item].push({
+                    date: row.issuedOn,
+                    qty: row.qty,
+                    size: row.size
+                });
+            });
+
+            const mobileFragment = document.createDocumentFragment();
+            employeeOrder.forEach((key, index) => {
+                const emp = employeeMap[key];
+                const cardElement = document.createElement('div');
+                cardElement.className = 'animate-glass bg-white/[0.45] dark:bg-white/[0.02] border border-slate-300/60 dark:border-white/[0.08] rounded-2xl p-5 shadow-sm space-y-4 text-left';
+                cardElement.style.animationDelay = `${index * 10}ms`;
+
+                let innerHtmlBlock = `
+                    <div class="space-y-1.5 text-sm">
+                        <div class="flex justify-between items-baseline"><span class="dynamic-text-muted font-bold text-xs uppercase tracking-wide">Name :</span> <span class="font-bold text-accent-color text-base">${emp.name}</span></div>
+                        <div class="flex justify-between items-baseline"><span class="dynamic-text-muted font-bold text-xs uppercase tracking-wide">Card No:</span> <span class="font-mono font-semibold text-accent-color">${emp.cardNo}</span></div>
+                        <div class="flex justify-between items-baseline"><span class="dynamic-text-muted font-bold text-xs uppercase tracking-wide">Section:</span> <span class="px-2.5 py-0.5 text-xs font-bold rounded-md border badge-custom shadow-sm">${emp.section}</span></div>
+                    </div>
+                    <div class="border-t border-slate-300/50 dark:border-white/[0.06] pt-3 mt-1">
+                        <div class="space-y-4">
+                `;
+
+                for (const ppeItemName in emp.ppeHistory) {
+                    innerHtmlBlock += `
+                        <div class="space-y-1">
+                            <div class="text-sm font-bold text-indigo-color tracking-wide border-b border-slate-200/40 dark:border-white/[0.04] pb-0.5 mb-1.5 flex items-center">
+                                <i class="fa-solid fa-angle-right mr-1.5 text-xs opacity-60"></i> ${ppeItemName}
+                            </div>
+                            <div class="space-y-1 pl-2">
+                `;
+
+                    emp.ppeHistory[ppeItemName].forEach(record => {
+                        const optionalSizeStr = record.size ? ` <span class="size-custom font-mono text-[10px] font-bold bg-amber-500/10 dark:bg-amber-500/20 px-1 rounded ml-1">Sz: ${record.size}</span>` : '';
+                        innerHtmlBlock += `
+                            <div class="text-xs flex justify-between items-center text-accent-color opacity-95">
+                                <span class="font-mono">${record.date}</span>
+                                <span class="font-medium text-slate-500 dark:text-slate-400">${record.qty} Qty${optionalSizeStr}</span>
+                            </div>
+                        `;
+                    });
+
+                    innerHtmlBlock += `
+                            </div>
+                        </div>
+                    `;
+                }
+
+                innerHtmlBlock += `
+                        </div>
+                    </div>
+                `;
+
+                cardElement.innerHTML = innerHtmlBlock;
+                mobileFragment.appendChild(cardElement);
+            });
+            mobileCardsBody.appendChild(mobileFragment);
+        }
+
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(filterData, 200);
+        }
+
+        function filterData() {
+            const cardVal = document.getElementById('search-card').value.toLowerCase().trim();
+            const nameVal = document.getElementById('search-name').value.toLowerCase().trim();
+            const deptVal = document.getElementById('search-dept').value.toLowerCase().trim();
+            const itemVal = document.getElementById('search-item').value.toLowerCase().trim();
+
+            currentFilteredData = allMasterData.filter(entry => {
+                return entry.cardNo.toLowerCase().includes(cardVal) &&
+                       entry.name.toLowerCase().includes(nameVal) &&
+                       entry.section.toLowerCase().includes(deptVal) &&
+                       entry.item.toLowerCase().includes(itemVal);
+            });
+            goToPage(1); 
+        }
+
+        function goToPage(pageNumber) {
+            currentPage = pageNumber;
+            renderTableMatrix();
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            renderTableMatrix();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-card').value = '';
+            document.getElementById('search-name').value = '';
+            document.getElementById('search-dept').value = '';
+            document.getElementById('search-item').value = '';
+            currentFilteredData = [...allMasterData];
+            goToPage(1);
+        }
+    </script>
+    
+    <!-- --- 📱 SERVICE WORKER REGISTRATION SCRIPT --- -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('PWA Service Worker running securely.', reg))
+                    .catch(err => console.error('PWA Registration halted: ', err));
+            });
+        }
+    </script>
+</body>
+</html>
