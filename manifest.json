@@ -1,0 +1,22 @@
+{
+  "name": "PPE Issue Register Portal",
+  "short_name": "PPE Register",
+  "description": "High-speed live tracking and lookup dashboard for company PPE distribution records.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#020617",
+  "theme-color": "#020617",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/192/1255/1255421.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1255/1255421.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
