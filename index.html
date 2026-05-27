@@ -15,7 +15,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- ENTERPRISE-GRADE CORE COLOR TOKENS --- */
+        /* --- HIGH-CONTRAST DUAL-THEME VARIABLE DICTIONARY --- */
         :root {
             --bg-canvas: radial-gradient(circle at top right, #0b0f19, #030712);
             --text-main: #94a3b8;       
@@ -44,33 +44,33 @@
         }
 
         [data-theme="light"] {
-            --bg-canvas: radial-gradient(circle at top right, #f8fafc, #f1f5f9, #e2e8f0);
-            --text-main: #475569;       
-            --text-muted: #64748b;      
-            --text-title: #0f172a;      
-            --text-accent: #0f172a;     
-            --text-indigo: #4f46e5;     
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --glass-shadow: rgba(148, 163, 184, 0.08);
-            --nav-bg: rgba(255, 255, 255, 0.75);
-            --nav-border: rgba(226, 232, 240, 0.8);
-            --input-bg: rgba(255, 255, 255, 0.95);
-            --input-border: rgba(203, 213, 225, 0.8);
-            --input-focus-ring: rgba(79, 70, 229, 0.12);
-            --table-header: rgba(241, 245, 249, 0.85);
-            --table-row-hover: rgba(255, 255, 255, 0.01);
-            --badge-bg: rgba(79, 70, 229, 0.06);
-            --badge-border: rgba(79, 70, 229, 0.15);
-            --badge-text: #4f46e5;
-            --qty-bg: #f8fafc;
-            --qty-border: #cbd5e1;
-            --size-text: #c2410c;
-            --overlay-bg: rgba(241, 245, 249, 0.85);
-            --progress-track: rgba(0, 0, 0, 0.05);
+            --bg-canvas: linear-gradient(to bottom right, #f1f5f9, #e2e8f0);
+            --text-main: #334155;       /* Deep high-visibility grey */
+            --text-muted: #57657a;      /* Enhanced contrast labels */
+            --text-title: #0f172a;      /* Solid black/slate title blocks */
+            --text-accent: #0f172a;     /* Deep high-contrast profile typography */
+            --text-indigo: #3730a3;     /* Rich dark indigo accent headers */
+            --glass-bg: rgba(255, 255, 255, 0.85); 
+            --glass-border: rgba(148, 163, 184, 0.3);
+            --glass-shadow: rgba(15, 23, 42, 0.08);
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --nav-border: rgba(203, 213, 225, 1);
+            --input-bg: #ffffff;
+            --input-border: #94a3b8;
+            --input-focus-ring: rgba(79, 70, 229, 0.15);
+            --table-header: #e2e8f0;
+            --table-row-hover: rgba(255, 255, 255, 0.5);
+            --badge-bg: rgba(79, 70, 229, 0.08);
+            --badge-border: rgba(79, 70, 229, 0.3);
+            --badge-text: #3730a3;
+            --qty-bg: #e2e8f0;
+            --qty-border: #94a3b8;
+            --size-text: #9a3412;       /* Maximum contrast rust-orange */
+            --overlay-bg: rgba(241, 245, 249, 0.9);
+            --progress-track: rgba(0, 0, 0, 0.08);
         }
 
-        /* --- STYLING MACRO CONNECTORS --- */
+        /* --- STYLING BRIDGE WORKCLASSES --- */
         .dynamic-bg { background: var(--bg-canvas); }
         .dynamic-text { color: var(--text-main); }
         .dynamic-text-muted { color: var(--text-muted); }
@@ -84,8 +84,14 @@
         .overlay-bg-custom { background: var(--overlay-bg); }
         .progress-track-custom { background: var(--progress-track); }
         
-        .item-nested-card { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--glass-border); transition: background-color 150ms ease; }
-        [data-theme="light"] .item-nested-card { background: rgba(255, 255, 255, 0.5); }
+        /* Forces inputs to respect native dynamic styling placeholders across engines */
+        input::placeholder {
+            color: var(--text-muted) !important;
+            opacity: 0.65 !important;
+        }
+
+        .item-nested-card { background: rgba(0, 0, 0, 0.12); border: 1px solid var(--glass-border); transition: background-color 150ms ease; }
+        [data-theme="light"] .item-nested-card { background: rgba(255, 255, 255, 0.6); }
         .item-nested-card:hover { background: var(--table-row-hover); }
 
         .badge-custom { background: var(--badge-bg); border-color: var(--badge-border); color: var(--badge-text); }
@@ -114,10 +120,9 @@
 </head>
 <body class="dynamic-bg min-h-screen dynamic-text font-sans antialiased tracking-tight selection:bg-indigo-500/20 transition-all duration-300">
 
-    <!-- --- 🔒 GLOBAL SYSTEM LOCK OVERLAY (With Progress Bar Optimization) --- -->
+    <!-- --- 🔒 GLOBAL SYSTEM LOCK OVERLAY --- -->
     <div id="loading-overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center overlay-bg-custom backdrop-blur-2xl transition-all duration-500">
-        <h3 id="overlay-title" class="text-xs font-bold tracking-widest dynamic-text-title uppercase mb-4">Synchronizing Nodes</h3>
-        <!-- Frosted Progress Bar Container Track -->
+        <h3 id="overlay-title" class="text-xs font-bold tracking-widest dynamic-text-title uppercase mb-4">Loading..</h3>
         <div class="w-56 h-1 progress-track-custom rounded-full overflow-hidden relative border border-black/5 dark:border-white/5 shadow-inner">
             <div class="progress-bar-fill h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full absolute"></div>
         </div>
@@ -156,7 +161,7 @@
     <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
         
         <!-- Search Controls Deck Panel -->
-        <div class="animate-glass dynamic-glass backdrop-blur-xl border rounded-2xl p-6 relative overflow-hidden transition-all duration-300">
+        <div class="animate-glass dynamic-glass backdrop-blur-xl border rounded-2xl p-6 relative transition-all duration-300">
             <div class="flex items-center space-x-2 mb-5 text-indigo-color font-bold text-[11px] tracking-widest uppercase">
                 <i class="fa-solid fa-layer-group text-sm"></i>
                 <h2>Interactive Query Filter Console</h2>
@@ -167,11 +172,11 @@
                 <div>
                     <label class="block text-[10px] font-bold dynamic-text-muted uppercase tracking-widest mb-1.5">Card Number</label>
                     <div class="relative group">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 dynamic-text-muted group-focus-within:text-indigo-500 transition-colors">
                             <i class="fa-solid fa-id-card text-xs"></i>
                         </span>
                         <input type="text" id="search-card" oninput="debounceSearch()" placeholder="Search ID tag..." 
-                            class="w-full pl-9 pr-3 py-2 bg-transparent dynamic-input border rounded-xl focus:outline-none transition-all text-sm tracking-wide">
+                            class="w-full pl-9 pr-3 py-2 dynamic-input border rounded-xl focus:outline-none transition-all text-sm tracking-wide">
                     </div>
                 </div>
 
@@ -179,11 +184,11 @@
                 <div>
                     <label class="block text-[10px] font-bold dynamic-text-muted uppercase tracking-widest mb-1.5">Employee Name</label>
                     <div class="relative group">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 dynamic-text-muted group-focus-within:text-indigo-500 transition-colors">
                             <i class="fa-solid fa-user text-xs"></i>
                         </span>
                         <input type="text" id="search-name" oninput="debounceSearch()" placeholder="Search user name..." 
-                            class="w-full pl-9 pr-3 py-2 bg-transparent dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
+                            class="w-full pl-9 pr-3 py-2 dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
                     </div>
                 </div>
 
@@ -191,11 +196,11 @@
                 <div>
                     <label class="block text-[10px] font-bold dynamic-text-muted uppercase tracking-widest mb-1.5">Section / Branch</label>
                     <div class="relative group">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 dynamic-text-muted group-focus-within:text-indigo-500 transition-colors">
                             <i class="fa-solid fa-building text-xs"></i>
                         </span>
                         <input type="text" id="search-dept" oninput="debounceSearch()" placeholder="Search department..." 
-                            class="w-full pl-9 pr-3 py-2 bg-transparent dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
+                            class="w-full pl-9 pr-3 py-2 dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
                     </div>
                 </div>
 
@@ -203,11 +208,11 @@
                 <div>
                     <label class="block text-[10px] font-bold dynamic-text-muted uppercase tracking-widest mb-1.5">PPE Gear Type</label>
                     <div class="relative group">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 dynamic-text-muted group-focus-within:text-indigo-500 transition-colors">
                             <i class="fa-solid fa-helmet-safety text-xs"></i>
                         </span>
                         <input type="text" id="search-item" list="item-options" oninput="debounceSearch()" placeholder="Select hardware model..." 
-                            class="w-full pl-9 pr-3 py-2 bg-transparent dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
+                            class="w-full pl-9 pr-3 py-2 dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
                         <datalist id="item-options"></datalist>
                     </div>
                 </div>
@@ -451,7 +456,7 @@
                     </div>
                     
                     <div class="w-full md:w-3/4 flex flex-col justify-start">
-                        <div class="text-[10px] font-black uppercase tracking-widest text-amber-500/90 dark:text-amber-400 mb-3 flex items-center gap-1">
+                        <div class="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-3 flex items-center gap-1 font-bold">
                             <i class="fa-solid fa-clock-rotate-left"></i> Item-Wise Issue History
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -460,18 +465,18 @@
                 for (const ppeItemName in emp.ppeHistory) {
                     htmlOutputBlock += `
                         <div class="item-nested-card p-3 rounded-xl flex flex-col justify-between space-y-2 shadow-sm transition-all duration-150">
-                            <div class="text-[11px] font-extrabold text-indigo-color tracking-wide border-b border-slate-200/30 dark:border-white/[0.04] pb-1 uppercase truncate" title="${ppeItemName}">
+                            <div class="text-[11px] font-extrabold text-indigo-color tracking-wide border-b border-slate-300/40 dark:border-white/[0.04] pb-1 uppercase truncate" style="border-bottom-color: var(--glass-border);" title="${ppeItemName}">
                                 ${ppeItemName}
                             </div>
                             <div class="space-y-1.5 max-h-[120px] overflow-y-auto pr-1">
                     `;
 
                     emp.ppeHistory[ppeItemName].forEach(record => {
-                        const optionalSizeStr = record.size ? ` <span class="size-custom font-mono text-[9px] font-extrabold bg-amber-500/10 dark:bg-amber-500/15 px-1.5 py-0.5 rounded ml-1">Sz: ${record.size}</span>` : '';
+                        const optionalSizeStr = record.size ? ` <span class="size-custom font-mono text-[9px] font-extrabold bg-black/5 dark:bg-white/10 border border-slate-400/15 px-1.5 py-0.5 rounded ml-1">Sz: ${record.size}</span>` : '';
                         htmlOutputBlock += `
-                            <div class="text-[11px] flex justify-between items-center text-accent-color/90 gap-x-2">
-                                <span class="font-mono opacity-70">${record.date}</span>
-                                <span class="font-bold tracking-tight text-slate-600 dark:text-slate-300 flex items-center bg-black/5 dark:bg-white/10 border border-slate-400/10 px-1.5 py-0.5 rounded">${record.qty} Qty${optionalSizeStr}</span>
+                            <div class="text-[11px] flex justify-between items-center text-accent-color gap-x-2 opacity-95">
+                                <span class="font-mono opacity-80 font-medium">${record.date}</span>
+                                <span class="font-bold tracking-tight flex items-center qty-custom border px-1.5 py-0.5 rounded text-[10px]">${record.qty} Qty${optionalSizeStr}</span>
                             </div>
                         `;
                     });
