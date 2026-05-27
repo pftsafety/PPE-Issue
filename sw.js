@@ -1,10 +1,11 @@
 const CACHE_NAME = 'ppe-register-v1';
 const ASSETS = [
-  'index.html',
-  'manifest.json'
+  './',
+  './index.html',
+  './manifest.json'
 ];
 
-// Initialize and Cache basic structural assets
+// Initialize and Cache basic structural assets securely
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
