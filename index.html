@@ -3,547 +3,998 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPE Issue Register Dashboard</title>
-    
-    <!-- PWA Core Settings Matrix -->
+    <title>PPE Issue Register</title>
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#f0f4ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1255/1255421.png">
-
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        /* --- HIGH-CONTRAST VARIABLE DICTIONARY (LIGHT MODE BY DEFAULT) --- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         :root {
-            --bg-canvas: linear-gradient(to bottom right, #ffffff, #f1f5f9);
-            --text-main: #000000;       /* Solid crisp black typography */
-            --text-muted: #000000;      /* Solid crisp black labels */
-            --text-title: #000000;      /* Solid crisp black titles */
-            --text-accent: #000000;     /* Solid crisp black values */
-            --text-indigo: #3730a3;     /* Deep high-visibility indigo */
-            --glass-bg: rgba(255, 255, 255, 0.9); 
-            --glass-border: #000000;    /* Solid black defining borders */
-            --glass-shadow: rgba(15, 23, 42, 0.06);
-            --nav-bg: rgba(255, 255, 255, 0.95);
-            --nav-border: #000000;
-            --input-bg: #ffffff;
-            --input-border: #000000;    /* High contrast input borders */
-            --input-focus-ring: rgba(79, 70, 229, 0.15);
-            --table-header: #e2e8f0;
-            --table-row-hover: rgba(0, 0, 0, 0.03);
-            --badge-bg: rgba(79, 70, 229, 0.08);
-            --badge-border: #3730a3;
-            --badge-text: #3730a3;
-            --qty-bg: #e2e8f0;
-            --qty-border: #000000;
-            --size-text: #9a3412;       
-            --overlay-bg: rgba(255, 255, 255, 0.95);
-            --progress-track: rgba(0, 0, 0, 0.08);
+            --font: -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+
+            /* Liquid Glass Surfaces */
+            --glass-1: rgba(255,255,255,0.55);
+            --glass-2: rgba(255,255,255,0.35);
+            --glass-3: rgba(255,255,255,0.18);
+            --glass-border: rgba(255,255,255,0.60);
+            --glass-border-subtle: rgba(255,255,255,0.30);
+
+            /* Specular & Depth */
+            --spec-top: inset 0 1px 0 rgba(255,255,255,0.75);
+            --spec-bottom: inset 0 -1px 0 rgba(0,0,0,0.04);
+            --shadow-glass: 0 4px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+            --shadow-card: 0 8px 40px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05);
+            --shadow-float: 0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06);
+
+            /* Blur */
+            --blur-glass: blur(40px) saturate(200%) brightness(108%);
+            --blur-subtle: blur(20px) saturate(180%);
+
+            /* Accent */
+            --blue: #007AFF;
+            --blue-light: rgba(0,122,255,0.12);
+            --blue-medium: rgba(0,122,255,0.20);
+            --indigo: #5856D6;
+            --indigo-light: rgba(88,86,214,0.10);
+            --green: #34C759;
+            --red: #FF3B30;
+            --orange: #FF9500;
+            --teal: #5AC8FA;
+
+            /* Text */
+            --text-primary: rgba(0,0,0,0.88);
+            --text-secondary: rgba(0,0,0,0.55);
+            --text-tertiary: rgba(0,0,0,0.35);
+            --text-on-glass: rgba(0,0,0,0.80);
+
+            /* Background mesh */
+            --bg: #eef2ff;
         }
 
-        /* --- DARK THEME OVERRIDE MATRIX --- */
         [data-theme="dark"] {
-            --bg-canvas: radial-gradient(circle at top right, #0b0f19, #030712);
-            --text-main: #94a3b8;       
-            --text-muted: #475569;      
-            --text-title: #f8fafc;      
-            --text-accent: #ffffff;     
-            --text-indigo: #818cf8;     
-            --glass-bg: rgba(15, 23, 42, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.05);
-            --glass-shadow: rgba(0, 0, 0, 0.6);
-            --nav-bg: rgba(3, 7, 18, 0.5);
-            --nav-border: rgba(255, 255, 255, 0.03);
-            --input-bg: rgba(255, 255, 255, 0.02);
-            --input-border: rgba(255, 255, 255, 0.06);
-            --input-focus-ring: rgba(99, 102, 241, 0.25);
-            --table-header: rgba(255, 255, 255, 0.02);
-            --table-row-hover: rgba(255, 255, 255, 0.02);
-            --badge-bg: rgba(99, 102, 241, 0.08);
-            --badge-border: rgba(99, 102, 241, 0.2);
-            --badge-text: #a5b4fc;
-            --qty-bg: rgba(255, 255, 255, 0.04);
-            --qty-border: rgba(255, 255, 255, 0.05);
-            --size-text: #f59e0b;
-            --overlay-bg: rgba(3, 7, 18, 0.85);
-            --progress-track: rgba(255, 255, 255, 0.05);
+            --glass-1: rgba(28,28,40,0.72);
+            --glass-2: rgba(28,28,40,0.50);
+            --glass-3: rgba(28,28,40,0.30);
+            --glass-border: rgba(255,255,255,0.12);
+            --glass-border-subtle: rgba(255,255,255,0.07);
+
+            --spec-top: inset 0 1px 0 rgba(255,255,255,0.12);
+            --spec-bottom: inset 0 -1px 0 rgba(0,0,0,0.3);
+            --shadow-glass: 0 4px 24px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3);
+            --shadow-card: 0 8px 40px rgba(0,0,0,0.50), 0 2px 8px rgba(0,0,0,0.30);
+            --shadow-float: 0 20px 60px rgba(0,0,0,0.60), 0 4px 16px rgba(0,0,0,0.40);
+
+            --blur-glass: blur(40px) saturate(160%) brightness(80%);
+
+            --blue: #0A84FF;
+            --blue-light: rgba(10,132,255,0.15);
+            --blue-medium: rgba(10,132,255,0.25);
+            --indigo: #7877e6;
+            --indigo-light: rgba(120,119,230,0.15);
+            --green: #30D158;
+            --orange: #FF9F0A;
+            --teal: #64D2FF;
+
+            --text-primary: rgba(255,255,255,0.92);
+            --text-secondary: rgba(255,255,255,0.55);
+            --text-tertiary: rgba(255,255,255,0.30);
+            --text-on-glass: rgba(255,255,255,0.85);
+
+            --bg: #080812;
         }
 
-        /* --- CLASSIFICATION WORK CONNECTORS --- */
-        .dynamic-bg { background: var(--bg-canvas); }
-        .dynamic-text { color: var(--text-main); }
-        .dynamic-text-muted { color: var(--text-muted); }
-        .dynamic-text-title { color: var(--text-title); }
-        .text-accent-color { color: var(--text-accent); }
-        .text-indigo-color { color: var(--text-indigo); }
-        .dynamic-glass { background: var(--glass-bg); border-color: var(--glass-border); box-shadow: 0 20px 40px -15px var(--glass-shadow); }
-        .dynamic-nav { background: var(--nav-bg); border-color: var(--nav-border); }
-        .dynamic-input { background: var(--input-bg); border-color: var(--input-border); color: var(--text-accent); }
-        .dynamic-input:focus { box-shadow: 0 0 0 4px var(--input-focus-ring); border-color: var(--text-indigo); }
-        .overlay-bg-custom { background: var(--overlay-bg); }
-        .progress-track-custom { background: var(--progress-track); }
-        
-        input::placeholder {
-            color: var(--text-main) !important;
-            opacity: 0.5 !important;
+        /* ── BODY & BACKGROUND MESH ─────────────────────────────── */
+        body {
+            font-family: var(--font);
+            background-color: var(--bg);
+            min-height: 100vh;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color 0.4s ease, color 0.3s ease;
+            overflow-x: hidden;
         }
 
-        .item-nested-card { background: rgba(0, 0, 0, 0.04); border: 1px solid var(--glass-border); transition: background-color 150ms ease; }
-        [data-theme="dark"] .item-nested-card { background: rgba(0, 0, 0, 0.2); }
-        .item-nested-card:hover { background: var(--table-row-hover); }
+        /* Ambient light orbs */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(80px);
+        }
+        body::before {
+            width: 600px; height: 600px;
+            top: -150px; right: -100px;
+            background: radial-gradient(circle, rgba(120,119,255,0.20) 0%, rgba(88,86,214,0.10) 40%, transparent 70%);
+            animation: orbFloat1 18s ease-in-out infinite;
+        }
+        body::after {
+            width: 500px; height: 500px;
+            bottom: -100px; left: -80px;
+            background: radial-gradient(circle, rgba(0,122,255,0.18) 0%, rgba(90,200,250,0.10) 40%, transparent 70%);
+            animation: orbFloat2 22s ease-in-out infinite;
+        }
+        [data-theme="dark"] body::before {
+            background: radial-gradient(circle, rgba(88,86,214,0.25) 0%, rgba(120,119,255,0.10) 40%, transparent 70%);
+        }
+        [data-theme="dark"] body::after {
+            background: radial-gradient(circle, rgba(10,132,255,0.20) 0%, rgba(100,210,255,0.08) 40%, transparent 70%);
+        }
 
-        .badge-custom { background: var(--badge-bg); border-color: var(--badge-border); color: var(--badge-text); }
-        .qty-custom { background: var(--qty-bg); border-color: var(--qty-border); color: var(--text-accent); }
-        .size-custom { color: var(--size-text); }
+        /* ── LIQUID GLASS BASE MIXIN ────────────────────────────── */
+        .lg {
+            background: var(--glass-1);
+            backdrop-filter: var(--blur-glass);
+            -webkit-backdrop-filter: var(--blur-glass);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--spec-top), var(--spec-bottom), var(--shadow-glass);
+            position: relative;
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .lg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%, rgba(255,255,255,0.05) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .lg > * { position: relative; z-index: 1; }
 
-        @keyframes glassFadeIn {
-            from { opacity: 0; transform: translateY(16px); filter: blur(4px); }
-            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        .lg-card {
+            background: var(--glass-2);
+            backdrop-filter: var(--blur-glass);
+            -webkit-backdrop-filter: var(--blur-glass);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--spec-top), var(--spec-bottom), var(--shadow-card);
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
         }
-        @keyframes cardReveal {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+        .lg-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 60%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 0;
+            border-radius: 20px 20px 0 0;
         }
-        @keyframes progressMove {
-            0% { left: -40%; width: 40%; }
-            50% { width: 60%; }
-            100% { left: 100%; width: 40%; }
+        .lg-card > * { position: relative; z-index: 1; }
+        .lg-card:hover {
+            box-shadow: var(--spec-top), var(--spec-bottom), var(--shadow-float);
+            transform: translateY(-1px);
         }
-        
-        .animate-glass { animation: glassFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .animate-card { animation: cardReveal 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .progress-bar-fill { animation: progressMove 1.6s infinite ease-in-out; }
+
+        /* ── OVERLAY ────────────────────────────────────────────── */
+        #loading-overlay {
+            position: fixed; inset: 0; z-index: 999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 20px;
+            background: var(--bg);
+            backdrop-filter: blur(60px);
+            -webkit-backdrop-filter: blur(60px);
+            transition: opacity 0.4s ease;
+        }
+        .loader-glass {
+            background: var(--glass-1);
+            backdrop-filter: var(--blur-glass);
+            -webkit-backdrop-filter: var(--blur-glass);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--spec-top), var(--shadow-float);
+            border-radius: 24px;
+            padding: 32px 48px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .loader-glass::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        .loader-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--blue) 0%, var(--indigo) 100%);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+            box-shadow: 0 8px 24px rgba(0,122,255,0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+        .loader-title {
+            font-size: 13px; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            position: relative; z-index: 1;
+        }
+        .progress-track {
+            width: 200px; height: 3px;
+            background: rgba(0,0,0,0.06);
+            border-radius: 100px;
+            overflow: hidden;
+            position: relative; z-index: 1;
+        }
+        [data-theme="dark"] .progress-track { background: rgba(255,255,255,0.08); }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--indigo), var(--teal));
+            border-radius: 100px;
+            position: absolute;
+            animation: progressSlide 1.8s ease-in-out infinite;
+        }
+
+        /* ── NAVIGATION ─────────────────────────────────────────── */
+        nav {
+            position: sticky; top: 0; z-index: 50;
+            background: var(--glass-1);
+            backdrop-filter: var(--blur-glass);
+            -webkit-backdrop-filter: var(--blur-glass);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--spec-top), 0 1px 0 var(--glass-border-subtle), var(--shadow-glass);
+            padding: 12px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: background 0.3s ease;
+        }
+        nav::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        nav > * { position: relative; z-index: 1; }
+
+        .nav-brand-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(145deg, var(--blue) 0%, var(--indigo) 100%);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 16px rgba(0,122,255,0.30), inset 0 1px 0 rgba(255,255,255,0.25);
+            flex-shrink: 0;
+        }
+
+        .nav-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; color: var(--text-primary); }
+        .nav-subtitle {
+            font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--blue);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .live-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 0 0 rgba(52,199,89,0.5);
+            animation: livePulse 2s ease-out infinite;
+        }
+
+        /* Pills */
+        .pill {
+            background: var(--glass-2);
+            backdrop-filter: var(--blur-subtle);
+            -webkit-backdrop-filter: var(--blur-subtle);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--spec-top), var(--shadow-glass);
+            border-radius: 100px;
+            padding: 6px 14px;
+            font-size: 12px; font-weight: 600;
+            color: var(--text-secondary);
+            display: flex; align-items: center; gap: 6px;
+            white-space: nowrap;
+            position: relative; overflow: hidden;
+        }
+        .pill::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        .pill > * { position: relative; z-index: 1; }
+
+        /* Install button */
+        #install-btn {
+            background: linear-gradient(135deg, var(--blue) 0%, var(--indigo) 100%);
+            border: none;
+            border-radius: 100px;
+            padding: 8px 16px;
+            font-size: 12px; font-weight: 700;
+            color: white;
+            cursor: pointer;
+            display: none;
+            align-items: center; gap: 6px;
+            box-shadow: 0 4px 16px rgba(0,122,255,0.30), inset 0 1px 0 rgba(255,255,255,0.25);
+            animation: installPulse 2.5s ease-in-out infinite;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        #install-btn:hover { transform: scale(1.03); box-shadow: 0 6px 24px rgba(0,122,255,0.45); }
+        #install-btn:active { transform: scale(0.97); }
+
+        /* Theme toggle */
+        .theme-toggle {
+            width: 46px; height: 26px;
+            background: var(--glass-2);
+            backdrop-filter: var(--blur-subtle);
+            -webkit-backdrop-filter: var(--blur-subtle);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: var(--spec-top), var(--shadow-glass);
+            transition: background 0.3s ease;
+            overflow: hidden;
+        }
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, transparent 100%);
+            border-radius: 100px 100px 0 0;
+            pointer-events: none;
+        }
+        .toggle-knob {
+            position: absolute; top: 2px; left: 2px;
+            width: 20px; height: 20px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+            transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+            z-index: 1;
+        }
+        [data-theme="dark"] .toggle-knob { transform: translateX(20px); }
+
+        /* ── MAIN LAYOUT ─────────────────────────────────────────── */
+        .page { max-width: 1100px; margin: 0 auto; padding: 24px 20px 40px; }
+        .stack > * + * { margin-top: 16px; }
+
+        /* ── SEARCH PANEL ───────────────────────────────────────── */
+        .search-panel {
+            border-radius: 24px;
+            padding: 24px;
+            animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .section-label {
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 0.09em; text-transform: uppercase;
+            color: var(--text-tertiary);
+            display: flex; align-items: center; gap: 7px;
+            margin-bottom: 18px;
+        }
+        .section-label i { color: var(--blue); font-size: 12px; }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .field-label {
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-bottom: 6px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .field-label i { color: var(--blue); font-size: 11px; }
+        .field-wrap { position: relative; }
+        .field-icon {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            color: var(--text-tertiary); font-size: 13px;
+            pointer-events: none; transition: color 0.2s ease;
+        }
+        .lg-input {
+            width: 100%;
+            background: var(--glass-3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 10px 12px 10px 36px;
+            font-size: 14px; font-family: var(--font);
+            color: var(--text-primary);
+            outline: none;
+            box-shadow: var(--spec-top), inset 0 1px 3px rgba(0,0,0,0.04);
+            transition: all 0.2s ease;
+        }
+        .lg-input::placeholder { color: var(--text-tertiary); }
+        .lg-input:focus {
+            background: var(--glass-2);
+            border-color: rgba(0,122,255,0.45);
+            box-shadow: var(--spec-top), inset 0 1px 3px rgba(0,0,0,0.04), 0 0 0 3px var(--blue-light);
+        }
+        .lg-input:focus ~ .field-icon { color: var(--blue); }
+        .field-wrap:focus-within .field-icon { color: var(--blue); }
+
+        .reset-btn {
+            background: none; border: none; cursor: pointer;
+            font-size: 12px; font-weight: 700;
+            color: var(--red); font-family: var(--font);
+            display: flex; align-items: center; gap: 6px;
+            padding: 7px 12px; border-radius: 10px;
+            opacity: 0.85;
+            transition: opacity 0.15s ease, background 0.15s ease;
+        }
+        .reset-btn:hover { opacity: 1; background: rgba(255,59,48,0.06); }
+
+        /* ── RECORD CARDS ───────────────────────────────────────── */
+        .record-card {
+            border-radius: 20px;
+            padding: 20px 22px;
+            animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both;
+            display: flex; gap: 20px;
+        }
+        @media (max-width: 700px) {
+            .record-card { flex-direction: column; }
+        }
+
+        /* Identity block */
+        .identity {
+            min-width: 200px; flex-shrink: 0;
+            padding-right: 20px;
+            border-right: 1px solid var(--glass-border);
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        @media (max-width: 700px) {
+            .identity {
+                border-right: none;
+                border-bottom: 1px solid var(--glass-border);
+                padding-right: 0; padding-bottom: 16px;
+            }
+        }
+        .identity-name {
+            font-size: 17px; font-weight: 700; letter-spacing: -0.2px;
+            color: var(--text-primary);
+        }
+        .identity-meta-label {
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.07em; text-transform: uppercase;
+            color: var(--text-tertiary); margin-bottom: 2px;
+        }
+        .identity-meta-value {
+            font-size: 13px; font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            color: var(--blue);
+        }
+        .dept-badge {
+            display: inline-flex; align-items: center;
+            background: var(--indigo-light);
+            border: 1px solid rgba(88,86,214,0.20);
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 11px; font-weight: 700;
+            color: var(--indigo);
+            max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
+        /* History block */
+        .history { flex: 1; min-width: 0; }
+        .history-label {
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 0.07em; text-transform: uppercase;
+            color: var(--orange);
+            display: flex; align-items: center; gap: 6px;
+            margin-bottom: 14px;
+        }
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+            gap: 10px;
+        }
+        .ppe-item-card {
+            background: var(--glass-3);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border-subtle);
+            border-radius: 14px;
+            padding: 12px;
+            box-shadow: var(--spec-top), 0 2px 8px rgba(0,0,0,0.04);
+            overflow: hidden;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .ppe-item-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 40%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        .ppe-item-card:hover {
+            background: var(--glass-2);
+            border-color: var(--glass-border);
+            transform: scale(1.01);
+        }
+        .ppe-item-name {
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 0.04em; text-transform: uppercase;
+            color: var(--blue);
+            border-bottom: 1px solid var(--glass-border-subtle);
+            padding-bottom: 8px; margin-bottom: 8px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            position: relative; z-index: 1;
+        }
+        .ppe-records { max-height: 120px; overflow-y: auto; position: relative; z-index: 1; display: flex; flex-direction: column; gap: 5px; }
+        .ppe-records::-webkit-scrollbar { width: 3px; }
+        .ppe-records::-webkit-scrollbar-track { background: transparent; }
+        .ppe-records::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+        .ppe-record-row {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 6px;
+        }
+        .ppe-date {
+            font-size: 11px; font-variant-numeric: tabular-nums;
+            color: var(--text-secondary); font-weight: 500;
+        }
+        .ppe-qty-wrap { display: flex; align-items: center; gap: 4px; }
+        .ppe-qty {
+            background: var(--blue-medium);
+            border: 1px solid rgba(0,122,255,0.25);
+            border-radius: 6px;
+            padding: 2px 7px;
+            font-size: 10px; font-weight: 800;
+            color: var(--blue);
+            white-space: nowrap;
+        }
+        .ppe-size {
+            background: rgba(255,149,0,0.12);
+            border: 1px solid rgba(255,149,0,0.20);
+            border-radius: 5px;
+            padding: 1px 6px;
+            font-size: 9px; font-weight: 800;
+            color: var(--orange);
+            white-space: nowrap;
+        }
+
+        /* ── PAGINATION ─────────────────────────────────────────── */
+        .pagination {
+            border-radius: 20px;
+            padding: 14px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .page-info { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+        .page-info strong { color: var(--text-primary); font-weight: 700; }
+        .page-info .count { color: var(--blue); font-weight: 700; }
+        .page-btns { display: flex; gap: 8px; }
+        .page-btn {
+            background: var(--glass-2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 7px 14px;
+            font-size: 12px; font-weight: 700;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-family: var(--font);
+            box-shadow: var(--spec-top), var(--shadow-glass);
+            display: flex; align-items: center; gap: 5px;
+            transition: all 0.15s ease;
+        }
+        .page-btn:hover:not(:disabled) {
+            background: var(--glass-1);
+            box-shadow: var(--spec-top), var(--shadow-card);
+            transform: scale(1.02);
+        }
+        .page-btn:active:not(:disabled) { transform: scale(0.97); }
+        .page-btn:disabled { opacity: 0.3; cursor: default; }
+
+        /* ── EMPTY / LOADER STATES ──────────────────────────────── */
+        .state-block {
+            text-align: center; padding: 64px 24px;
+            border-radius: 20px;
+        }
+        .state-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.3; color: var(--blue); }
+        .state-title { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
+        .state-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+
+        /* count badge in nav */
+        .count-badge {
+            font-size: 11px; font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--green);
+            font-family: 'SF Mono', 'Fira Mono', monospace;
+        }
+
+        /* ── ANIMATIONS ─────────────────────────────────────────── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); filter: blur(2px); }
+            to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+        }
+        @keyframes progressSlide {
+            0%   { left: -50%; width: 40%; }
+            50%  { width: 65%; }
+            100% { left: 110%; width: 40%; }
+        }
+        @keyframes livePulse {
+            0%   { box-shadow: 0 0 0 0 rgba(52,199,89,0.5); }
+            70%  { box-shadow: 0 0 0 5px rgba(52,199,89,0); }
+            100% { box-shadow: 0 0 0 0 rgba(52,199,89,0); }
+        }
+        @keyframes orbFloat1 {
+            0%,100% { transform: translate(0,0) scale(1); }
+            33% { transform: translate(-40px,30px) scale(1.08); }
+            66% { transform: translate(30px,-20px) scale(0.94); }
+        }
+        @keyframes orbFloat2 {
+            0%,100% { transform: translate(0,0) scale(1); }
+            40% { transform: translate(50px,-35px) scale(1.06); }
+            70% { transform: translate(-20px,25px) scale(0.97); }
+        }
+        @keyframes installPulse {
+            0%,100% { box-shadow: 0 4px 16px rgba(0,122,255,0.30), inset 0 1px 0 rgba(255,255,255,0.25); }
+            50%      { box-shadow: 0 4px 24px rgba(0,122,255,0.55), inset 0 1px 0 rgba(255,255,255,0.25); }
+        }
     </style>
 </head>
-<body class="dynamic-bg min-h-screen dynamic-text font-sans antialiased tracking-tight selection:bg-indigo-500/20 transition-all duration-300">
+<body>
 
-    <!-- --- 🔒 GLOBAL SYSTEM LOCK OVERLAY --- -->
-    <div id="loading-overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center overlay-bg-custom backdrop-blur-2xl transition-all duration-500">
-        <h3 id="overlay-title" class="text-xs font-bold tracking-widest dynamic-text-title uppercase mb-4">Loading...</h3>
-        <div class="w-56 h-1 progress-track-custom rounded-full overflow-hidden relative border border-black/5 dark:border-white/5 shadow-inner">
-            <div class="progress-bar-fill h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full absolute"></div>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loader-glass">
+            <div class="loader-icon">
+                <i class="fa-solid fa-shield-halved" style="color:white;font-size:20px;"></i>
+            </div>
+            <div class="loader-title">Loading Registry</div>
+            <div class="progress-track">
+                <div class="progress-fill"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Application Top Navigation Bar -->
-    <nav class="sticky top-0 z-50 dynamic-nav backdrop-blur-xl border-b px-6 py-3.5 flex justify-between items-center shadow-md transition-all duration-300">
-        <div class="flex items-center space-x-3">
-            <div class="p-2.5 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-xl shadow-lg flex items-center justify-center">
-                <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+    <!-- Navigation -->
+    <nav>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div class="nav-brand-icon">
+                <i class="fa-solid fa-shield-halved" style="color:white;font-size:18px;"></i>
             </div>
             <div>
-                <h1 class="text-base font-extrabold tracking-tight dynamic-text-title">PPE Issue</h1>
-                <div class="flex items-center space-x-1.5 mt-0.5">
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <p class="text-[10px] text-indigo-color font-bold tracking-widest uppercase">Live Distribution Stream</p>
+                <div class="nav-title">PPE Issue</div>
+                <div class="nav-subtitle">
+                    <div class="live-dot"></div>
+                    Live Distribution Stream
                 </div>
             </div>
         </div>
-        
-        <div class="flex items-center space-x-3.5">
-            <!-- Smooth Design Theme Toggle Slider Button -->
-            <button onclick="toggleTheme()" class="relative inline-flex h-6 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-300 dark:bg-white/10 transition-colors duration-200 focus:outline-none shadow-inner" id="theme-toggle-btn">
-                <span id="toggle-thumb" class="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-250 ease-in-out translate-x-0 flex items-center justify-center text-[10px]">
-                    <i id="theme-icon" class="fa-solid fa-sun text-amber-500"></i>
-                </span>
-            </button>
 
-            <div class="text-[11px] dynamic-input backdrop-blur-md px-3 py-1.5 rounded-lg border font-medium transition-all duration-300">
-                <span class="dynamic-text-muted">Total Array Blocks:</span> 
-                <span id="total-count" class="font-mono font-bold text-emerald-500 ml-1">0</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <button id="install-btn" onclick="triggerInstallPrompt()">
+                <i class="fa-solid fa-download" style="font-size:11px;"></i>
+                Install App
+            </button>
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                <div class="toggle-knob" id="toggle-knob">
+                    <i class="fa-solid fa-sun" id="theme-icon" style="color:#f59e0b;font-size:10px;"></i>
+                </div>
+            </button>
+            <div class="pill">
+                Total: <span class="count-badge" id="total-count">0</span>
             </div>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-        
-        <!-- Search Controls Deck Panel -->
-        <div class="animate-glass dynamic-glass backdrop-blur-xl border rounded-2xl p-6 relative overflow-hidden transition-all duration-300">
-            <div class="flex items-center space-x-2 mb-5 text-indigo-color font-bold text-[11px] tracking-widest uppercase">
-                <i class="fa-solid fa-layer-group text-sm"></i>
-                <h2>Interactive Query Filter Console</h2>
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <!-- Card Input Component -->
-                <div>
-                    <label class="block text-[10px] font-bold dynamic-text-muted uppercase tracking-widest mb-1.5">Card Number</label>
-                    <div class="relative group">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 dynamic-text-muted group-focus-within:text-indigo-500 transition-colors">
-                            <i class="fa-solid fa-id-card text-xs"></i>
-                        </span>
-                        <input type="text" id="search-card" oninput="debounceSearch()" placeholder="Search ID tag..." 
-                            class="w-full pl-9 pr-3 py-2 bg-transparent dynamic-input border rounded-xl focus:outline-none transition-all text-sm tracking-wide">
+    <!-- Page -->
+    <div class="page">
+        <div class="stack">
+
+            <!-- Search Panel -->
+            <div class="lg search-panel">
+                <div class="section-label">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Filter & Search
+                </div>
+                <div class="search-grid">
+                    <div>
+                        <div class="field-label"><i class="fa-solid fa-id-card"></i>Card Number</div>
+                        <div class="field-wrap">
+                            <i class="fa-solid fa-id-card field-icon"></i>
+                            <input class="lg-input" type="text" id="search-card" oninput="debounceSearch()" placeholder="Search card ID…">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="field-label"><i class="fa-solid fa-user"></i>Employee Name</div>
+                        <div class="field-wrap">
+                            <i class="fa-solid fa-user field-icon"></i>
+                            <input class="lg-input" type="text" id="search-name" oninput="debounceSearch()" placeholder="Search name…">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="field-label"><i class="fa-solid fa-building"></i>Section / Branch</div>
+                        <div class="field-wrap">
+                            <i class="fa-solid fa-building field-icon"></i>
+                            <input class="lg-input" type="text" id="search-dept" oninput="debounceSearch()" placeholder="Search department…">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="field-label"><i class="fa-solid fa-helmet-safety"></i>PPE Gear Type</div>
+                        <div class="field-wrap">
+                            <i class="fa-solid fa-helmet-safety field-icon"></i>
+                            <input class="lg-input" type="text" id="search-item" list="item-options" oninput="debounceSearch()" placeholder="Select gear type…">
+                            <datalist id="item-options"></datalist>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Name Input Component -->
-                <div>
-                    <label class="block text-[10px] font-bold dynamic-text-muted uppercase tracking-widest mb-1.5">Employee Name</label>
-                    <div class="relative group">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 dynamic-text-muted group-focus-within:text-indigo-500 transition-colors">
-                            <i class="fa-solid fa-user text-xs"></i>
-                        </span>
-                        <input type="text" id="search-name" oninput="debounceSearch()" placeholder="Search user name..." 
-                            class="w-full pl-9 pr-3 py-2 bg-transparent dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
-                    </div>
-                </div>
-
-                <!-- Section Input Component -->
-                <div>
-                    <label class="block text-[10px] font-bold dynamic-text-muted uppercase tracking-widest mb-1.5">Section / Branch</label>
-                    <div class="relative group">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 dynamic-text-muted group-focus-within:text-indigo-500 transition-colors">
-                            <i class="fa-solid fa-building text-xs"></i>
-                        </span>
-                        <input type="text" id="search-dept" oninput="debounceSearch()" placeholder="Search department..." 
-                            class="w-full pl-9 pr-3 py-2 bg-transparent dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
-                    </div>
-                </div>
-
-                <!-- Dynamic Recommendations Autocomplete Item Component -->
-                <div>
-                    <label class="block text-[10px] font-bold dynamic-text-muted uppercase tracking-widest mb-1.5">PPE Gear Type</label>
-                    <div class="relative group">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 dynamic-text-muted group-focus-within:text-indigo-500 transition-colors">
-                            <i class="fa-solid fa-helmet-safety text-xs"></i>
-                        </span>
-                        <input type="text" id="search-item" list="item-options" oninput="debounceSearch()" placeholder="Select hardware model..." 
-                            class="w-full pl-9 pr-3 py-2 bg-transparent dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
-                        <datalist id="item-options"></datalist>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex justify-end mt-4 pt-2 border-t border-slate-200/20 dark:border-white/[0.03]">
-                <button onclick="resetFilters()" class="text-[11px] font-bold text-rose-500 hover:text-rose-400 flex items-center space-x-1.5 transition-colors px-3 py-1.5 rounded-lg hover:bg-rose-500/5">
-                    <i class="fa-solid fa-arrow-rotate-left text-[10px]"></i>
-                    <span>Flush Parameters</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Master Registry Unified Main Viewport Block -->
-        <div class="animate-glass [animation-delay:150ms] border border-transparent rounded-2xl relative overflow-hidden transition-all duration-300 space-y-4">
-            
-            <!-- Structural Inline Loader Component -->
-            <div id="inline-loader" class="flex flex-col items-center justify-center p-20 dynamic-glass rounded-2xl border dynamic-text-muted">
-                <i class="fa-solid fa-chart-simple text-2xl animate-pulse text-indigo-500"></i>
-                <p class="text-xs font-semibold mt-2 tracking-wide uppercase">Assembling Itemwise Workspace Matrix...</p>
-            </div>
-
-            <!-- CORE RECORD CARDS INJECTION DECK VIEW -->
-            <div id="master-records-deck" class="space-y-4 hidden"></div>
-
-            <!-- Empty Query Response Error Alert Box -->
-            <div id="no-results" class="hidden flex flex-col items-center justify-center p-20 dynamic-glass rounded-2xl border dynamic-text-muted">
-                <i class="fa-solid fa-hourglass-empty text-3xl mb-3 opacity-30 text-indigo-500"></i>
-                <p class="text-xs font-bold tracking-widest uppercase">Zero Matrix Matches Discovered</p>
-                <p class="text-[11px] opacity-70 mt-1">Refine active parameters inside your lookups.</p>
-            </div>
-
-            <!-- Pagination Control Dock System -->
-            <div id="pagination-footer" class="hidden dynamic-glass border rounded-2xl p-4 sm:px-6 flex items-center justify-between flex-wrap gap-y-3 shadow-xl">
-                <div class="text-xs dynamic-text-muted font-medium tracking-normal">
-                    Displaying records <span id="page-start" class="font-mono font-bold text-accent-color">0</span> – 
-                    <span id="page-end" class="font-mono font-bold text-accent-color">0</span> of 
-                    <span id="filtered-count" class="font-mono font-bold text-indigo-color">0</span> verified items
-                </div>
-                <div class="flex space-x-2">
-                    <button id="btn-prev" onclick="changePage(-1)" class="px-3 py-1.5 text-xs font-bold dynamic-text bg-white/5 hover:bg-black/5 dark:hover:bg-white/10 border border-slate-400/20 rounded-xl disabled:opacity-30 transition-all flex items-center">
-                        <i class="fa-solid fa-angle-left mr-1 text-[10px]"></i>Previous
-                    </button>
-                    <button id="btn-next" onclick="changePage(1)" class="px-3 py-1.5 text-xs font-bold dynamic-text bg-white/5 hover:bg-black/5 dark:hover:bg-white/10 border border-slate-400/20 rounded-xl disabled:opacity-30 transition-all flex items-center">
-                        Next<i class="fa-solid fa-angle-right ml-1 text-[10px]"></i>
+                <div style="display:flex;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--glass-border-subtle);">
+                    <button class="reset-btn" onclick="resetFilters()">
+                        <i class="fa-solid fa-arrow-rotate-left" style="font-size:10px;"></i>
+                        Reset Filters
                     </button>
                 </div>
             </div>
+
+            <!-- Inline Loader -->
+            <div id="inline-loader" class="lg state-block">
+                <div class="state-icon"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="state-title">Loading Records…</div>
+            </div>
+
+            <!-- Record Cards -->
+            <div id="master-records-deck" class="stack" style="display:none;"></div>
+
+            <!-- Empty State -->
+            <div id="no-results" class="lg state-block" style="display:none;">
+                <div class="state-icon"><i class="fa-solid fa-hourglass-empty"></i></div>
+                <div class="state-title">No Results Found</div>
+                <div class="state-sub">Try adjusting your search filters</div>
+            </div>
+
+            <!-- Pagination -->
+            <div id="pagination-footer" class="lg pagination" style="display:none;">
+                <div class="page-info">
+                    Showing <strong id="page-start">0</strong>–<strong id="page-end">0</strong>
+                    of <span class="count" id="filtered-count">0</span> records
+                </div>
+                <div class="page-btns">
+                    <button class="page-btn" id="btn-prev" onclick="changePage(-1)">
+                        <i class="fa-solid fa-angle-left" style="font-size:10px;"></i> Previous
+                    </button>
+                    <button class="page-btn" id="btn-next" onclick="changePage(1)">
+                        Next <i class="fa-solid fa-angle-right" style="font-size:10px;"></i>
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- Application Operational Controller Logic Script -->
     <script>
         const apiEndpoint = "https://script.google.com/macros/s/AKfycbydwxwb1CYJtjLcWG_OKpcKIBdl4KQ7xeKe12PvJzwOzxu3Mvwu-OU9kvybNTji3iIX/exec";
 
-        let allMasterData = [];
-        let currentFilteredData = [];
+        let allMasterData = [], currentFilteredData = [];
         let currentPage = 1;
-        const rowsPerPage = 50; 
+        const rowsPerPage = 50;
         let searchTimeout = null;
 
+        // ── PWA INSTALL ───────────────────────────────────────────
+        let deferredPrompt = null;
+        const installBtn = document.getElementById('install-btn');
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'flex';
+        });
+        window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+            installBtn.style.display = 'none';
+        });
+        function triggerInstallPrompt() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(r => {
+                if (r.outcome === 'accepted') installBtn.style.display = 'none';
+                deferredPrompt = null;
+            });
+        }
+
+        // ── THEME ─────────────────────────────────────────────────
         function toggleTheme() {
-            const body = document.body;
-            const thumb = document.getElementById('toggle-thumb');
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
             const icon = document.getElementById('theme-icon');
-            
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme');
-                thumb.style.transform = 'translateX(0px)';
-                icon.className = 'fa-solid fa-sun text-amber-500';
+            if (isDark) {
+                document.body.removeAttribute('data-theme');
+                icon.className = 'fa-solid fa-sun';
+                icon.style.color = '#f59e0b';
             } else {
-                body.setAttribute('data-theme', 'dark');
-                thumb.style.transform = 'translateX(20px)';
-                icon.className = 'fa-solid fa-moon text-indigo-950';
+                document.body.setAttribute('data-theme', 'dark');
+                icon.className = 'fa-solid fa-moon';
+                icon.style.color = '#818cf8';
             }
         }
 
-        window.onload = function() {
+        // ── DATA LOAD ─────────────────────────────────────────────
+        window.onload = function () {
             fetch(apiEndpoint)
-                .then(response => {
-                    if (!response.ok) throw new Error("Cloud matrix stream parsing validation failure.");
-                    return response.json();
-                })
-                .then(parsedData => {
-                    if(parsedData.error) throw new Error(parsedData.error);
-                    
-                    // --- INTELLIGENT NAME CONSOLIDATION ENGINE ---
-                    const cardNameRegistry = {};
-                    parsedData.forEach(row => {
-                        const card = row.cardNo ? row.cardNo.toString().trim() : "";
-                        const rawName = row.name ? row.name.toString().trim() : "";
-                        if (!card || !rawName) return;
-                        
-                        if (!cardNameRegistry[card]) {
-                            cardNameRegistry[card] = {};
-                        }
-                        cardNameRegistry[card][rawName] = (cardNameRegistry[card][rawName] || 0) + 1;
-                    });
+                .then(r => { if (!r.ok) throw new Error('Network error'); return r.json(); })
+                .then(data => {
+                    if (data.error) throw new Error(data.error);
 
-                    const canonicalCardNames = {};
-                    for (const cardNo in cardNameRegistry) {
-                        let topCount = -1;
-                        let winningNameString = "";
-                        for (const nameVariant in cardNameRegistry[cardNo]) {
-                            if (cardNameRegistry[cardNo][nameVariant] > topCount) {
-                                topCount = cardNameRegistry[cardNo][nameVariant];
-                                winningNameString = nameVariant;
-                            }
-                        }
-                        canonicalCardNames[cardNo] = winningNameString;
+                    // Name consolidation
+                    const reg = {};
+                    data.forEach(row => {
+                        const card = (row.cardNo || '').toString().trim();
+                        const name = (row.name || '').toString().trim();
+                        if (!card || !name) return;
+                        if (!reg[card]) reg[card] = {};
+                        reg[card][name] = (reg[card][name] || 0) + 1;
+                    });
+                    const canonical = {};
+                    for (const c in reg) {
+                        let top = -1, winner = '';
+                        for (const n in reg[c]) if (reg[c][n] > top) { top = reg[c][n]; winner = n; }
+                        canonical[c] = winner;
                     }
-
-                    parsedData.forEach(row => {
-                        const card = row.cardNo ? row.cardNo.toString().trim() : "";
-                        if (canonicalCardNames[card]) {
-                            row.name = canonicalCardNames[card];
-                        }
+                    data.forEach(row => {
+                        const c = (row.cardNo || '').toString().trim();
+                        if (canonical[c]) row.name = canonical[c];
                     });
 
-                    // --- AUTOMATIC AUTO-FILL RECOMMENDATIONS POPULATOR ---
-                    const datalistContainer = document.getElementById('item-options');
-                    datalistContainer.innerHTML = '';
-                    const uniquePpeItems = [...new Set(parsedData.map(row => row.item ? row.item.toString().trim() : "").filter(Boolean))];
-                    uniquePpeItems.sort();
-                    uniquePpeItems.forEach(itemString => {
-                        const optionNode = document.createElement('option');
-                        optionNode.value = itemString;
-                        datalistContainer.appendChild(optionNode);
-                    });
+                    // Datalist
+                    const dl = document.getElementById('item-options');
+                    [...new Set(data.map(r => (r.item || '').toString().trim()).filter(Boolean))].sort()
+                        .forEach(v => { const o = document.createElement('option'); o.value = v; dl.appendChild(o); });
 
-                    allMasterData = parsedData.reverse(); 
+                    allMasterData = data.reverse();
                     currentFilteredData = [...allMasterData];
-                    
-                    document.getElementById('total-count').innerText = allMasterData.length;
-                    document.getElementById('loading-overlay').classList.add('hidden');
-                    document.getElementById('inline-loader').classList.add('hidden');
-                    document.getElementById('master-records-deck').classList.remove('hidden');
-                    document.getElementById('pagination-footer').classList.remove('hidden');
-                    
+                    document.getElementById('total-count').textContent = allMasterData.length;
+                    document.getElementById('loading-overlay').style.display = 'none';
+                    document.getElementById('inline-loader').style.display = 'none';
+                    document.getElementById('master-records-deck').style.display = '';
+                    document.getElementById('pagination-footer').style.display = 'flex';
                     goToPage(1);
                 })
-                .catch(errorObj => {
+                .catch(err => {
                     document.getElementById('loading-overlay').innerHTML = `
-                        <div class="text-center p-6 bg-slate-900/40 rounded-2xl border border-white/5 max-w-sm backdrop-blur-xl">
-                            <i class="fa-solid fa-triangle-exclamation text-rose-500 text-2xl mb-3"></i>
-                            <h3 class="text-sm font-bold text-rose-500 uppercase tracking-wider">Sync Error Generated</h3>
-                            <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">${errorObj.message}</p>
-                        </div>
-                    `;
+                        <div class="loader-glass" style="text-align:center;">
+                            <i class="fa-solid fa-triangle-exclamation" style="color:var(--red);font-size:28px;margin-bottom:12px;display:block;"></i>
+                            <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px;">Sync Error</div>
+                            <div style="font-size:12px;color:var(--text-secondary);max-width:280px;">${err.message}</div>
+                        </div>`;
                 });
         };
 
+        // ── RENDER ────────────────────────────────────────────────
         function renderTableMatrix() {
-            const recordsDeck = document.getElementById('master-records-deck');
-            const noResults = document.getElementById('no-results');
-            const footerContainer = document.getElementById('pagination-footer');
-            
-            recordsDeck.innerHTML = '';
+            const deck = document.getElementById('master-records-deck');
+            const noRes = document.getElementById('no-results');
+            const footer = document.getElementById('pagination-footer');
 
-            const totalRecords = currentFilteredData.length;
-            document.getElementById('filtered-count').innerText = totalRecords;
+            deck.innerHTML = '';
+            const total = currentFilteredData.length;
+            document.getElementById('filtered-count').textContent = total;
 
-            if (totalRecords === 0) {
-                noResults.classList.remove('hidden');
-                footerContainer.classList.add('hidden');
-                document.getElementById('page-start').innerText = "0";
-                document.getElementById('page-end').innerText = "0";
+            if (total === 0) {
+                noRes.style.display = '';
+                footer.style.display = 'none';
+                document.getElementById('page-start').textContent = '0';
+                document.getElementById('page-end').textContent = '0';
                 document.getElementById('btn-prev').disabled = true;
                 document.getElementById('btn-next').disabled = true;
                 return;
-            } else {
-                noResults.classList.add('hidden');
-                footerContainer.classList.remove('hidden');
             }
+            noRes.style.display = 'none';
+            footer.style.display = 'flex';
 
-            const startIdx = (currentPage - 1) * rowsPerPage;
-            const endIdx = Math.min(startIdx + rowsPerPage, totalRecords);
-            const pageSubset = currentFilteredData.slice(startIdx, endIdx);
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = Math.min(start + rowsPerPage, total);
+            const slice = currentFilteredData.slice(start, end);
 
-            document.getElementById('page-start').innerText = startIdx + 1;
-            document.getElementById('page-end').innerText = endIdx;
-            document.getElementById('btn-prev').disabled = (currentPage === 1);
-            document.getElementById('btn-next').disabled = (endIdx >= totalRecords);
+            document.getElementById('page-start').textContent = start + 1;
+            document.getElementById('page-end').textContent = end;
+            document.getElementById('btn-prev').disabled = currentPage === 1;
+            document.getElementById('btn-next').disabled = end >= total;
 
-            // --- ADVANCED DATA AGGREGATOR MODULE ---
-            const employeeMap = {};
-            const employeeOrder = []; 
-
-            pageSubset.forEach(row => {
-                const compoundKey = row.cardNo + "_" + row.name;
-                if (!employeeMap[compoundKey]) {
-                    employeeMap[compoundKey] = {
-                        name: row.name,
-                        cardNo: row.cardNo,
-                        section: row.section,
-                        ppeHistory: {}
-                    };
-                    employeeOrder.push(compoundKey);
+            // Aggregate by employee
+            const empMap = {}, empOrder = [];
+            slice.forEach(row => {
+                const key = row.cardNo + '_' + row.name;
+                if (!empMap[key]) {
+                    empMap[key] = { name: row.name, cardNo: row.cardNo, section: row.section, items: {} };
+                    empOrder.push(key);
                 }
-                
-                if (!employeeMap[compoundKey].ppeHistory[row.item]) {
-                    employeeMap[compoundKey].ppeHistory[row.item] = [];
-                }
-                
-                employeeMap[compoundKey].ppeHistory[row.item].push({
-                    date: row.issuedOn,
-                    qty: row.qty,
-                    size: row.size
-                });
+                if (!empMap[key].items[row.item]) empMap[key].items[row.item] = [];
+                empMap[key].items[row.item].push({ date: row.issuedOn, qty: row.qty, size: row.size });
             });
 
-            // --- HIGH-PERFORMANCE DOM COMPILER ---
-            const deckFragment = document.createDocumentFragment();
-            
-            employeeOrder.forEach((key, index) => {
-                const emp = employeeMap[key];
-                const cardElement = document.createElement('div');
-                
-                cardElement.className = 'animate-card dynamic-glass border rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col md:flex-row gap-5 md:gap-6 text-left relative overflow-hidden';
-                cardElement.style.animationDelay = `${index * 12}ms`;
+            const frag = document.createDocumentFragment();
+            empOrder.forEach((key, i) => {
+                const emp = empMap[key];
+                const el = document.createElement('div');
+                el.className = 'lg-card record-card';
+                el.style.animationDelay = `${i * 15}ms`;
 
-                let htmlOutputBlock = `
-                    <div class="w-full md:w-1/4 flex flex-col justify-start space-y-2 md:space-y-2.5 pb-4 md:pb-0 border-b md:border-b-0 md:border-r border-slate-300/40 dark:border-white/[0.05] shrink-0">
-                        <div class="space-y-0.5">
-                            <span class="dynamic-text-muted font-bold text-[10px] uppercase tracking-widest block">Employee Name</span>
-                            <span class="font-extrabold text-accent-color text-base sm:text-lg tracking-tight block">${emp.name}</span>
-                        </div>
-                        <div class="space-y-0.5">
-                            <span class="dynamic-text-muted font-bold text-[10px] uppercase tracking-widest block">ID Card No</span>
-                            <span class="font-mono font-bold text-indigo-color text-sm block">${emp.cardNo}</span>
-                        </div>
-                        <div class="space-y-0.5">
-                            <span class="dynamic-text-muted font-bold text-[10px] uppercase tracking-widest block">Department</span>
-                            <div class="pt-0.5">
-                                <span class="px-2.5 py-0.5 text-[11px] font-extrabold rounded-md border badge-custom inline-block shadow-sm">${emp.section}</span>
+                let itemsHTML = '';
+                for (const itemName in emp.items) {
+                    let rowsHTML = emp.items[itemName].map(r => {
+                        const sizeHTML = r.size ? `<span class="ppe-size">Sz: ${r.size}</span>` : '';
+                        return `<div class="ppe-record-row">
+                            <span class="ppe-date">${r.date}</span>
+                            <div class="ppe-qty-wrap">
+                                <span class="ppe-qty">${r.qty} Qty</span>
+                                ${sizeHTML}
                             </div>
-                        </div>
-                    </div>
-                    
-                    <div class="w-full md:w-3/4 flex flex-col justify-start">
-                        <div class="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-3 flex items-center gap-1 font-bold">
-                            <i class="fa-solid fa-clock-rotate-left"></i> Item-Wise Issue History
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                `;
-
-                for (const ppeItemName in emp.ppeHistory) {
-                    htmlOutputBlock += `
-                        <div class="item-nested-card p-3 rounded-xl flex flex-col justify-between space-y-2 shadow-sm transition-all duration-150">
-                            <div class="text-[11px] font-extrabold text-indigo-color tracking-wide border-b pb-1 uppercase truncate" style="border-bottom-color: var(--glass-border);" title="${ppeItemName}">
-                                ${ppeItemName}
-                            </div>
-                            <div class="space-y-1.5 max-h-[120px] overflow-y-auto pr-1">
-                    `;
-
-                    emp.ppeHistory[ppeItemName].forEach(record => {
-                        const optionalSizeStr = record.size ? ` <span class="size-custom font-mono text-[9px] font-extrabold bg-black/5 dark:bg-white/10 border border-slate-400/15 px-1.5 py-0.5 rounded ml-1">Sz: ${record.size}</span>` : '';
-                        htmlOutputBlock += `
-                            <div class="text-[11px] flex justify-between items-center text-accent-color gap-x-2 opacity-95">
-                                <span class="font-mono opacity-80 font-medium">${record.date}</span>
-                                <span class="font-bold tracking-tight flex items-center qty-custom border px-1.5 py-0.5 rounded text-[10px]">${record.qty} Qty${optionalSizeStr}</span>
-                            </div>
-                        `;
-                    });
-
-                    htmlOutputBlock += `
-                            </div>
-                        </div>
-                    `;
+                        </div>`;
+                    }).join('');
+                    itemsHTML += `
+                        <div class="ppe-item-card">
+                            <div class="ppe-item-name" title="${itemName}">${itemName}</div>
+                            <div class="ppe-records">${rowsHTML}</div>
+                        </div>`;
                 }
 
-                htmlOutputBlock += `
+                el.innerHTML = `
+                    <div class="identity">
+                        <div>
+                            <div class="identity-meta-label">Employee</div>
+                            <div class="identity-name">${emp.name}</div>
+                        </div>
+                        <div>
+                            <div class="identity-meta-label">Card No</div>
+                            <div class="identity-meta-value">${emp.cardNo}</div>
+                        </div>
+                        <div>
+                            <div class="identity-meta-label">Department</div>
+                            <span class="dept-badge">${emp.section}</span>
                         </div>
                     </div>
-                `;
-
-                cardElement.innerHTML = htmlOutputBlock;
-                deckFragment.appendChild(cardElement);
+                    <div class="history">
+                        <div class="history-label">
+                            <i class="fa-solid fa-clock-rotate-left" style="font-size:11px;"></i>
+                            Item-Wise Issue History
+                        </div>
+                        <div class="items-grid">${itemsHTML}</div>
+                    </div>`;
+                frag.appendChild(el);
             });
-            
-            recordsDeck.appendChild(deckFragment);
+            deck.appendChild(frag);
         }
 
         function debounceSearch() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(filterData, 200);
         }
-
         function filterData() {
-            const cardVal = document.getElementById('search-card').value.toLowerCase().trim();
-            const nameVal = document.getElementById('search-name').value.toLowerCase().trim();
-            const deptVal = document.getElementById('search-dept').value.toLowerCase().trim();
-            const itemVal = document.getElementById('search-item').value.toLowerCase().trim();
-
-            currentFilteredData = allMasterData.filter(entry => {
-                return entry.cardNo.toLowerCase().includes(cardVal) &&
-                       entry.name.toLowerCase().includes(nameVal) &&
-                       entry.section.toLowerCase().includes(deptVal) &&
-                       entry.item.toLowerCase().includes(itemVal);
-            });
-            goToPage(1); 
+            const c = document.getElementById('search-card').value.toLowerCase().trim();
+            const n = document.getElementById('search-name').value.toLowerCase().trim();
+            const d = document.getElementById('search-dept').value.toLowerCase().trim();
+            const it = document.getElementById('search-item').value.toLowerCase().trim();
+            currentFilteredData = allMasterData.filter(e =>
+                e.cardNo.toLowerCase().includes(c) &&
+                e.name.toLowerCase().includes(n) &&
+                e.section.toLowerCase().includes(d) &&
+                e.item.toLowerCase().includes(it)
+            );
+            goToPage(1);
         }
-
-        function goToPage(pageNumber) {
-            currentPage = pageNumber;
-            renderTableMatrix();
-        }
-
-        function changePage(direction) {
-            currentPage += direction;
-            renderTableMatrix();
-        }
-
+        function goToPage(p) { currentPage = p; renderTableMatrix(); }
+        function changePage(d) { currentPage += d; renderTableMatrix(); }
         function resetFilters() {
-            document.getElementById('search-card').value = '';
-            document.getElementById('search-name').value = '';
-            document.getElementById('search-dept').value = '';
-            document.getElementById('search-item').value = '';
+            ['search-card','search-name','search-dept','search-item'].forEach(id => document.getElementById(id).value = '');
             currentFilteredData = [...allMasterData];
             goToPage(1);
         }
     </script>
-    
-    <!-- PWA Installation Registration Trigger -->
+
     <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('ServiceWorker channel bound.', reg))
-                .catch(err => console.error('ServiceWorker binding aborted: ', err));
-        });
-    }
-</script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(r => console.log('SW registered', r))
+                    .catch(e => console.error('SW error', e));
+            });
+        }
+    </script>
 </body>
 </html>
