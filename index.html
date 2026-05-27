@@ -6,7 +6,7 @@
     <title>PPE Issue Register Dashboard</title>
     
     <!-- PWA Core Settings Matrix -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -537,13 +537,13 @@
     
     <!-- PWA Installation Registration Trigger -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('ServiceWorker tracking channel bound successfully.', reg))
-                    .catch(err => console.error('ServiceWorker setup mapping error sequence: ', err));
-            });
-        }
-    </script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('ServiceWorker channel bound.', reg))
+                .catch(err => console.error('ServiceWorker binding aborted: ', err));
+        });
+    }
+</script>
 </body>
 </html>
