@@ -15,7 +15,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- enterprise-grade CORE COLOR TOKENS --- */
+        /* --- ENTERPRISE-GRADE CORE COLOR TOKENS --- */
         :root {
             --bg-canvas: radial-gradient(circle at top right, #0b0f19, #030712);
             --text-main: #94a3b8;       
@@ -40,6 +40,7 @@
             --qty-border: rgba(255, 255, 255, 0.05);
             --size-text: #f59e0b;
             --overlay-bg: rgba(3, 7, 18, 0.85);
+            --progress-track: rgba(255, 255, 255, 0.05);
         }
 
         [data-theme="light"] {
@@ -66,6 +67,7 @@
             --qty-border: #cbd5e1;
             --size-text: #c2410c;
             --overlay-bg: rgba(241, 245, 249, 0.85);
+            --progress-track: rgba(0, 0, 0, 0.05);
         }
 
         /* --- STYLING MACRO CONNECTORS --- */
@@ -80,6 +82,7 @@
         .dynamic-input { background: var(--input-bg); border-color: var(--input-border); color: var(--text-accent); }
         .dynamic-input:focus { box-shadow: 0 0 0 4px var(--input-focus-ring); border-color: var(--text-indigo); }
         .overlay-bg-custom { background: var(--overlay-bg); }
+        .progress-track-custom { background: var(--progress-track); }
         
         .item-nested-card { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--glass-border); transition: background-color 150ms ease; }
         [data-theme="light"] .item-nested-card { background: rgba(255, 255, 255, 0.5); }
@@ -98,20 +101,26 @@
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes progressMove {
+            0% { left: -40%; width: 40%; }
+            50% { width: 60%; }
+            100% { left: 100%; width: 40%; }
+        }
+        
         .animate-glass { animation: glassFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-card { animation: cardReveal 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .progress-bar-fill { animation: progressMove 1.6s infinite ease-in-out; }
     </style>
 </head>
 <body class="dynamic-bg min-h-screen dynamic-text font-sans antialiased tracking-tight selection:bg-indigo-500/20 transition-all duration-300">
 
-    <!-- --- 🔒 GLOBAL SYSTEM LOCK OVERLAY --- -->
+    <!-- --- 🔒 GLOBAL SYSTEM LOCK OVERLAY (With Progress Bar Optimization) --- -->
     <div id="loading-overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center overlay-bg-custom backdrop-blur-2xl transition-all duration-500">
-        <div class="relative flex items-center justify-center mb-5">
-            <div class="animate-ping absolute inline-flex h-16 w-16 rounded-full bg-indigo-500 opacity-10"></div>
-            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-indigo-600 relative z-10"></i>
+        <h3 id="overlay-title" class="text-xs font-bold tracking-widest dynamic-text-title uppercase mb-4">Synchronizing Nodes</h3>
+        <!-- Frosted Progress Bar Container Track -->
+        <div class="w-56 h-1 progress-track-custom rounded-full overflow-hidden relative border border-black/5 dark:border-white/5 shadow-inner">
+            <div class="progress-bar-fill h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full absolute"></div>
         </div>
-        <h3 id="overlay-title" class="text-base font-bold tracking-wider dynamic-text-title uppercase">Synchronizing Nodes</h3>
-        <p id="overlay-subtitle" class="text-xs dynamic-text-muted mt-1.5 text-center px-8 max-w-xs">System fields are locked while database arrays optimize spelling variances...</p>
     </div>
 
     <!-- Application Top Navigation Bar -->
@@ -147,7 +156,7 @@
     <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
         
         <!-- Search Controls Deck Panel -->
-        <div class="animate-glass dynamic-glass backdrop-blur-xl border rounded-2xl p-6 relative transition-all duration-300">
+        <div class="animate-glass dynamic-glass backdrop-blur-xl border rounded-2xl p-6 relative overflow-hidden transition-all duration-300">
             <div class="flex items-center space-x-2 mb-5 text-indigo-color font-bold text-[11px] tracking-widest uppercase">
                 <i class="fa-solid fa-layer-group text-sm"></i>
                 <h2>Interactive Query Filter Console</h2>
@@ -221,10 +230,8 @@
                 <p class="text-xs font-semibold mt-2 tracking-wide uppercase">Assembling Itemwise Workspace Matrix...</p>
             </div>
 
-            <!-- CORE RECORD CARDS INJECTION DECK VIEW (Serves both phone and wide screens natively) -->
-            <div id="master-records-deck" class="space-y-4 hidden">
-                <!-- Grouped itemwise profile cards are dynamically built inside here -->
-            </div>
+            <!-- CORE RECORD CARDS INJECTION DECK VIEW -->
+            <div id="master-records-deck" class="space-y-4 hidden"></div>
 
             <!-- Empty Query Response Error Alert Box -->
             <div id="no-results" class="hidden flex flex-col items-center justify-center p-20 dynamic-glass rounded-2xl border dynamic-text-muted">
@@ -233,7 +240,7 @@
                 <p class="text-[11px] opacity-70 mt-1">Refine active parameters inside your lookups.</p>
             </div>
 
-            <!-- Pagination Control Dock System (Glued beautifully underneath the deck) -->
+            <!-- Pagination Control Dock System -->
             <div id="pagination-footer" class="hidden dynamic-glass border rounded-2xl p-4 sm:px-6 flex items-center justify-between flex-wrap gap-y-3 shadow-xl">
                 <div class="text-xs dynamic-text-muted font-medium tracking-normal">
                     Displaying records <span id="page-start" class="font-mono font-bold text-accent-color">0</span> – 
@@ -348,7 +355,7 @@
                 .catch(errorObj => {
                     document.getElementById('loading-overlay').innerHTML = `
                         <div class="text-center p-6 bg-slate-900/40 rounded-2xl border border-white/5 max-w-sm backdrop-blur-xl">
-                            <i class="fa-solid fa-triangle-exclamation text-rose-500 text-3xl mb-3"></i>
+                            <i class="fa-solid fa-triangle-exclamation text-rose-500 text-2xl mb-3"></i>
                             <h3 class="text-sm font-bold text-rose-500 uppercase tracking-wider">Sync Error Generated</h3>
                             <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">${errorObj.message}</p>
                         </div>
@@ -388,7 +395,7 @@
             document.getElementById('btn-prev').disabled = (currentPage === 1);
             document.getElementById('btn-next').disabled = (endIdx >= totalRecords);
 
-            // --- UNIFIED ADVANCED DATA AGGREGATOR ENGINE (Item-Wise Array Mapping) ---
+            // --- UNIFIED ADVANCED DATA AGGREGATOR ENGINE ---
             const employeeMap = {};
             const employeeOrder = []; 
 
@@ -422,12 +429,9 @@
                 const emp = employeeMap[key];
                 const cardElement = document.createElement('div');
                 
-                // SaaS Dashboard Grid Blueprint:
-                // Acts as a clean side-by-side split row on wide PC monitors and cleanly cascades on smartphone frames
                 cardElement.className = 'animate-card dynamic-glass border rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col md:flex-row gap-5 md:gap-6 text-left relative overflow-hidden';
                 cardElement.style.animationDelay = `${index * 12}ms`;
 
-                // Column A: Employee Demographics Sidebar Panel block
                 let htmlOutputBlock = `
                     <div class="w-full md:w-1/4 flex flex-col justify-start space-y-2 md:space-y-2.5 pb-4 md:pb-0 border-b md:border-b-0 md:border-r border-slate-300/40 dark:border-white/[0.05] shrink-0">
                         <div class="space-y-0.5">
@@ -446,7 +450,6 @@
                         </div>
                     </div>
                     
-                    <!-- Column B: Dynamic Nested Item-Wise Issuance Grid Panel -->
                     <div class="w-full md:w-3/4 flex flex-col justify-start">
                         <div class="text-[10px] font-black uppercase tracking-widest text-amber-500/90 dark:text-amber-400 mb-3 flex items-center gap-1">
                             <i class="fa-solid fa-clock-rotate-left"></i> Item-Wise Issue History
@@ -454,7 +457,6 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 `;
 
-                // Nested loop iteration mapping transactions item by item
                 for (const ppeItemName in emp.ppeHistory) {
                     htmlOutputBlock += `
                         <div class="item-nested-card p-3 rounded-xl flex flex-col justify-between space-y-2 shadow-sm transition-all duration-150">
@@ -465,7 +467,7 @@
                     `;
 
                     emp.ppeHistory[ppeItemName].forEach(record => {
-                        const optionalSizeStr = record.size ? ` <span class="size-custom font-mono text-[9px] font-extrabold bg-amber-500/10 dark:bg-amber-500/15 px-1 py-0.5 rounded ml-1">Sz: ${record.size}</span>` : '';
+                        const optionalSizeStr = record.size ? ` <span class="size-custom font-mono text-[9px] font-extrabold bg-amber-500/10 dark:bg-amber-500/15 px-1.5 py-0.5 rounded ml-1">Sz: ${record.size}</span>` : '';
                         htmlOutputBlock += `
                             <div class="text-[11px] flex justify-between items-center text-accent-color/90 gap-x-2">
                                 <span class="font-mono opacity-70">${record.date}</span>
