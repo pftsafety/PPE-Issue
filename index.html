@@ -7,7 +7,7 @@
     
     <!-- PWA Core Settings Matrix -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#030712">
+    <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1255/1255421.png">
@@ -15,8 +15,36 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- HIGH-CONTRAST DUAL-THEME VARIABLE DICTIONARY --- */
+        /* --- HIGH-CONTRAST VARIABLE DICTIONARY (LIGHT MODE BY DEFAULT) --- */
         :root {
+            --bg-canvas: linear-gradient(to bottom right, #ffffff, #f1f5f9);
+            --text-main: #000000;       /* Solid crisp black typography */
+            --text-muted: #000000;      /* Solid crisp black labels */
+            --text-title: #000000;      /* Solid crisp black titles */
+            --text-accent: #000000;     /* Solid crisp black values */
+            --text-indigo: #3730a3;     /* Deep high-visibility indigo */
+            --glass-bg: rgba(255, 255, 255, 0.9); 
+            --glass-border: #000000;    /* Solid black defining borders */
+            --glass-shadow: rgba(15, 23, 42, 0.06);
+            --nav-bg: rgba(255, 255, 255, 0.95);
+            --nav-border: #000000;
+            --input-bg: #ffffff;
+            --input-border: #000000;    /* High contrast input borders */
+            --input-focus-ring: rgba(79, 70, 229, 0.15);
+            --table-header: #e2e8f0;
+            --table-row-hover: rgba(0, 0, 0, 0.03);
+            --badge-bg: rgba(79, 70, 229, 0.08);
+            --badge-border: #3730a3;
+            --badge-text: #3730a3;
+            --qty-bg: #e2e8f0;
+            --qty-border: #000000;
+            --size-text: #9a3412;       
+            --overlay-bg: rgba(255, 255, 255, 0.95);
+            --progress-track: rgba(0, 0, 0, 0.08);
+        }
+
+        /* --- DARK THEME OVERRIDE MATRIX --- */
+        [data-theme="dark"] {
             --bg-canvas: radial-gradient(circle at top right, #0b0f19, #030712);
             --text-main: #94a3b8;       
             --text-muted: #475569;      
@@ -43,34 +71,7 @@
             --progress-track: rgba(255, 255, 255, 0.05);
         }
 
-        [data-theme="light"] {
-            --bg-canvas: linear-gradient(to bottom right, #f1f5f9, #e2e8f0);
-            --text-main: #334155;       /* Deep high-visibility grey */
-            --text-muted: #57657a;      /* Enhanced contrast labels */
-            --text-title: #0f172a;      /* Solid black/slate title blocks */
-            --text-accent: #0f172a;     /* Deep high-contrast profile typography */
-            --text-indigo: #3730a3;     /* Rich dark indigo accent headers */
-            --glass-bg: rgba(255, 255, 255, 0.85); 
-            --glass-border: rgba(148, 163, 184, 0.3);
-            --glass-shadow: rgba(15, 23, 42, 0.08);
-            --nav-bg: rgba(255, 255, 255, 0.9);
-            --nav-border: rgba(203, 213, 225, 1);
-            --input-bg: #ffffff;
-            --input-border: #94a3b8;
-            --input-focus-ring: rgba(79, 70, 229, 0.15);
-            --table-header: #e2e8f0;
-            --table-row-hover: rgba(255, 255, 255, 0.5);
-            --badge-bg: rgba(79, 70, 229, 0.08);
-            --badge-border: rgba(79, 70, 229, 0.3);
-            --badge-text: #3730a3;
-            --qty-bg: #e2e8f0;
-            --qty-border: #94a3b8;
-            --size-text: #9a3412;       /* Maximum contrast rust-orange */
-            --overlay-bg: rgba(241, 245, 249, 0.9);
-            --progress-track: rgba(0, 0, 0, 0.08);
-        }
-
-        /* --- STYLING BRIDGE WORKCLASSES --- */
+        /* --- CLASSIFICATION WORK CONNECTORS --- */
         .dynamic-bg { background: var(--bg-canvas); }
         .dynamic-text { color: var(--text-main); }
         .dynamic-text-muted { color: var(--text-muted); }
@@ -84,21 +85,19 @@
         .overlay-bg-custom { background: var(--overlay-bg); }
         .progress-track-custom { background: var(--progress-track); }
         
-        /* Forces inputs to respect native dynamic styling placeholders across engines */
         input::placeholder {
-            color: var(--text-muted) !important;
-            opacity: 0.65 !important;
+            color: var(--text-main) !important;
+            opacity: 0.5 !important;
         }
 
-        .item-nested-card { background: rgba(0, 0, 0, 0.12); border: 1px solid var(--glass-border); transition: background-color 150ms ease; }
-        [data-theme="light"] .item-nested-card { background: rgba(255, 255, 255, 0.6); }
+        .item-nested-card { background: rgba(0, 0, 0, 0.04); border: 1px solid var(--glass-border); transition: background-color 150ms ease; }
+        [data-theme="dark"] .item-nested-card { background: rgba(0, 0, 0, 0.2); }
         .item-nested-card:hover { background: var(--table-row-hover); }
 
         .badge-custom { background: var(--badge-bg); border-color: var(--badge-border); color: var(--badge-text); }
         .qty-custom { background: var(--qty-bg); border-color: var(--qty-border); color: var(--text-accent); }
         .size-custom { color: var(--size-text); }
 
-        /* Smooth CSS Transitions & Animations */
         @keyframes glassFadeIn {
             from { opacity: 0; transform: translateY(16px); filter: blur(4px); }
             to { opacity: 1; transform: translateY(0); filter: blur(0); }
@@ -122,7 +121,7 @@
 
     <!-- --- 🔒 GLOBAL SYSTEM LOCK OVERLAY --- -->
     <div id="loading-overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center overlay-bg-custom backdrop-blur-2xl transition-all duration-500">
-        <h3 id="overlay-title" class="text-xs font-bold tracking-widest dynamic-text-title uppercase mb-4">Synchronizing Nodes</h3>
+        <h3 id="overlay-title" class="text-xs font-bold tracking-widest dynamic-text-title uppercase mb-4">Loading...</h3>
         <div class="w-56 h-1 progress-track-custom rounded-full overflow-hidden relative border border-black/5 dark:border-white/5 shadow-inner">
             <div class="progress-bar-fill h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full absolute"></div>
         </div>
@@ -135,7 +134,7 @@
                 <i class="fa-solid fa-shield-halved text-white text-lg"></i>
             </div>
             <div>
-                <h1 class="text-base font-extrabold tracking-tight dynamic-text-title">PPE CONTROL HUB</h1>
+                <h1 class="text-base font-extrabold tracking-tight dynamic-text-title">PPE Issue</h1>
                 <div class="flex items-center space-x-1.5 mt-0.5">
                     <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <p class="text-[10px] text-indigo-color font-bold tracking-widest uppercase">Live Distribution Stream</p>
@@ -145,9 +144,9 @@
         
         <div class="flex items-center space-x-3.5">
             <!-- Smooth Design Theme Toggle Slider Button -->
-            <button onclick="toggleTheme()" class="relative inline-flex h-6 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-800/80 dark:bg-white/10 transition-colors duration-200 focus:outline-none shadow-inner" id="theme-toggle-btn">
+            <button onclick="toggleTheme()" class="relative inline-flex h-6 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-300 dark:bg-white/10 transition-colors duration-200 focus:outline-none shadow-inner" id="theme-toggle-btn">
                 <span id="toggle-thumb" class="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-250 ease-in-out translate-x-0 flex items-center justify-center text-[10px]">
-                    <i id="theme-icon" class="fa-solid fa-moon text-indigo-950"></i>
+                    <i id="theme-icon" class="fa-solid fa-sun text-amber-500"></i>
                 </span>
             </button>
 
@@ -161,7 +160,7 @@
     <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
         
         <!-- Search Controls Deck Panel -->
-        <div class="animate-glass dynamic-glass backdrop-blur-xl border rounded-2xl p-6 relative transition-all duration-300">
+        <div class="animate-glass dynamic-glass backdrop-blur-xl border rounded-2xl p-6 relative overflow-hidden transition-all duration-300">
             <div class="flex items-center space-x-2 mb-5 text-indigo-color font-bold text-[11px] tracking-widest uppercase">
                 <i class="fa-solid fa-layer-group text-sm"></i>
                 <h2>Interactive Query Filter Console</h2>
@@ -176,7 +175,7 @@
                             <i class="fa-solid fa-id-card text-xs"></i>
                         </span>
                         <input type="text" id="search-card" oninput="debounceSearch()" placeholder="Search ID tag..." 
-                            class="w-full pl-9 pr-3 py-2 dynamic-input border rounded-xl focus:outline-none transition-all text-sm tracking-wide">
+                            class="w-full pl-9 pr-3 py-2 bg-transparent dynamic-input border rounded-xl focus:outline-none transition-all text-sm tracking-wide">
                     </div>
                 </div>
 
@@ -188,7 +187,7 @@
                             <i class="fa-solid fa-user text-xs"></i>
                         </span>
                         <input type="text" id="search-name" oninput="debounceSearch()" placeholder="Search user name..." 
-                            class="w-full pl-9 pr-3 py-2 dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
+                            class="w-full pl-9 pr-3 py-2 bg-transparent dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
                     </div>
                 </div>
 
@@ -200,7 +199,7 @@
                             <i class="fa-solid fa-building text-xs"></i>
                         </span>
                         <input type="text" id="search-dept" oninput="debounceSearch()" placeholder="Search department..." 
-                            class="w-full pl-9 pr-3 py-2 dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
+                            class="w-full pl-9 pr-3 py-2 bg-transparent dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
                     </div>
                 </div>
 
@@ -212,7 +211,7 @@
                             <i class="fa-solid fa-helmet-safety text-xs"></i>
                         </span>
                         <input type="text" id="search-item" list="item-options" oninput="debounceSearch()" placeholder="Select hardware model..." 
-                            class="w-full pl-9 pr-3 py-2 dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
+                            class="w-full pl-9 pr-3 py-2 bg-transparent dynamic-input border rounded-xl focus:outline-none transition-all text-sm">
                         <datalist id="item-options"></datalist>
                     </div>
                 </div>
@@ -278,31 +277,28 @@
             const body = document.body;
             const thumb = document.getElementById('toggle-thumb');
             const icon = document.getElementById('theme-icon');
-            const toggleBtn = document.getElementById('theme-toggle-btn');
             
-            if (body.getAttribute('data-theme') === 'light') {
+            if (body.getAttribute('data-theme') === 'dark') {
                 body.removeAttribute('data-theme');
                 thumb.style.transform = 'translateX(0px)';
-                icon.className = 'fa-solid fa-moon text-indigo-950';
-                toggleBtn.style.backgroundColor = '';
-            } else {
-                body.setAttribute('data-theme', 'light');
-                thumb.style.transform = 'translateX(20px)';
                 icon.className = 'fa-solid fa-sun text-amber-500';
-                toggleBtn.style.backgroundColor = '#4f46e5';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                thumb.style.transform = 'translateX(20px)';
+                icon.className = 'fa-solid fa-moon text-indigo-950';
             }
         }
 
         window.onload = function() {
             fetch(apiEndpoint)
                 .then(response => {
-                    if (!response.ok) throw new Error("Cloud matrix stream parsing validation execution failure.");
+                    if (!response.ok) throw new Error("Cloud matrix stream parsing validation failure.");
                     return response.json();
                 })
                 .then(parsedData => {
                     if(parsedData.error) throw new Error(parsedData.error);
                     
-                    // --- INTELLIGENT NAME CONSOLIDATION LOGIC PROFILE ---
+                    // --- INTELLIGENT NAME CONSOLIDATION ENGINE ---
                     const cardNameRegistry = {};
                     parsedData.forEach(row => {
                         const card = row.cardNo ? row.cardNo.toString().trim() : "";
@@ -400,7 +396,7 @@
             document.getElementById('btn-prev').disabled = (currentPage === 1);
             document.getElementById('btn-next').disabled = (endIdx >= totalRecords);
 
-            // --- UNIFIED ADVANCED DATA AGGREGATOR ENGINE ---
+            // --- ADVANCED DATA AGGREGATOR MODULE ---
             const employeeMap = {};
             const employeeOrder = []; 
 
@@ -427,7 +423,7 @@
                 });
             });
 
-            // --- UNIFIED HIGH-PERFORMANCE SCREEN BUILDER LOOP ---
+            // --- HIGH-PERFORMANCE DOM COMPILER ---
             const deckFragment = document.createDocumentFragment();
             
             employeeOrder.forEach((key, index) => {
@@ -465,7 +461,7 @@
                 for (const ppeItemName in emp.ppeHistory) {
                     htmlOutputBlock += `
                         <div class="item-nested-card p-3 rounded-xl flex flex-col justify-between space-y-2 shadow-sm transition-all duration-150">
-                            <div class="text-[11px] font-extrabold text-indigo-color tracking-wide border-b border-slate-300/40 dark:border-white/[0.04] pb-1 uppercase truncate" style="border-bottom-color: var(--glass-border);" title="${ppeItemName}">
+                            <div class="text-[11px] font-extrabold text-indigo-color tracking-wide border-b pb-1 uppercase truncate" style="border-bottom-color: var(--glass-border);" title="${ppeItemName}">
                                 ${ppeItemName}
                             </div>
                             <div class="space-y-1.5 max-h-[120px] overflow-y-auto pr-1">
@@ -539,13 +535,13 @@
         }
     </script>
     
-    <!-- PWA Active Registration Submodule Loop -->
+    <!-- PWA Installation Registration Trigger -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('ServiceWorker channel bound.', reg))
-                    .catch(err => console.error('ServiceWorker binding aborted: ', err));
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('ServiceWorker tracking channel bound successfully.', reg))
+                    .catch(err => console.error('ServiceWorker setup mapping error sequence: ', err));
             });
         }
     </script>
