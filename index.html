@@ -170,10 +170,104 @@
             position: fixed; inset: 0; z-index: 999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             background: var(--bg);
-            background-image:
-                radial-gradient(ellipse at 10% 10%, rgba(99,102,241,0.14) 0%, transparent 52%),
-                radial-gradient(ellipse at 90% 90%, rgba(14,165,233,0.12) 0%, transparent 52%);
+            overflow: hidden;
             transition: opacity 0.3s ease;
+        }
+
+        /* Animated mesh background on loader */
+        #loading-overlay::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(99,102,241,0.28) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 80%, rgba(14,165,233,0.24) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 15%, rgba(168,85,247,0.22) 0%, transparent 48%),
+                radial-gradient(ellipse at 15% 80%, rgba(52,199,89,0.14) 0%, transparent 48%);
+            animation: meshShift 6s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+        [data-theme="dark"] #loading-overlay::before {
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(99,102,241,0.40) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 80%, rgba(14,165,233,0.32) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 15%, rgba(168,85,247,0.30) 0%, transparent 48%),
+                radial-gradient(ellipse at 15% 80%, rgba(10,132,255,0.22) 0%, transparent 48%);
+        }
+
+        /* Floating blobs */
+        .loader-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(55px);
+            pointer-events: none;
+            opacity: 0.55;
+        }
+        .loader-blob-1 {
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, rgba(99,102,241,0.7), transparent 70%);
+            top: -80px; left: -60px;
+            animation: blobDrift1 7s ease-in-out infinite;
+        }
+        .loader-blob-2 {
+            width: 240px; height: 240px;
+            background: radial-gradient(circle, rgba(14,165,233,0.65), transparent 70%);
+            bottom: -60px; right: -50px;
+            animation: blobDrift2 9s ease-in-out infinite;
+        }
+        .loader-blob-3 {
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(168,85,247,0.55), transparent 70%);
+            top: 40%; right: -70px;
+            animation: blobDrift3 11s ease-in-out infinite;
+        }
+        .loader-blob-4 {
+            width: 160px; height: 160px;
+            background: radial-gradient(circle, rgba(52,199,89,0.45), transparent 70%);
+            bottom: 20%; left: -50px;
+            animation: blobDrift4 8s ease-in-out infinite;
+        }
+
+        /* Floating rings */
+        .loader-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.18);
+            pointer-events: none;
+            animation: ringExpand 4s ease-out infinite;
+        }
+        .loader-ring-1 { width: 120px; height: 120px; top: 15%; left: 10%; animation-delay: 0s; }
+        .loader-ring-2 { width: 80px;  height: 80px;  bottom: 25%; right: 12%; animation-delay: 1.3s; }
+        .loader-ring-3 { width: 60px;  height: 60px;  top: 60%;  left: 20%; animation-delay: 2.6s; }
+
+        @keyframes meshShift {
+            0%   { transform: scale(1)    rotate(0deg); }
+            50%  { transform: scale(1.06) rotate(2deg); }
+            100% { transform: scale(1.03) rotate(-1deg); }
+        }
+        @keyframes blobDrift1 {
+            0%,100% { transform: translate(0,0) scale(1); }
+            33%     { transform: translate(40px, 50px) scale(1.10); }
+            66%     { transform: translate(-20px, 30px) scale(0.93); }
+        }
+        @keyframes blobDrift2 {
+            0%,100% { transform: translate(0,0) scale(1); }
+            40%     { transform: translate(-50px,-40px) scale(1.08); }
+            70%     { transform: translate(25px,-20px) scale(0.95); }
+        }
+        @keyframes blobDrift3 {
+            0%,100% { transform: translate(0,0) scale(1); }
+            35%     { transform: translate(-30px, 45px) scale(1.12); }
+            65%     { transform: translate(15px,-25px) scale(0.90); }
+        }
+        @keyframes blobDrift4 {
+            0%,100% { transform: translate(0,0) scale(1); }
+            45%     { transform: translate(35px,-30px) scale(1.06); }
+            75%     { transform: translate(-15px, 20px) scale(0.96); }
+        }
+        @keyframes ringExpand {
+            0%   { transform: scale(0.6); opacity: 0.5; }
+            60%  { transform: scale(1.8); opacity: 0.12; }
+            100% { transform: scale(2.4); opacity: 0; }
         }
         .loader-box {
             background: var(--g1); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
@@ -436,6 +530,16 @@
 
     <!-- Loading -->
     <div id="loading-overlay">
+        <!-- Animated background blobs -->
+        <div class="loader-blob loader-blob-1"></div>
+        <div class="loader-blob loader-blob-2"></div>
+        <div class="loader-blob loader-blob-3"></div>
+        <div class="loader-blob loader-blob-4"></div>
+        <!-- Expanding rings -->
+        <div class="loader-ring loader-ring-1"></div>
+        <div class="loader-ring loader-ring-2"></div>
+        <div class="loader-ring loader-ring-3"></div>
+        <!-- Glass card -->
         <div class="loader-box">
             <div class="loader-heading">Loading...</div>
             <div class="loader-sub">Fetching PPE records</div>
@@ -451,7 +555,7 @@
             </div>
             <div class="brand-text">
                 <div class="brand-name">PPE Issue</div>
-                <div class="brand-sub"><div class="live-dot"></div>Safety & Envt Dept_PFT</div>
+                <div class="brand-sub"><div class="live-dot"></div>Live Distribution Stream</div>
             </div>
         </div>
         <div class="nav-right">
