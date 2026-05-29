@@ -428,10 +428,16 @@
 
         /* ── RECORD CARD ── */
         .record-card {
-            background: var(--g2); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-            border: 1px solid var(--gb); border-radius: 20px;
-            box-shadow: var(--st), var(--sb), var(--s2), 0 1px 0 rgba(255,255,255,0.5);
+            background: rgba(235, 240, 255, 0.82);
+            backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+            border: 1px solid rgba(200, 210, 255, 0.70); border-radius: 20px;
+            box-shadow: var(--st), var(--sb), var(--s2), 0 1px 0 rgba(255,255,255,0.8);
             overflow: hidden; position: relative;
+            animation: fadeUp 0.38s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        [data-theme="dark"] .record-card {
+            background: rgba(30, 32, 58, 0.78);
+            border-color: rgba(80, 90, 160, 0.25);
         }
         .record-card::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 55%;
@@ -774,22 +780,18 @@
             </div>
 
             <!-- Pagination -->
-            <div class="glow-shell glow-shell-page">
-                <div class="glow-ring"></div>
-                <div class="glow-ring-blur"></div>
-                <div id="pagination-footer" class="lg pagination" style="display:none;">
-                    <div class="page-info">
-                        <b id="page-start">0</b>–<b id="page-end">0</b>
-                        of <span class="cnt" id="filtered-count">0</span>
-                    </div>
-                    <div class="page-btns">
-                        <button class="page-btn" id="btn-prev" onclick="changePage(-1)">
-                            <i class="fa-solid fa-angle-left" style="font-size:11px;"></i> Prev
-                        </button>
-                        <button class="page-btn" id="btn-next" onclick="changePage(1)">
-                            Next <i class="fa-solid fa-angle-right" style="font-size:11px;"></i>
-                        </button>
-                    </div>
+            <div id="pagination-footer" class="lg pagination" style="display:none;">
+                <div class="page-info">
+                    <b id="page-start">0</b>–<b id="page-end">0</b>
+                    of <span class="cnt" id="filtered-count">0</span>
+                </div>
+                <div class="page-btns">
+                    <button class="page-btn" id="btn-prev" onclick="changePage(-1)">
+                        <i class="fa-solid fa-angle-left" style="font-size:11px;"></i> Prev
+                    </button>
+                    <button class="page-btn" id="btn-next" onclick="changePage(1)">
+                        Next <i class="fa-solid fa-angle-right" style="font-size:11px;"></i>
+                    </button>
                 </div>
             </div>
 
@@ -965,17 +967,9 @@
         var frag=document.createDocumentFragment();
         empOrder.forEach(function(k,i){
             var emp=empMap[k];
-
-            // Glow shell wrapper (provides the AI border light)
-            var shell=document.createElement('div');
-            shell.className='glow-shell glow-shell-card';
-            shell.style.animationDelay=(i*18)+'ms';
-
-            var ring1=document.createElement('div'); ring1.className='glow-ring';
-            var ring2=document.createElement('div'); ring2.className='glow-ring-blur';
-
             var el=document.createElement('div');
             el.className='record-card';
+            el.style.animationDelay=(i*18)+'ms';
 
             var itemsHTML='';
             for(var name in emp.items){
@@ -999,10 +993,7 @@
                     '<div class="items-stack">'+itemsHTML+'</div>'+
                 '</div>';
 
-            shell.appendChild(ring1);
-            shell.appendChild(ring2);
-            shell.appendChild(el);
-            frag.appendChild(shell);
+            frag.appendChild(el);
         });
         deck.appendChild(frag);
     }
