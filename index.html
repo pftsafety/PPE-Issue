@@ -432,7 +432,6 @@
             border: 1px solid var(--gb); border-radius: 20px;
             box-shadow: var(--st), var(--sb), var(--s2), 0 1px 0 rgba(255,255,255,0.5);
             overflow: hidden; position: relative;
-            animation: fadeUp 0.38s cubic-bezier(0.16,1,0.3,1) both;
         }
         .record-card::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 55%;
@@ -518,9 +517,120 @@
         .state-title { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--t2); }
         .state-sub { font-size: 12px; color: var(--t3); margin-top: 4px; }
 
+        /* ══ GOOGLE AI MODE BORDER LIGHT ══════════════════════════════
+           Technique: shell with overflow:hidden clips the rotating
+           conic-gradient ring to the card shape. The 1.5px padding gap
+           IS the border — the ring shines through it.              */
+
+        .glow-shell {
+            position: relative;
+            padding: 1.5px;
+            overflow: hidden;   /* clips rotating ring to rounded shape */
+        }
+        .glow-shell-card   { border-radius: 22px; animation: fadeUp 0.38s cubic-bezier(0.16,1,0.3,1) both; }
+        .glow-shell-search { border-radius: 25px; }
+        .glow-shell-loader { border-radius: 30px; }
+        .glow-shell-page   { border-radius: 20px; }
+
+        /* Sharp rotating ring */
+        .glow-ring {
+            position: absolute;
+            width: 260%; height: 260%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(0deg);
+            background: conic-gradient(
+                from 0deg at 50% 50%,
+                transparent  0deg,
+                transparent  52deg,
+                rgba(129,140,248,0.00) 66deg,
+                rgba(129,140,248,1.00) 90deg,   /* indigo */
+                rgba(56, 189,248,1.00) 118deg,  /* sky blue — brightest */
+                rgba(167,139,250,0.95) 144deg,  /* violet */
+                rgba(244,114,182,0.70) 162deg,  /* pink */
+                rgba(244,114,182,0.00) 178deg,
+                transparent 178deg,
+                transparent 360deg
+            );
+            animation: aiGlowSpin 4s linear infinite;
+            pointer-events: none; z-index: 0;
+        }
+
+        /* Blurred duplicate ring for ambient glow halo */
+        .glow-ring-blur {
+            position: absolute;
+            width: 260%; height: 260%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(0deg);
+            background: conic-gradient(
+                from 0deg at 50% 50%,
+                transparent  0deg,
+                transparent  52deg,
+                rgba(129,140,248,0.00) 66deg,
+                rgba(129,140,248,0.55) 90deg,
+                rgba(56, 189,248,0.60) 118deg,
+                rgba(167,139,250,0.50) 144deg,
+                rgba(244,114,182,0.35) 162deg,
+                rgba(244,114,182,0.00) 178deg,
+                transparent 178deg,
+                transparent 360deg
+            );
+            animation: aiGlowSpin 4s linear infinite;
+            pointer-events: none; filter: blur(10px); z-index: 0;
+        }
+
+        /* Dark mode — more vivid since dark bg makes neon pop */
+        [data-theme="dark"] .glow-ring {
+            background: conic-gradient(
+                from 0deg at 50% 50%,
+                transparent  0deg,
+                transparent  52deg,
+                rgba(99, 102,241,0.00) 66deg,
+                rgba(99, 102,241,1.00) 90deg,
+                rgba(14, 165,233,1.00) 118deg,
+                rgba(168, 85,247,1.00) 144deg,
+                rgba(236, 72,153,0.80) 162deg,
+                rgba(236, 72,153,0.00) 178deg,
+                transparent 178deg,
+                transparent 360deg
+            );
+        }
+        [data-theme="dark"] .glow-ring-blur {
+            background: conic-gradient(
+                from 0deg at 50% 50%,
+                transparent  0deg,
+                transparent  52deg,
+                rgba(99, 102,241,0.00) 66deg,
+                rgba(99, 102,241,0.65) 90deg,
+                rgba(14, 165,233,0.70) 118deg,
+                rgba(168, 85,247,0.65) 144deg,
+                rgba(236, 72,153,0.45) 162deg,
+                rgba(236, 72,153,0.00) 178deg,
+                transparent 178deg,
+                transparent 360deg
+            );
+            filter: blur(12px);
+        }
+
+        @keyframes aiGlowSpin {
+            from { transform: translate(-50%,-50%) rotate(0deg); }
+            to   { transform: translate(-50%,-50%) rotate(360deg); }
+        }
+
+        /* Inner elements inside shell — remove their own border
+           (shell gap IS the border) and tighten border-radius by 2px */
+        .glow-shell > .record-card {
+            border-color: transparent;
+            border-radius: 20px;
+            animation: none; /* animation moved to shell */
+        }
+        .glow-shell > .lg {
+            border-color: transparent;
+        }
+        .glow-shell-search > .lg { border-radius: 23px; }
+        .glow-shell-loader > .loader-box { border-color: transparent; border-radius: 28px; }
+        .glow-shell-page > .lg { border-radius: 18px; }
         /* ── ANIMATIONS ── */
         @keyframes fadeUp    { from{opacity:0;transform:translateY(10px);filter:blur(2px)} to{opacity:1;transform:none;filter:none} }
-        @keyframes progSlide { 0%{left:-50%;width:40%} 50%{width:65%} 100%{left:110%;width:40%} }
         @keyframes livePulse { 0%{box-shadow:0 0 0 0 rgba(52,199,89,0.5)} 70%{box-shadow:0 0 0 5px rgba(52,199,89,0)} 100%{box-shadow:0 0 0 0 rgba(52,199,89,0)} }
         @keyframes orb1 { 0%,100%{transform:translate(0,0)} 40%{transform:translate(-30px,25px)} 70%{transform:translate(20px,-15px)} }
         @keyndef orb2 { 0%,100%{transform:translate(0,0)} 35%{transform:translate(35px,-28px)} 65%{transform:translate(-15px,20px)} }
@@ -540,10 +650,15 @@
         <div class="loader-ring loader-ring-2"></div>
         <div class="loader-ring loader-ring-3"></div>
         <!-- Glass card -->
-        <div class="loader-box">
-            <div class="loader-heading">Loading...</div>
-            <div class="loader-sub">Fetching PPE records</div>
-            <div class="prog-track"><div class="prog-fill"></div></div>
+        <!-- Glass card with AI border light -->
+        <div class="glow-shell glow-shell-loader">
+            <div class="glow-ring"></div>
+            <div class="glow-ring-blur"></div>
+            <div class="loader-box">
+                <div class="loader-heading">Loading...</div>
+                <div class="loader-sub">Fetching PPE records</div>
+                <div class="prog-track"><div class="prog-fill"></div></div>
+            </div>
         </div>
     </div>
 
@@ -600,7 +715,10 @@
         <div class="stack">
 
             <!-- Search -->
-            <div class="lg search-panel">
+            <div class="glow-shell glow-shell-search">
+                <div class="glow-ring"></div>
+                <div class="glow-ring-blur"></div>
+                <div class="lg search-panel">
                 <div class="panel-label"><i class="fa-solid fa-magnifying-glass"></i>Filter &amp; Search</div>
 
                 <div class="field">
@@ -637,7 +755,7 @@
                     <i class="fa-solid fa-arrow-rotate-left" style="font-size:11px;"></i>
                     Reset Filters
                 </button>
-            </div>
+            </div> <!-- /glow-shell-search -->
 
             <!-- Loader state -->
             <div id="inline-loader" class="lg state-box">
@@ -656,18 +774,22 @@
             </div>
 
             <!-- Pagination -->
-            <div id="pagination-footer" class="lg pagination" style="display:none;">
-                <div class="page-info">
-                    <b id="page-start">0</b>–<b id="page-end">0</b>
-                    of <span class="cnt" id="filtered-count">0</span>
-                </div>
-                <div class="page-btns">
-                    <button class="page-btn" id="btn-prev" onclick="changePage(-1)">
-                        <i class="fa-solid fa-angle-left" style="font-size:11px;"></i> Prev
-                    </button>
-                    <button class="page-btn" id="btn-next" onclick="changePage(1)">
-                        Next <i class="fa-solid fa-angle-right" style="font-size:11px;"></i>
-                    </button>
+            <div class="glow-shell glow-shell-page">
+                <div class="glow-ring"></div>
+                <div class="glow-ring-blur"></div>
+                <div id="pagination-footer" class="lg pagination" style="display:none;">
+                    <div class="page-info">
+                        <b id="page-start">0</b>–<b id="page-end">0</b>
+                        of <span class="cnt" id="filtered-count">0</span>
+                    </div>
+                    <div class="page-btns">
+                        <button class="page-btn" id="btn-prev" onclick="changePage(-1)">
+                            <i class="fa-solid fa-angle-left" style="font-size:11px;"></i> Prev
+                        </button>
+                        <button class="page-btn" id="btn-next" onclick="changePage(1)">
+                            Next <i class="fa-solid fa-angle-right" style="font-size:11px;"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -842,8 +964,18 @@
 
         var frag=document.createDocumentFragment();
         empOrder.forEach(function(k,i){
-            var emp=empMap[k], el=document.createElement('div');
-            el.className='record-card'; el.style.animationDelay=(i*18)+'ms';
+            var emp=empMap[k];
+
+            // Glow shell wrapper (provides the AI border light)
+            var shell=document.createElement('div');
+            shell.className='glow-shell glow-shell-card';
+            shell.style.animationDelay=(i*18)+'ms';
+
+            var ring1=document.createElement('div'); ring1.className='glow-ring';
+            var ring2=document.createElement('div'); ring2.className='glow-ring-blur';
+
+            var el=document.createElement('div');
+            el.className='record-card';
 
             var itemsHTML='';
             for(var name in emp.items){
@@ -866,7 +998,11 @@
                     '<div class="history-label"><i class="fa-solid fa-clock-rotate-left" style="font-size:10px;"></i>Issue History</div>'+
                     '<div class="items-stack">'+itemsHTML+'</div>'+
                 '</div>';
-            frag.appendChild(el);
+
+            shell.appendChild(ring1);
+            shell.appendChild(ring2);
+            shell.appendChild(el);
+            frag.appendChild(shell);
         });
         deck.appendChild(frag);
     }
