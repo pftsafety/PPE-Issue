@@ -110,12 +110,6 @@
         body {
             font-family: var(--font);
             background-color: var(--bg);
-            background-image:
-                radial-gradient(ellipse at 10% 10%, rgba(99,102,241,0.14) 0%, transparent 52%),
-                radial-gradient(ellipse at 90% 90%, rgba(14,165,233,0.12) 0%, transparent 52%),
-                radial-gradient(ellipse at 88% 12%, rgba(168,85,247,0.10) 0%, transparent 44%),
-                radial-gradient(ellipse at 12% 88%, rgba(52,199,89,0.07) 0%, transparent 44%);
-            background-attachment: fixed;
             min-height: 100%;
             color: var(--t1);
             -webkit-font-smoothing: antialiased;
@@ -125,31 +119,6 @@
             transition: background-color 0.35s ease, color 0.3s ease;
             position: relative;
         }
-        [data-theme="dark"] body {
-            background-image:
-                radial-gradient(ellipse at 10% 10%, rgba(99,102,241,0.22) 0%, transparent 52%),
-                radial-gradient(ellipse at 90% 90%, rgba(14,165,233,0.16) 0%, transparent 52%),
-                radial-gradient(ellipse at 88% 12%, rgba(168,85,247,0.16) 0%, transparent 44%),
-                radial-gradient(ellipse at 12% 88%, rgba(10,132,255,0.10) 0%, transparent 44%);
-        }
-
-        /* Ambient orbs */
-        body::before, body::after {
-            content: ''; position: fixed; border-radius: 50%;
-            pointer-events: none; z-index: 0; filter: blur(60px);
-        }
-        body::before {
-            width: 340px; height: 340px; top: -80px; right: -60px;
-            background: radial-gradient(circle, rgba(100,100,255,0.22) 0%, transparent 70%);
-            animation: orb1 16s ease-in-out infinite;
-        }
-        body::after {
-            width: 300px; height: 300px; bottom: -60px; left: -40px;
-            background: radial-gradient(circle, rgba(0,122,255,0.18) 0%, transparent 70%);
-            animation: orb2 20s ease-in-out infinite;
-        }
-        [data-theme="dark"] body::before { background: radial-gradient(circle, rgba(88,86,214,0.28) 0%, transparent 70%); }
-        [data-theme="dark"] body::after  { background: radial-gradient(circle, rgba(10,132,255,0.22) 0%, transparent 70%); }
 
         /* ── GLASS UTILITY ── */
         .lg {
@@ -530,8 +499,10 @@
 
         .glow-shell {
             position: relative;
-            padding: 1.5px;
-            overflow: hidden;   /* clips rotating ring to rounded shape */
+            padding: 2px;
+            overflow: hidden;
+            transform: translateZ(0);      /* forces GPU layer — fixes blur bleed */
+            -webkit-transform: translateZ(0);
         }
         .glow-shell-card   { border-radius: 22px; animation: fadeUp 0.38s cubic-bezier(0.16,1,0.3,1) both; }
         .glow-shell-search { border-radius: 25px; }
@@ -561,29 +532,6 @@
             pointer-events: none; z-index: 0;
         }
 
-        /* Blurred duplicate ring for ambient glow halo */
-        .glow-ring-blur {
-            position: absolute;
-            width: 260%; height: 260%;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotate(0deg);
-            background: conic-gradient(
-                from 0deg at 50% 50%,
-                transparent  0deg,
-                transparent  52deg,
-                rgba(129,140,248,0.00) 66deg,
-                rgba(129,140,248,0.55) 90deg,
-                rgba(56, 189,248,0.60) 118deg,
-                rgba(167,139,250,0.50) 144deg,
-                rgba(244,114,182,0.35) 162deg,
-                rgba(244,114,182,0.00) 178deg,
-                transparent 178deg,
-                transparent 360deg
-            );
-            animation: aiGlowSpin 4s linear infinite;
-            pointer-events: none; filter: blur(10px); z-index: 0;
-        }
-
         /* Dark mode — more vivid since dark bg makes neon pop */
         [data-theme="dark"] .glow-ring {
             background: conic-gradient(
@@ -600,23 +548,6 @@
                 transparent 360deg
             );
         }
-        [data-theme="dark"] .glow-ring-blur {
-            background: conic-gradient(
-                from 0deg at 50% 50%,
-                transparent  0deg,
-                transparent  52deg,
-                rgba(99, 102,241,0.00) 66deg,
-                rgba(99, 102,241,0.65) 90deg,
-                rgba(14, 165,233,0.70) 118deg,
-                rgba(168, 85,247,0.65) 144deg,
-                rgba(236, 72,153,0.45) 162deg,
-                rgba(236, 72,153,0.00) 178deg,
-                transparent 178deg,
-                transparent 360deg
-            );
-            filter: blur(12px);
-        }
-
         @keyframes aiGlowSpin {
             from { transform: translate(-50%,-50%) rotate(0deg); }
             to   { transform: translate(-50%,-50%) rotate(360deg); }
@@ -659,7 +590,6 @@
         <!-- Glass card with AI border light -->
         <div class="glow-shell glow-shell-loader">
             <div class="glow-ring"></div>
-            <div class="glow-ring-blur"></div>
             <div class="loader-box">
                 <div class="loader-heading">Loading...</div>
                 <div class="loader-sub">Fetching PPE records</div>
@@ -723,7 +653,6 @@
             <!-- Search -->
             <div class="glow-shell glow-shell-search">
                 <div class="glow-ring"></div>
-                <div class="glow-ring-blur"></div>
                 <div class="lg search-panel">
                 <div class="panel-label"><i class="fa-solid fa-magnifying-glass"></i>Filter &amp; Search</div>
 
