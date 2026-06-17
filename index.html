@@ -970,7 +970,6 @@
                     <div class="form-label"><i class="fa-solid fa-id-card"></i>Card No</div>
                     <input class="form-input" type="text" id="add-card"
                         placeholder="Enter card number…"
-                        oninput="onCardLookup()"
                         autocomplete="off" autocorrect="off" spellcheck="false">
                 </div>
                 <div class="form-row">
@@ -1031,34 +1030,37 @@
         document.body.style.overflow = '';
     }
 
-    // Auto-fill name & section when card number matches existing record
-    function onCardLookup() {
-        var card = document.getElementById('add-card').value.trim().toLowerCase();
-        if (!card) return;
-        for (var i = 0; i < allData.length; i++) {
-            var row = allData[i];
-            if (row.cardNo && row.cardNo.toString().toLowerCase() === card) {
-                if (!document.getElementById('add-name').value)
-                    document.getElementById('add-name').value = row.name || '';
-                if (!document.getElementById('add-section').value)
-                    document.getElementById('add-section').value = row.section || '';
-                break;
-            }
+    var itemRowCount = 0;
+    // Items that require a size field
+    var SIZE_ITEMS = ['safety shoes', 'gum boot', 'button boot'];
+
+    function needsSize(itemName) {
+        return SIZE_ITEMS.indexOf(itemName.trim().toLowerCase()) !== -1;
+    }
+
+    function onItemNameChange(input) {
+        var row      = input.closest('.item-row');
+        var sizeWrap = row.querySelector('.item-size-wrap');
+        if (needsSize(input.value)) {
+            sizeWrap.style.display = '';
+        } else {
+            sizeWrap.style.display = 'none';
+            sizeWrap.querySelector('input').value = ''; // clear size when hidden
         }
     }
 
-    var itemRowCount = 0;
     function addItemRow() {
-        var idx  = itemRowCount++;
-        var div  = document.createElement('div');
-        div.className  = 'item-row';
+        var idx = itemRowCount++;
+        var div = document.createElement('div');
+        div.className   = 'item-row';
         div.dataset.idx = idx;
         div.innerHTML =
             '<div class="item-row-top">' +
                 '<div class="item-name-wrap">' +
                     '<div class="item-field-label">Item Name</div>' +
                     '<input class="item-input" type="text" list="item-options"' +
-                    ' placeholder="e.g. Gloves…" autocomplete="off">' +
+                    ' placeholder="e.g. Gloves…" autocomplete="off"' +
+                    ' oninput="onItemNameChange(this)">' +
                 '</div>' +
                 '<div class="item-qty-wrap">' +
                     '<div class="item-field-label">Qty</div>' +
@@ -1066,9 +1068,9 @@
                 '</div>' +
             '</div>' +
             '<div class="item-row-bottom">' +
-                '<div style="flex:1;">' +
-                    '<div class="item-field-label">Size <span style="opacity:.5;">(optional)</span></div>' +
-                    '<input class="item-input" type="text" placeholder="e.g. L, XL…">' +
+                '<div class="item-size-wrap" style="display:none;flex:1;">' +
+                    '<div class="item-field-label">Size</div>' +
+                    '<input class="item-input" type="text" placeholder="e.g. 7, 8, 9…">' +
                 '</div>' +
                 '<button class="remove-item-btn" onclick="removeItemRow(this)">' +
                     '<i class="fa-solid fa-trash-can" style="font-size:11px;"></i> Remove' +
@@ -1104,11 +1106,14 @@
         // Collect items
         var items = [];
         document.querySelectorAll('.item-row').forEach(function(row) {
-            var inputs = row.querySelectorAll('input');
-            var item   = inputs[0].value.trim();
-            var qty    = inputs[1].value.trim() || '1';
-            var size   = inputs[2].value.trim();
-            if (item) items.push({ item: item, qty: qty, size: size });
+            var itemInput = row.querySelector('.item-name-wrap input');
+            var qtyInput  = row.querySelector('.item-qty-wrap input');
+            var sizeWrap  = row.querySelector('.item-size-wrap');
+            var sizeInput = sizeWrap ? sizeWrap.querySelector('input') : null;
+            var item = itemInput ? itemInput.value.trim() : '';
+            var qty  = qtyInput  ? qtyInput.value.trim()  : '1';
+            var size = (sizeInput && sizeWrap.style.display !== 'none') ? sizeInput.value.trim() : '';
+            if (item) items.push({ item: item, qty: qty || '1', size: size });
         });
 
         if (!items.length) {
