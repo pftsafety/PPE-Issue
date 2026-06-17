@@ -596,6 +596,189 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* ── FAB ── */
+        #add-fab {
+            position: fixed; bottom: calc(24px + var(--sab)); right: 20px; z-index: 40;
+            width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer;
+            background: linear-gradient(135deg, var(--blue), var(--indigo));
+            color: white; font-size: 22px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 6px 24px rgba(0,122,255,0.40), 0 2px 8px rgba(0,0,0,0.15),
+                        inset 0 1px 0 rgba(255,255,255,0.25);
+            transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+            font-family: var(--font);
+        }
+        #add-fab:active { transform: scale(0.90); }
+
+        /* ── MODAL BACKDROP ── */
+        #add-modal {
+            position: fixed; inset: 0; z-index: 80;
+            display: none; align-items: flex-end;
+        }
+        #add-modal.open { display: flex; }
+        .modal-backdrop {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            animation: backdropIn 0.25s ease;
+        }
+        @keyframes backdropIn { from{opacity:0} to{opacity:1} }
+
+        /* ── MODAL SHEET ── */
+        .modal-sheet {
+            position: relative; z-index: 1; width: 100%;
+            background: var(--g1);
+            backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+            border: 1px solid var(--gb); border-bottom: none;
+            border-radius: 28px 28px 0 0;
+            box-shadow: var(--st), 0 -8px 40px rgba(0,0,0,0.18);
+            padding: 0 0 calc(24px + var(--sab));
+            max-height: 92vh; overflow-y: auto;
+            animation: sheetUp 0.35s cubic-bezier(0.16,1,0.3,1);
+        }
+        .modal-sheet::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 100%);
+            border-radius: 28px 28px 0 0; pointer-events: none;
+        }
+        @keyframes sheetUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+        .modal-handle {
+            width: 36px; height: 4px; border-radius: 99px;
+            background: rgba(0,0,0,0.15); margin: 12px auto 0; position: relative; z-index: 1;
+        }
+        [data-theme="dark"] .modal-handle { background: rgba(255,255,255,0.18); }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px 4px; position: relative; z-index: 1;
+        }
+        .modal-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; color: var(--t1); }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer;
+            background: rgba(0,0,0,0.07); color: var(--t2); font-size: 15px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font); transition: background 0.15s;
+        }
+        [data-theme="dark"] .modal-close { background: rgba(255,255,255,0.10); }
+        .modal-close:active { background: rgba(0,0,0,0.14); }
+        .modal-body { padding: 16px 20px 0; position: relative; z-index: 1; }
+
+        /* ── FORM FIELDS ── */
+        .form-row { margin-bottom: 14px; }
+        .form-label {
+            font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--t3); margin-bottom: 5px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .form-label i { color: var(--blue); }
+        .form-input {
+            width: 100%;
+            background: rgba(0,0,0,0.055);
+            border: 1.5px solid rgba(0,0,0,0.10);
+            border-radius: 13px; padding: 12px 14px;
+            font-size: 16px; font-family: var(--font); color: var(--t1);
+            outline: none;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            -webkit-appearance: none;
+        }
+        [data-theme="dark"] .form-input {
+            background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.10);
+        }
+        .form-input::placeholder { color: var(--t3); }
+        .form-input:focus {
+            background: rgba(0,0,0,0.03);
+            border-color: rgba(0,122,255,0.50);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.03), 0 0 0 3px var(--bluel);
+        }
+        input[type="date"].form-input { color-scheme: light; }
+        [data-theme="dark"] input[type="date"].form-input { color-scheme: dark; }
+
+        /* ── ITEMS SECTION ── */
+        .items-section-label {
+            font-size: 11px; font-weight: 800; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--orange);
+            display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+        }
+        .item-row {
+            background: var(--g3);
+            border: 1px solid var(--gb2); border-radius: 14px;
+            padding: 12px 12px 10px; margin-bottom: 8px;
+            position: relative;
+        }
+        .item-row-top { display: flex; gap: 8px; margin-bottom: 8px; }
+        .item-name-wrap { flex: 1; }
+        .item-qty-wrap  { width: 70px; }
+        .item-size-wrap { width: 80px; }
+        .item-field-label {
+            font-size: 9px; font-weight: 700; letter-spacing: 0.07em;
+            text-transform: uppercase; color: var(--t3); margin-bottom: 4px;
+        }
+        .item-input {
+            width: 100%; background: rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.09); border-radius: 10px;
+            padding: 9px 10px; font-size: 15px; font-family: var(--font);
+            color: var(--t1); outline: none; -webkit-appearance: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        [data-theme="dark"] .item-input {
+            background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.08);
+        }
+        .item-input:focus { border-color: rgba(0,122,255,0.45); box-shadow: 0 0 0 2px var(--bluel); }
+        .item-input::placeholder { color: var(--t3); }
+        .item-row-bottom { display: flex; gap: 8px; align-items: center; }
+        .remove-item-btn {
+            background: rgba(255,59,48,0.09); border: none; border-radius: 8px;
+            color: var(--red); font-size: 13px; font-family: var(--font);
+            padding: 6px 10px; cursor: pointer; font-weight: 700;
+            display: flex; align-items: center; gap: 4px;
+            transition: background 0.15s; white-space: nowrap;
+        }
+        .remove-item-btn:active { background: rgba(255,59,48,0.16); }
+
+        .add-item-btn {
+            width: 100%; background: var(--bluel);
+            border: 1.5px dashed rgba(0,122,255,0.35); border-radius: 13px;
+            color: var(--blue); font-size: 13px; font-weight: 700;
+            font-family: var(--font); padding: 11px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+            margin-bottom: 16px; transition: background 0.15s;
+        }
+        .add-item-btn:active { background: var(--bluem); }
+
+        /* ── SUBMIT BUTTON ── */
+        .submit-btn {
+            width: 100%; padding: 15px;
+            background: linear-gradient(135deg, var(--blue), var(--indigo));
+            border: none; border-radius: 16px; cursor: pointer;
+            color: white; font-size: 16px; font-weight: 700;
+            font-family: var(--font);
+            box-shadow: 0 4px 18px rgba(0,122,255,0.35), inset 0 1px 0 rgba(255,255,255,0.22);
+            transition: transform 0.15s, opacity 0.15s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin-top: 4px;
+        }
+        .submit-btn:active:not(:disabled) { transform: scale(0.97); }
+        .submit-btn:disabled { opacity: 0.5; cursor: default; }
+
+        /* ── FORM DIVIDER ── */
+        .form-divider {
+            height: 1px; background: var(--gb2); margin: 16px 0;
+        }
+
+        /* ── SUBMIT TOAST ── */
+        #submit-toast {
+            position: fixed; top: calc(16px + var(--sat)); left: 50%;
+            transform: translateX(-50%); z-index: 999;
+            display: none; align-items: center; gap: 9px;
+            border-radius: 99px; padding: 10px 18px;
+            font-size: 13px; font-weight: 600; font-family: var(--font);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.20); white-space: nowrap;
+            animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1);
+        }
+        #submit-toast.success { background: var(--green); color: white; }
+        #submit-toast.error   { background: var(--red);   color: white; }
+        @keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(-10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
         /* ── ANIMATIONS ── */
         @keyframes fadeUp    { from{opacity:0;transform:translateY(10px);filter:blur(2px)} to{opacity:1;transform:none;filter:none} }
         @keyframes livePulse { 0%{box-shadow:0 0 0 0 rgba(52,199,89,0.5)} 70%{box-shadow:0 0 0 5px rgba(52,199,89,0)} 100%{box-shadow:0 0 0 0 rgba(52,199,89,0)} }
@@ -761,12 +944,240 @@
         </div>
     </div>
 
+    <!-- FAB — Add new PPE issue entry -->
+    <button id="add-fab" onclick="openAddModal()" aria-label="Add PPE Issue">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- Submit feedback toast -->
+    <div id="submit-toast"></div>
+
+    <!-- Add PPE Issue Modal -->
+    <div id="add-modal">
+        <div class="modal-backdrop" onclick="closeAddModal()"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <div class="modal-title">New PPE Issue</div>
+                <button class="modal-close" onclick="closeAddModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-label"><i class="fa-solid fa-calendar"></i>Issue Date</div>
+                    <input class="form-input" type="date" id="add-date">
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><i class="fa-solid fa-id-card"></i>Card No</div>
+                    <input class="form-input" type="text" id="add-card"
+                        placeholder="Enter card number…"
+                        oninput="onCardLookup()"
+                        autocomplete="off" autocorrect="off" spellcheck="false">
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><i class="fa-solid fa-user"></i>Employee Name</div>
+                    <input class="form-input" type="text" id="add-name"
+                        placeholder="Employee name…"
+                        autocomplete="off" autocorrect="off" spellcheck="false">
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><i class="fa-solid fa-building"></i>Section / Branch</div>
+                    <input class="form-input" type="text" id="add-section"
+                        placeholder="Department or section…"
+                        autocomplete="off" autocorrect="off" spellcheck="false">
+                </div>
+                <div class="form-divider"></div>
+                <div class="items-section-label">
+                    <i class="fa-solid fa-helmet-safety" style="font-size:12px;"></i>
+                    PPE Items Issued
+                </div>
+                <div id="add-items-list"></div>
+                <button class="add-item-btn" onclick="addItemRow()">
+                    <i class="fa-solid fa-plus" style="font-size:12px;"></i>
+                    Add Item
+                </button>
+                <button class="submit-btn" id="form-submit-btn" onclick="submitEntry()">
+                    <i class="fa-solid fa-floppy-disk" style="font-size:15px;"></i>
+                    Save Entry
+                </button>
+            </div>
+        </div>
+    </div>
+
 <script>
     var API = "https://script.google.com/macros/s/AKfycbydwxwb1CYJtjLcWG_OKpcKIBdl4KQ7xeKe12PvJzwOzxu3Mvwu-OU9kvybNTji3iIX/exec";
     var allData = [], filtered = [];
     var page = 1, perPage = 30, timer = null;
 
-    // ── INSTALL ──────────────────────────────────────────────────
+    // ── ADD ENTRY FORM ────────────────────────────────────────────
+
+    function openAddModal() {
+        // Set today's date as default
+        var today = new Date();
+        var yyyy  = today.getFullYear();
+        var mm    = String(today.getMonth()+1).padStart(2,'0');
+        var dd    = String(today.getDate()).padStart(2,'0');
+        document.getElementById('add-date').value    = yyyy+'-'+mm+'-'+dd;
+        document.getElementById('add-card').value    = '';
+        document.getElementById('add-name').value    = '';
+        document.getElementById('add-section').value = '';
+        document.getElementById('add-items-list').innerHTML = '';
+        addItemRow(); // start with one empty item row
+        document.getElementById('add-modal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeAddModal() {
+        document.getElementById('add-modal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // Auto-fill name & section when card number matches existing record
+    function onCardLookup() {
+        var card = document.getElementById('add-card').value.trim().toLowerCase();
+        if (!card) return;
+        for (var i = 0; i < allData.length; i++) {
+            var row = allData[i];
+            if (row.cardNo && row.cardNo.toString().toLowerCase() === card) {
+                if (!document.getElementById('add-name').value)
+                    document.getElementById('add-name').value = row.name || '';
+                if (!document.getElementById('add-section').value)
+                    document.getElementById('add-section').value = row.section || '';
+                break;
+            }
+        }
+    }
+
+    var itemRowCount = 0;
+    function addItemRow() {
+        var idx  = itemRowCount++;
+        var div  = document.createElement('div');
+        div.className  = 'item-row';
+        div.dataset.idx = idx;
+        div.innerHTML =
+            '<div class="item-row-top">' +
+                '<div class="item-name-wrap">' +
+                    '<div class="item-field-label">Item Name</div>' +
+                    '<input class="item-input" type="text" list="item-options"' +
+                    ' placeholder="e.g. Gloves…" autocomplete="off">' +
+                '</div>' +
+                '<div class="item-qty-wrap">' +
+                    '<div class="item-field-label">Qty</div>' +
+                    '<input class="item-input" type="number" min="1" value="1">' +
+                '</div>' +
+            '</div>' +
+            '<div class="item-row-bottom">' +
+                '<div style="flex:1;">' +
+                    '<div class="item-field-label">Size <span style="opacity:.5;">(optional)</span></div>' +
+                    '<input class="item-input" type="text" placeholder="e.g. L, XL…">' +
+                '</div>' +
+                '<button class="remove-item-btn" onclick="removeItemRow(this)">' +
+                    '<i class="fa-solid fa-trash-can" style="font-size:11px;"></i> Remove' +
+                '</button>' +
+            '</div>';
+        document.getElementById('add-items-list').appendChild(div);
+    }
+
+    function removeItemRow(btn) {
+        var row = btn.closest('.item-row');
+        if (document.querySelectorAll('.item-row').length > 1) row.remove();
+    }
+
+    function showToast(msg, type) {
+        var t = document.getElementById('submit-toast');
+        t.textContent = msg;
+        t.className   = type; // 'success' or 'error'
+        t.style.display = 'flex';
+        setTimeout(function(){ t.style.display = 'none'; }, 3200);
+    }
+
+    function submitEntry() {
+        var date    = document.getElementById('add-date').value;
+        var cardNo  = document.getElementById('add-card').value.trim();
+        var name    = document.getElementById('add-name').value.trim();
+        var section = document.getElementById('add-section').value.trim();
+
+        if (!date || !cardNo || !name) {
+            showToast('Please fill Date, Card No and Name', 'error');
+            return;
+        }
+
+        // Collect items
+        var items = [];
+        document.querySelectorAll('.item-row').forEach(function(row) {
+            var inputs = row.querySelectorAll('input');
+            var item   = inputs[0].value.trim();
+            var qty    = inputs[1].value.trim() || '1';
+            var size   = inputs[2].value.trim();
+            if (item) items.push({ item: item, qty: qty, size: size });
+        });
+
+        if (!items.length) {
+            showToast('Add at least one PPE item', 'error');
+            return;
+        }
+
+        var btn = document.getElementById('form-submit-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:15px;"></i> Saving…';
+
+        var payload = {
+            action  : 'add',
+            issuedOn: date,
+            cardNo  : cardNo,
+            name    : name,
+            section : section,
+            items   : items
+        };
+
+        // Use text/plain to avoid CORS preflight with GAS
+        fetch(API, {
+            method : 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+            body   : JSON.stringify(payload)
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(res){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk" style="font-size:15px;"></i> Save Entry';
+            if (res.error) { showToast('Error: ' + res.error, 'error'); return; }
+
+            showToast('✓ Entry saved — ' + items.length + ' row' + (items.length>1?'s':''), 'success');
+            closeAddModal();
+
+            // Clear localStorage so next load fetches fresh data
+            try { localStorage.removeItem(CK_RECENT); localStorage.removeItem(CK_OLDER); } catch(e){}
+
+            // Add new rows to local allData immediately so UI reflects the save
+            var cutoff = getCutoffDate();
+            items.forEach(function(it){
+                allData.unshift({
+                    cardNo  : cardNo,
+                    name    : name,
+                    section : section,
+                    issuedOn: formatNewDate(date),
+                    item    : it.item,
+                    qty     : it.qty,
+                    size    : it.size
+                });
+            });
+            filtered = allData.slice();
+            updateLastUpdated(allData);
+            goToPage(1);
+        })
+        .catch(function(err){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk" style="font-size:15px;"></i> Save Entry';
+            showToast('Network error — try again', 'error');
+        });
+    }
+
+    // Format YYYY-MM-DD date input to DD-Mon-YYYY display format
+    function formatNewDate(ymd) {
+        var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var p = ymd.split('-');
+        if (p.length === 3) return p[2]+'-'+M[parseInt(p[1],10)-1]+'-'+p[0];
+        return ymd;
+    }
     function triggerInstall() {
         if (!window._pwaPrompt) return;
         window._pwaPrompt.prompt();
@@ -896,64 +1307,144 @@
         document.getElementById('pagination-footer').style.display   = 'flex';
     }
 
-    window.onload = function() {
-        initInstallBanner();
+    // ── CACHE KEYS ───────────────────────────────────────────────
+    var CK_RECENT = 'ppe_recent_v3';
+    var CK_OLDER  = 'ppe_older_v3';
+    var CK_CUTOFF = 'ppe_cutoff_v3';
 
-        var cutoff = getCutoffDate();
+    // ── LOCALSTORAGE HELPERS ─────────────────────────────────────
+    function lsGet(key) {
+        try { return localStorage.getItem(key); } catch(e) { return null; }
+    }
+    function lsSet(key, val) {
+        try { localStorage.setItem(key, val); } catch(e) {
+            try { localStorage.clear(); localStorage.setItem(key, val); } catch(e2) {}
+        }
+    }
 
-        // ── PHASE 1 : last 3 years ───────────────────────────────
+    function saveRecent(cutoff, data) {
+        lsSet(CK_CUTOFF, cutoff);
+        lsSet(CK_RECENT, JSON.stringify(data));
+    }
+    function saveOlder(data) {
+        lsSet(CK_OLDER, JSON.stringify(data));
+    }
+
+    // ── LOAD FROM LOCALSTORAGE (instant) ─────────────────────────
+    // Returns true if valid cached data was found and applied
+    function loadFromCache(cutoff) {
+        try {
+            if (lsGet(CK_CUTOFF) !== cutoff) return false;
+            var raw = lsGet(CK_RECENT);
+            if (!raw) return false;
+
+            var recent = JSON.parse(raw);
+            if (!recent || !recent.length) return false;
+
+            // Apply older cache if available
+            var older = null;
+            try {
+                var rawOlder = lsGet(CK_OLDER);
+                if (rawOlder) older = JSON.parse(rawOlder);
+            } catch(e) {}
+
+            allData = older ? recent.concat(older) : recent;
+            updateDatalist(allData);
+            updateLastUpdated(allData);
+            filtered = allData.slice();
+            return true;
+        } catch(e) { return false; }
+    }
+
+    // ── PHASE 1 : fetch recent 3 years, show immediately ─────────
+    function fetchPhase1(cutoff, silent) {
         fetch(API + '?from=' + cutoff)
             .then(function(r){ if(!r.ok) throw new Error('Network error'); return r.json(); })
             .then(function(data){
-                if(data.error) throw new Error(data.error);
+                if (data.error) throw new Error(data.error);
 
                 consolidateNames(data);
-                updateDatalist(data);
-                updateLastUpdated(data);
+                var reversed = data.reverse();
+                saveRecent(cutoff, reversed);
 
-                allData  = data.reverse();
-                filtered = allData.slice();
-
-                showMainUI();
-                goToPage(1);
-
-                // ── PHASE 2 : older records in background ────────
-                var toast = document.getElementById('bg-loader');
-                toast.style.display = 'flex';
-
-                fetch(API + '?before=' + cutoff)
-                    .then(function(r){ if(!r.ok) throw new Error(); return r.json(); })
-                    .then(function(older){
-                        if(!older || older.error || !older.length) {
-                            toast.style.display = 'none'; return;
-                        }
-                        consolidateNames(older);
-                        // Older records go to the tail (allData is newest-first)
-                        allData = allData.concat(older);
-                        updateDatalist(allData);
-
-                        // Re-apply active filters silently
-                        var c  = document.getElementById('search-card').value.toLowerCase().trim();
-                        var n  = document.getElementById('search-name').value.toLowerCase().trim();
-                        var d  = document.getElementById('search-dept').value.toLowerCase().trim();
-                        var it = document.getElementById('search-item').value.toLowerCase().trim();
-                        filtered = allData.filter(function(e){
-                            return e.cardNo.toLowerCase().includes(c) &&
-                                   e.name.toLowerCase().includes(n) &&
-                                   e.section.toLowerCase().includes(d) &&
-                                   e.item.toLowerCase().includes(it);
-                        });
-                        document.getElementById('filtered-count').textContent = filtered.length;
-
-                        // Fade out toast
-                        toast.style.opacity = '0';
-                        setTimeout(function(){ toast.style.display='none'; toast.style.opacity='1'; }, 600);
-                    })
-                    .catch(function(){
-                        toast.style.display = 'none'; // silently dismiss on error
-                    });
+                if (!silent) {
+                    // First-ever load — populate UI now
+                    allData  = reversed;
+                    filtered = allData.slice();
+                    updateDatalist(allData);
+                    updateLastUpdated(allData);
+                    showMainUI();
+                    goToPage(1);
+                }
+                // Always kick off Phase 2
+                fetchPhase2(cutoff);
             })
-            .catch(function(err){ showError(err.message); });
+            .catch(function(err){
+                if (!silent) showError(err.message);
+            });
+    }
+
+    // ── PHASE 2 : fetch older data in background ─────────────────
+    function fetchPhase2(cutoff) {
+        var toast = document.getElementById('bg-loader');
+        toast.style.display = 'flex';
+
+        fetch(API + '?before=' + cutoff)
+            .then(function(r){ if(!r.ok) throw new Error(); return r.json(); })
+            .then(function(older){
+                toast.style.opacity = '0';
+                setTimeout(function(){ toast.style.display = 'none'; toast.style.opacity = '1'; }, 500);
+
+                if (!older || older.error || !older.length) return;
+
+                consolidateNames(older);
+                saveOlder(older);
+
+                // Merge — load fresh recent from cache to avoid duplicates
+                try {
+                    var raw = lsGet(CK_RECENT);
+                    var recent = raw ? JSON.parse(raw) : allData;
+                    allData = recent.concat(older);
+                } catch(e) {
+                    allData = allData.concat(older);
+                }
+
+                updateDatalist(allData);
+
+                // Re-apply active filters silently
+                var c  = document.getElementById('search-card').value.toLowerCase().trim();
+                var n  = document.getElementById('search-name').value.toLowerCase().trim();
+                var d  = document.getElementById('search-dept').value.toLowerCase().trim();
+                var it = document.getElementById('search-item').value.toLowerCase().trim();
+                filtered = allData.filter(function(row){
+                    return row.cardNo.toLowerCase().includes(c) &&
+                           row.name.toLowerCase().includes(n) &&
+                           row.section.toLowerCase().includes(d) &&
+                           row.item.toLowerCase().includes(it);
+                });
+                document.getElementById('filtered-count').textContent = filtered.length;
+            })
+            .catch(function(){
+                toast.style.display = 'none';
+            });
+    }
+
+    window.onload = function() {
+        initInstallBanner();
+        var cutoff = getCutoffDate();
+
+        var hasCached = loadFromCache(cutoff);
+
+        if (hasCached) {
+            // ── INSTANT: show cached data right away ─────────────
+            showMainUI();
+            goToPage(1);
+            // Silently refresh Phase 1 in background (no loading screen)
+            fetchPhase1(cutoff, true);
+        } else {
+            // ── FIRST VISIT: normal load with loading screen ──────
+            fetchPhase1(cutoff, false);
+        }
     };
 
     // ── RENDER ───────────────────────────────────────────────────
