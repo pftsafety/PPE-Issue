@@ -309,11 +309,12 @@
             border-radius: 16px;
             box-shadow: var(--elev1);
             overflow: hidden;
+            position: relative;
             animation: fadeUp 0.35s cubic-bezier(0.2,0,0,1) both;
         }
 
         .id-strip {
-            padding: 44px 16px 14px;
+            padding: 16px 16px 14px;
             border-bottom: 1px solid var(--outline-variant);
             display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
             background: var(--surface-container);
@@ -390,6 +391,27 @@
         .page-btn:hover:not(:disabled) { background: var(--primary-container); }
         .page-btn:active:not(:disabled) { transform: scale(0.94); }
         .page-btn:disabled { opacity: 0.32; cursor: default; }
+
+        /* ── CARD ACTION BAR ── */
+        .card-actions {
+            display: flex; justify-content: flex-end; align-items: center;
+            padding: 10px 14px 12px;
+            border-top: 1px solid var(--outline-variant);
+            background: var(--surface-container);
+        }
+        .share-btn {
+            display: flex; align-items: center; gap: 7px;
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none; border-radius: 20px;
+            padding: 9px 18px;
+            font-size: 13px; font-weight: 500; font-family: var(--md-font);
+            cursor: pointer; letter-spacing: 0.01em;
+            box-shadow: var(--elev2);
+            transition: transform 0.15s, filter 0.15s;
+        }
+        .share-btn:active { transform: scale(0.94); filter: brightness(0.92); }
+        .share-btn:disabled { opacity: 0.45; cursor: default; }
 
         /* ── FAB ── */
         #add-fab {
@@ -1092,9 +1114,6 @@
                 itemsHTML+='<div class="ppe-item"><div class="ppe-item-header">'+name+'</div><div class="ppe-rows">'+rows+'</div></div>';
             }
             el.innerHTML=
-                '<button class="share-btn" onclick="shareCard(this)" title="Share as image">'+
-                    '<i class="fa-solid fa-share-nodes" style="font-size:12px;"></i> Share'+
-                '</button>'+
                 '<div class="id-strip">'+
                     '<div class="id-main">'+
                         '<div class="id-name">'+emp.name+'</div>'+
@@ -1105,6 +1124,11 @@
                 '<div class="history-wrap">'+
                     '<div class="history-label"><i class="fa-solid fa-clock-rotate-left" style="font-size:10px;"></i>Issue History</div>'+
                     '<div class="items-stack">'+itemsHTML+'</div>'+
+                '</div>'+
+                '<div class="card-actions">'+
+                    '<button class="share-btn" onclick="shareCard(this)">'+
+                        '<i class="fa-solid fa-share-nodes" style="font-size:13px;"></i> Share'+
+                    '</button>'+
                 '</div>';
             frag.appendChild(el);
         });
