@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>PPE Issue Register</title>
+
+    <script>
+        window._pwaPrompt = null;
+        window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            window._pwaPrompt = e;
+            var tries = 0;
+            (function show() {
+                var btn = document.getElementById('install-btn');
+                if (btn) btn.style.display = 'flex';
+                else if (tries++ < 60) setTimeout(show, 100);
+            })();
+        });
+        window.addEventListener('appinstalled', function() {
+            window._pwaPrompt = null;
+            var b = document.getElementById('install-btn');
+            if (b) b.style.display = 'none';
+            var banner = document.getElementById('install-banner');
+            if (banner) banner.style.display = 'none';
+        });
+    </script>
+
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#F3F4FB">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="PPE Issue">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        /* ── MATERIAL YOU COLOR TOKENS ── */
+        :root {
+            --md-font: 'Roboto', sans-serif;
+            --md-mono: 'Roboto Mono', monospace;
+
+            /* Primary */
+            --primary:          #4355B9;
+            --on-primary:       #FFFFFF;
+            --primary-container:#DEE1FF;
+            --on-primary-cont:  #00105C;
+
+            /* Secondary */
+            --secondary:        #5A5D72;
+            --secondary-cont:   #DFE0F9;
+            --on-secondary-cont:#171A30;
+
+            /* Tertiary */
+            --tertiary:         #76546E;
+            --tertiary-cont:    #FFD7F3;
+
+            /* Error */
+            --error:            #B3261E;
+            --error-cont:       #F9DEDC;
+
+            /* Surfaces */
+            --bg:               #F3F4FB;
+            --surface:          #FAFAFF;
+            --surface-container:#ECEDF5;
+            --surface-cont-high:#E6E7EF;
+            --surface-variant:  #E3E1EC;
+            --on-surface:       #1B1B1F;
+            --on-surface-var:   #46464F;
+            --outline:          #767680;
+            --outline-variant:  #C7C5D0;
+
+            /* Elevation shadows */
+            --elev1: 0 1px 2px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.08);
+            --elev2: 0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.10);
+            --elev3: 0 2px 4px rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.10);
+
+            --sat: env(safe-area-inset-top,0px);
+            --sab: env(safe-area-inset-bottom,0px);
+        }
+
+        [data-theme="dark"] {
+            --primary:          #BAC3FF;
+            --on-primary:       #0E1F78;
+            --primary-container:#2B3D9E;
+            --on-primary-cont:  #DEE1FF;
+            --secondary:        #C3C4DD;
+            --secondary-cont:   #424459;
+            --on-secondary-cont:#DFE0F9;
+            --tertiary:         #E8B9DA;
+            --tertiary-cont:    #5D3D55;
+            --error:            #F2B8B5;
+            --error-cont:       #8C1D18;
+            --bg:               #12131A;
+            --surface:          #1B1C23;
+            --surface-container:#1F2029;
+            --surface-cont-high:#292A34;
+            --surface-variant:  #46464F;
+            --on-surface:       #E5E1E6;
+            --on-surface-var:   #C7C5D0;
+            --outline:          #91909A;
+            --outline-variant:  #46464F;
+            --elev1: 0 1px 2px rgba(0,0,0,0.40), 0 1px 3px rgba(0,0,0,0.30);
+            --elev2: 0 1px 2px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.35);
+            --elev3: 0 2px 4px rgba(0,0,0,0.45), 0 4px 10px rgba(0,0,0,0.35);
+        }
+
+        html, body { height: 100%; }
+        body {
+            font-family: var(--md-font);
+            background: var(--bg);
+            color: var(--on-surface);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            max-width: 480px;
+            margin: 0 auto;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ── LOADING OVERLAY ── */
+        #loading-overlay {
+            position: fixed; inset: 0; z-index: 999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--bg); gap: 24px;
+        }
+        .loader-card {
+            background: var(--surface);
+            border-radius: 28px;
+            padding: 40px 52px;
+            text-align: center;
+            box-shadow: var(--elev3);
+            min-width: 240px;
+        }
+        .md-progress-ring {
+            width: 48px; height: 48px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        .md-progress-ring svg {
+            transform: rotate(-90deg);
+            animation: ringRotate 1.4s linear infinite;
+        }
+        .md-progress-ring circle {
+            fill: none; stroke: var(--primary);
+            stroke-width: 4; stroke-linecap: round;
+            stroke-dasharray: 120;
+            stroke-dashoffset: 90;
+            animation: ringDash 1.4s ease-in-out infinite;
+        }
+        @keyframes ringRotate { to { transform: rotate(270deg); } }
+        @keyframes ringDash {
+            0%   { stroke-dashoffset: 110; }
+            50%  { stroke-dashoffset: 30; }
+            100% { stroke-dashoffset: 110; }
+        }
+        .loader-heading { font-size: 20px; font-weight: 500; color: var(--on-surface); letter-spacing: 0; margin-bottom: 4px; }
+        .loader-sub { font-size: 13px; color: var(--on-surface-var); font-weight: 400; }
+
+        /* ── TOP APP BAR ── */
+        nav {
+            position: sticky; top: 0; z-index: 50;
+            background: var(--surface);
+            border-bottom: 1px solid var(--outline-variant);
+            padding: 0 16px;
+            padding-top: var(--sat);
+            height: calc(64px + var(--sat));
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: var(--elev1);
+            transition: background 0.3s;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .brand-icon {
+            width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%;
+            background: var(--primary-container);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .brand-icon i { color: var(--on-primary-cont); font-size: 18px; }
+        .brand-name { font-size: 18px; font-weight: 500; color: var(--on-surface); letter-spacing: 0; }
+        .brand-sub  { font-size: 11px; font-weight: 500; color: var(--primary); letter-spacing: 0.04em; text-transform: uppercase; display: flex; align-items: center; gap: 4px; margin-top: 1px; }
+        .live-dot   { width: 6px; height: 6px; border-radius: 50%; background: #34C759; animation: livePulse 2s ease-out infinite; }
+
+        .nav-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+        /* Updated date pill */
+        .updated-pill {
+            background: var(--primary-container);
+            border-radius: 16px; padding: 6px 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .updated-pill i { color: var(--primary); font-size: 13px; flex-shrink: 0; }
+        .updated-label { font-size: 9px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--on-primary-cont); opacity: 0.65; line-height: 1; margin-bottom: 2px; }
+        #last-updated-val { font-size: 11px; font-weight: 700; color: var(--on-primary-cont); display: block; line-height: 1; font-family: var(--md-mono); }
+
+        /* Theme toggle */
+        .theme-btn {
+            width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer;
+            background: var(--surface-variant); color: var(--on-surface-var);
+            display: flex; align-items: center; justify-content: center; font-size: 16px;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .theme-btn:active { transform: scale(0.88); background: var(--secondary-cont); }
+
+        /* Install button */
+        #install-btn {
+            background: var(--primary); color: var(--on-primary);
+            border: none; border-radius: 20px; padding: 8px 16px;
+            font-size: 12px; font-weight: 500; font-family: var(--md-font);
+            cursor: pointer; display: none; align-items: center; gap: 6px;
+            box-shadow: var(--elev2); transition: transform 0.15s;
+        }
+        #install-btn:active { transform: scale(0.95); }
+
+        /* ── INSTALL BANNER ── */
+        #install-banner {
+            margin: 12px 14px 0; border-radius: 16px; padding: 14px 16px;
+            background: var(--secondary-cont); display: none;
+        }
+        .banner-inner {}
+        .banner-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+        .banner-title { font-size: 14px; font-weight: 500; color: var(--on-secondary-cont); }
+        .banner-sub   { font-size: 12px; color: var(--on-surface-var); margin-top: 2px; }
+        .banner-close { background: none; border: none; color: var(--on-surface-var); font-size: 18px; cursor: pointer; padding: 0; line-height: 1; }
+        .banner-actions { display: flex; gap: 8px; }
+        #ios-hint {
+            flex: 1; background: var(--surface); border: 1px solid var(--outline-variant);
+            border-radius: 12px; padding: 10px 12px;
+            font-size: 11px; color: var(--primary); font-weight: 500; line-height: 1.5; display: none;
+        }
+
+        /* ── BG LOADER TOAST ── */
+        #bg-loader {
+            position: fixed; bottom: calc(20px + var(--sab)); left: 50%;
+            transform: translateX(-50%); z-index: 40;
+            display: none; align-items: center; gap: 10px;
+            background: var(--on-surface); color: var(--surface);
+            font-size: 13px; font-weight: 500; font-family: var(--md-font);
+            padding: 12px 20px; border-radius: 28px;
+            box-shadow: var(--elev3); white-space: nowrap;
+            transition: opacity 0.4s;
+        }
+        .bg-spinner {
+            width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,0.25); border-top-color: #fff;
+            animation: spin 0.7s linear infinite;
+        }
+
+        /* ── PAGE ── */
+        .page { padding: 16px 14px; padding-bottom: calc(32px + var(--sab)); }
+        .stack > * + * { margin-top: 12px; }
+
+        /* ── SEARCH CARD ── */
+        .search-panel {
+            background: var(--surface);
+            border-radius: 16px; padding: 20px 16px;
+            box-shadow: var(--elev1);
+            border: 1px solid var(--outline-variant);
+        }
+        .panel-label {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--primary); display: flex; align-items: center; gap: 6px; margin-bottom: 16px;
+        }
+
+        /* M3 Outlined text fields */
+        .field + .field { margin-top: 14px; }
+        .field-label {
+            font-size: 12px; font-weight: 500; color: var(--on-surface-var);
+            margin-bottom: 6px; display: flex; align-items: center; gap: 5px; letter-spacing: 0.01em;
+        }
+        .field-label i { color: var(--primary); font-size: 12px; }
+        .field-wrap { position: relative; }
+        .fi {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--outline); font-size: 14px; pointer-events: none; transition: color 0.2s;
+        }
+        .field-wrap:focus-within .fi { color: var(--primary); }
+        .lg-input {
+            width: 100%;
+            background: var(--surface-container);
+            border: 1.5px solid var(--outline);
+            border-radius: 12px; padding: 13px 14px 13px 42px;
+            font-size: 16px; font-family: var(--md-font); color: var(--on-surface);
+            outline: none; -webkit-appearance: none; appearance: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .lg-input::placeholder { color: var(--on-surface-var); opacity: 0.55; }
+        .lg-input:focus {
+            border-color: var(--primary); border-width: 2px;
+            background: var(--surface);
+        }
+
+        .reset-btn {
+            background: none; border: none; cursor: pointer;
+            font-size: 13px; font-weight: 500; color: var(--error);
+            font-family: var(--md-font); display: flex; align-items: center; gap: 6px;
+            padding: 8px 12px; border-radius: 99px; margin-top: 14px; margin-left: auto;
+            transition: background 0.15s; letter-spacing: 0.01em;
+        }
+        .reset-btn:active { background: var(--error-cont); }
+
+        /* ── RECORD CARD ── */
+        .record-card {
+            background: var(--surface);
+            border: 1px solid var(--outline-variant);
+            border-radius: 16px;
+            box-shadow: var(--elev1);
+            overflow: hidden;
+            animation: fadeUp 0.35s cubic-bezier(0.2,0,0,1) both;
+        }
+
+        .id-strip {
+            padding: 16px 16px 14px;
+            border-bottom: 1px solid var(--outline-variant);
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+            background: var(--surface-container);
+        }
+        .id-name { font-size: 17px; font-weight: 500; color: var(--on-surface); letter-spacing: -0.2px; }
+        .id-card { font-size: 12px; font-weight: 500; color: var(--primary); margin-top: 3px; display: flex; align-items: center; gap: 4px; font-family: var(--md-mono); }
+        .dept-badge {
+            flex-shrink: 0; margin-top: 3px;
+            background: var(--primary-container);
+            border-radius: 8px; padding: 4px 10px;
+            font-size: 11px; font-weight: 500; color: var(--on-primary-cont);
+            max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .history-wrap { padding: 12px 16px 14px; }
+        .history-label {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+            color: var(--tertiary); display: flex; align-items: center; gap: 5px; margin-bottom: 10px;
+        }
+        .items-stack { display: flex; flex-direction: column; gap: 8px; }
+        .ppe-item {
+            background: var(--surface-container);
+            border: 1px solid var(--outline-variant);
+            border-radius: 12px; overflow: hidden;
+        }
+        .ppe-item-header {
+            background: var(--primary-container);
+            padding: 7px 12px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+            color: var(--on-primary-cont);
+        }
+        .ppe-rows { padding: 7px 12px 8px; display: flex; flex-direction: column; gap: 5px; }
+        .ppe-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+        .ppe-date { font-size: 12px; color: var(--on-surface-var); font-weight: 400; font-family: var(--md-mono); }
+        .ppe-tags { display: flex; gap: 4px; align-items: center; }
+        .ppe-qty {
+            background: var(--secondary-cont); border-radius: 8px; padding: 2px 9px;
+            font-size: 11px; font-weight: 700; color: var(--on-secondary-cont);
+        }
+        .ppe-size {
+            background: var(--tertiary-cont); border-radius: 7px; padding: 2px 7px;
+            font-size: 10px; font-weight: 700; color: var(--tertiary);
+        }
+
+        /* ── STATE BOXES ── */
+        .state-box {
+            background: var(--surface); border: 1px solid var(--outline-variant);
+            border-radius: 16px; text-align: center; padding: 56px 24px;
+            box-shadow: var(--elev1);
+        }
+        .state-icon { font-size: 28px; color: var(--primary); opacity: 0.35; margin-bottom: 10px; }
+        .state-title { font-size: 14px; font-weight: 500; color: var(--on-surface-var); letter-spacing: 0.01em; }
+        .state-sub { font-size: 12px; color: var(--outline); margin-top: 4px; }
+
+        /* ── PAGINATION ── */
+        #pagination-footer {
+            background: var(--surface); border: 1px solid var(--outline-variant);
+            border-radius: 16px; padding: 12px 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 10px; box-shadow: var(--elev1);
+        }
+        .page-info { font-size: 13px; color: var(--on-surface-var); font-weight: 400; }
+        .page-info b { color: var(--on-surface); font-weight: 500; }
+        .page-info .cnt { color: var(--primary); font-weight: 700; }
+        .page-btns { display: flex; gap: 8px; }
+        .page-btn {
+            background: var(--surface-container); border: 1px solid var(--outline-variant);
+            border-radius: 12px; padding: 8px 16px;
+            font-size: 13px; font-weight: 500; color: var(--primary);
+            cursor: pointer; font-family: var(--md-font);
+            display: flex; align-items: center; gap: 5px;
+            transition: background 0.15s, transform 0.12s;
+            min-height: 44px;
+        }
+        .page-btn:hover:not(:disabled) { background: var(--primary-container); }
+        .page-btn:active:not(:disabled) { transform: scale(0.94); }
+        .page-btn:disabled { opacity: 0.32; cursor: default; }
+
+        /* ── FAB ── */
+        #add-fab {
+            position: fixed; bottom: calc(24px + var(--sab)); right: 20px; z-index: 40;
+            width: 56px; height: 56px; border-radius: 16px; border: none; cursor: pointer;
+            background: var(--primary-container); color: var(--on-primary-cont);
+            font-size: 22px; display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--elev3); font-family: var(--md-font);
+            transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
+        }
+        #add-fab:active { transform: scale(0.88); }
+
+        /* ── MODAL ── */
+        #add-modal { position: fixed; inset: 0; z-index: 80; display: none; align-items: flex-end; }
+        #add-modal.open { display: flex; }
+        .modal-backdrop {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.45);
+            animation: backdropIn 0.25s ease;
+        }
+        .modal-sheet {
+            position: relative; z-index: 1; width: 100%;
+            background: var(--surface-container);
+            border-radius: 28px 28px 0 0;
+            box-shadow: 0 -4px 32px rgba(0,0,0,0.18);
+            padding: 0 0 calc(24px + var(--sab));
+            max-height: 92vh; overflow-y: auto;
+            animation: sheetUp 0.35s cubic-bezier(0.2,0,0,1);
+        }
+        .modal-handle {
+            width: 36px; height: 4px; border-radius: 99px;
+            background: var(--outline-variant); margin: 12px auto 0;
+        }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px 8px;
+        }
+        .modal-title { font-size: 20px; font-weight: 500; color: var(--on-surface); letter-spacing: 0; }
+        .modal-close {
+            width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer;
+            background: var(--surface-variant); color: var(--on-surface-var); font-size: 15px;
+            display: flex; align-items: center; justify-content: center; font-family: var(--md-font);
+            transition: background 0.15s;
+        }
+        .modal-close:active { background: var(--outline-variant); }
+        .modal-body { padding: 8px 20px 0; }
+
+        /* ── FORM FIELDS ── */
+        .form-row { margin-bottom: 16px; }
+        .form-label {
+            font-size: 12px; font-weight: 500; letter-spacing: 0.01em;
+            color: var(--on-surface-var); margin-bottom: 6px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .form-label i { color: var(--primary); }
+        .form-input {
+            width: 100%;
+            background: var(--surface);
+            border: 1.5px solid var(--outline);
+            border-radius: 12px; padding: 13px 14px;
+            font-size: 16px; font-family: var(--md-font); color: var(--on-surface);
+            outline: none; -webkit-appearance: none; appearance: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .form-input::placeholder { color: var(--on-surface-var); opacity: 0.55; }
+        .form-input:focus { border-color: var(--primary); border-width: 2px; background: var(--surface); }
+        input[type="date"].form-input { color-scheme: light; }
+        [data-theme="dark"] input[type="date"].form-input { color-scheme: dark; }
+
+        .form-divider { height: 1px; background: var(--outline-variant); margin: 8px 0 16px; }
+
+        /* ── ITEM ROWS ── */
+        .items-section-label {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--tertiary);
+            display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+        }
+        .item-row {
+            background: var(--surface);
+            border: 1px solid var(--outline-variant);
+            border-radius: 16px; padding: 14px 13px 12px; margin-bottom: 10px;
+            box-shadow: var(--elev1);
+        }
+        .item-row-top { display: flex; gap: 8px; margin-bottom: 10px; }
+        .item-name-wrap { flex: 1; }
+        .item-qty-wrap  { width: 72px; }
+        .item-size-wrap { width: 84px; }
+        .item-field-label {
+            font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--primary); margin-bottom: 5px; opacity: 0.8;
+        }
+        .item-input {
+            width: 100%; background: var(--surface-container);
+            border: 1.5px solid var(--outline-variant); border-radius: 10px;
+            padding: 9px 10px; font-size: 15px; font-family: var(--md-font);
+            color: var(--on-surface); outline: none; -webkit-appearance: none;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .item-input:focus { border-color: var(--primary); background: var(--surface); }
+        .item-input::placeholder { color: var(--on-surface-var); opacity: 0.5; }
+        .item-row-bottom { display: flex; gap: 8px; align-items: flex-end; }
+        .remove-item-btn {
+            background: var(--error-cont); border: none; border-radius: 10px;
+            color: var(--error); font-size: 12px; font-family: var(--md-font);
+            padding: 8px 12px; cursor: pointer; font-weight: 500;
+            display: flex; align-items: center; gap: 4px;
+            transition: background 0.15s; white-space: nowrap; margin-bottom: 1px;
+        }
+        .remove-item-btn:active { filter: brightness(0.9); }
+        .add-item-btn {
+            width: 100%; background: var(--surface);
+            border: 1.5px solid var(--primary); border-radius: 12px;
+            color: var(--primary); font-size: 14px; font-weight: 500;
+            font-family: var(--md-font); padding: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin-bottom: 16px; letter-spacing: 0.01em;
+            transition: background 0.15s;
+        }
+        .add-item-btn:active { background: var(--primary-container); }
+        .submit-btn {
+            width: 100%; padding: 15px;
+            background: var(--primary); border: none; border-radius: 100px; cursor: pointer;
+            color: var(--on-primary); font-size: 15px; font-weight: 500;
+            font-family: var(--md-font); letter-spacing: 0.01em;
+            box-shadow: var(--elev2);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin-top: 4px; transition: transform 0.15s, filter 0.15s;
+        }
+        .submit-btn:active:not(:disabled) { transform: scale(0.97); }
+        .submit-btn:disabled { opacity: 0.5; cursor: default; }
+
+        /* ── SUBMIT TOAST ── */
+        #submit-toast {
+            position: fixed; top: calc(16px + var(--sat)); left: 50%;
+            transform: translateX(-50%); z-index: 999;
+            display: none; align-items: center; gap: 8px;
+            border-radius: 28px; padding: 12px 20px;
+            font-size: 13px; font-weight: 500; font-family: var(--md-font);
+            box-shadow: var(--elev3); white-space: nowrap;
+            animation: toastIn 0.3s cubic-bezier(0.2,0,0,1);
+        }
+        #submit-toast.success { background: var(--on-surface); color: var(--surface); }
+        #submit-toast.error   { background: var(--error);     color: #FFFFFF; }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(12px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        @keyframes backdropIn { from{opacity:0} to{opacity:1} }
+        @keyframes sheetUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+        @keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(-8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+        @keyframes livePulse { 0%{box-shadow:0 0 0 0 rgba(52,199,89,0.5)} 70%{box-shadow:0 0 0 5px rgba(52,199,89,0)} 100%{box-shadow:0 0 0 0 rgba(52,199,89,0)} }
+        @keyframes spin { to{transform:rotate(360deg)} }
+    </style>
+</head>
+<body>
+
+    <!-- Loading -->
+    <div id="loading-overlay">
+        <div class="loader-card">
+            <div class="md-progress-ring">
+                <svg viewBox="0 0 48 48" width="48" height="48">
+                    <circle cx="24" cy="24" r="20"/>
+                </svg>
+            </div>
+            <div class="loader-heading">Loading...</div>
+            <div class="loader-sub">Fetching PPE records</div>
+        </div>
+    </div>
+
+    <!-- Top App Bar -->
+    <nav>
+        <div class="brand">
+            <div class="brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div>
+                <div class="brand-name">PPE Issue</div>
+                <div class="brand-sub"><div class="live-dot"></div>Live Stream</div>
+            </div>
+        </div>
+        <div class="nav-right">
+            <button id="install-btn" onclick="triggerInstall()">
+                <i class="fa-solid fa-download" style="font-size:11px;"></i> Install
+            </button>
+            <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+                <i class="fa-solid fa-sun" id="theme-icon" style="color:#F9A825;"></i>
+            </button>
+            <div class="updated-pill">
+                <i class="fa-solid fa-calendar-check"></i>
+                <div>
+                    <div class="updated-label">Last Updated</div>
+                    <span id="last-updated-val">—</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Install banner -->
+    <div id="install-banner" style="display:none;">
+        <div class="banner-inner">
+            <div class="banner-top">
+                <div>
+                    <div class="banner-title">Add to Home Screen</div>
+                    <div class="banner-sub">Install for offline access &amp; faster loads</div>
+                </div>
+                <button class="banner-close" onclick="document.getElementById('install-banner').style.display='none'">✕</button>
+            </div>
+            <div class="banner-actions">
+                <button id="install-btn" onclick="triggerInstall()">
+                    <i class="fa-solid fa-download" style="font-size:12px;"></i> Install App
+                </button>
+                <div id="ios-hint">
+                    Tap <strong><i class="fa-solid fa-arrow-up-from-bracket"></i> Share</strong> then <strong>"Add to Home Screen"</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BG loader toast -->
+    <div id="bg-loader">
+        <div class="bg-spinner"></div>
+        <span>Loading older records…</span>
+    </div>
+
+    <!-- Page -->
+    <div class="page">
+        <div class="stack">
+
+            <!-- Search -->
+            <div class="search-panel">
+                <div class="panel-label"><i class="fa-solid fa-magnifying-glass"></i>Filter &amp; Search</div>
+                <div class="field">
+                    <div class="field-label"><i class="fa-solid fa-id-card"></i>Card Number</div>
+                    <div class="field-wrap">
+                        <i class="fa-solid fa-id-card fi"></i>
+                        <input class="lg-input" type="search" id="search-card" oninput="debounceSearch()" placeholder="Search card ID…" autocomplete="off" autocorrect="off" spellcheck="false">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="field-label"><i class="fa-solid fa-user"></i>Employee Name</div>
+                    <div class="field-wrap">
+                        <i class="fa-solid fa-user fi"></i>
+                        <input class="lg-input" type="search" id="search-name" oninput="debounceSearch()" placeholder="Search name…" autocomplete="off" autocorrect="off" spellcheck="false">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="field-label"><i class="fa-solid fa-building"></i>Section / Branch</div>
+                    <div class="field-wrap">
+                        <i class="fa-solid fa-building fi"></i>
+                        <input class="lg-input" type="search" id="search-dept" oninput="debounceSearch()" placeholder="Search department…" autocomplete="off" autocorrect="off" spellcheck="false">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="field-label"><i class="fa-solid fa-helmet-safety"></i>PPE Gear Type</div>
+                    <div class="field-wrap">
+                        <i class="fa-solid fa-helmet-safety fi"></i>
+                        <input class="lg-input" type="search" id="search-item" list="item-options" oninput="debounceSearch()" placeholder="Select gear type…" autocomplete="off">
+                        <datalist id="item-options"></datalist>
+                    </div>
+                </div>
+                <button class="reset-btn" onclick="resetFilters()">
+                    <i class="fa-solid fa-arrow-rotate-left" style="font-size:11px;"></i>
+                    Reset Filters
+                </button>
+            </div>
+
+            <div id="inline-loader" class="state-box">
+                <div class="state-icon"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
+                <div class="state-title">Loading Records…</div>
+            </div>
+
+            <div id="master-records-deck" class="stack" style="display:none;"></div>
+
+            <div id="no-results" class="state-box" style="display:none;">
+                <div class="state-icon"><i class="fa-solid fa-filter-circle-xmark"></i></div>
+                <div class="state-title">No Results Found</div>
+                <div class="state-sub">Try adjusting your filters</div>
+            </div>
+
+            <div id="pagination-footer" class="page-info" style="display:none;">
+                <div class="page-info">
+                    <b id="page-start">0</b>–<b id="page-end">0</b>
+                    of <span class="cnt" id="filtered-count">0</span>
+                </div>
+                <div class="page-btns">
+                    <button class="page-btn" id="btn-prev" onclick="changePage(-1)">
+                        <i class="fa-solid fa-angle-left" style="font-size:11px;"></i> Prev
+                    </button>
+                    <button class="page-btn" id="btn-next" onclick="changePage(1)">
+                        Next <i class="fa-solid fa-angle-right" style="font-size:11px;"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FAB -->
+    <button id="add-fab" onclick="openAddModal()" aria-label="Add PPE Issue">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- Submit toast -->
+    <div id="submit-toast"></div>
+
+    <!-- Add Modal -->
+    <div id="add-modal">
+        <div class="modal-backdrop" onclick="closeAddModal()"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <div class="modal-title">New PPE Issue</div>
+                <button class="modal-close" onclick="closeAddModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-label"><i class="fa-solid fa-calendar"></i>Issue Date</div>
+                    <input class="form-input" type="date" id="add-date">
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><i class="fa-solid fa-id-card"></i>Card No</div>
+                    <input class="form-input" type="text" id="add-card" placeholder="Enter card number…" autocomplete="off" autocorrect="off" spellcheck="false">
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><i class="fa-solid fa-user"></i>Employee Name</div>
+                    <input class="form-input" type="text" id="add-name" placeholder="Employee name…" autocomplete="off" autocorrect="off" spellcheck="false">
+                </div>
+                <div class="form-row">
+                    <div class="form-label"><i class="fa-solid fa-building"></i>Section / Branch</div>
+                    <input class="form-input" type="text" id="add-section" placeholder="Department or section…" autocomplete="off" autocorrect="off" spellcheck="false">
+                </div>
+                <div class="form-divider"></div>
+                <div class="items-section-label">
+                    <i class="fa-solid fa-helmet-safety" style="font-size:12px;"></i>PPE Items Issued
+                </div>
+                <div id="add-items-list"></div>
+                <button class="add-item-btn" onclick="addItemRow()">
+                    <i class="fa-solid fa-plus" style="font-size:13px;"></i>Add Item
+                </button>
+                <button class="submit-btn" id="form-submit-btn" onclick="submitEntry()">
+                    <i class="fa-solid fa-floppy-disk" style="font-size:15px;"></i>Save Entry
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    var API = "https://script.google.com/macros/s/AKfycbydwxwb1CYJtjLcWG_OKpcKIBdl4KQ7xeKe12PvJzwOzxu3Mvwu-OU9kvybNTji3iIX/exec";
+    var allData = [], filtered = [];
+    var page = 1, perPage = 30, timer = null;
+
+    // ── ADD ENTRY FORM ────────────────────────────────────────────
+
+    function openAddModal() {
+        var today = new Date();
+        var yyyy  = today.getFullYear();
+        var mm    = String(today.getMonth()+1).padStart(2,'0');
+        var dd    = String(today.getDate()).padStart(2,'0');
+        document.getElementById('add-date').value    = yyyy+'-'+mm+'-'+dd;
+        document.getElementById('add-card').value    = '';
+        document.getElementById('add-name').value    = '';
+        document.getElementById('add-section').value = '';
+        document.getElementById('add-items-list').innerHTML = '';
+        addItemRow();
+        document.getElementById('add-modal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeAddModal() {
+        document.getElementById('add-modal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    var itemRowCount = 0;
+    var SIZE_ITEMS = ['safety shoes', 'gum boot', 'button boot'];
+
+    function needsSize(itemName) {
+        return SIZE_ITEMS.indexOf(itemName.trim().toLowerCase()) !== -1;
+    }
+
+    function onItemNameChange(input) {
+        var row      = input.closest('.item-row');
+        var sizeWrap = row.querySelector('.item-size-wrap');
+        if (needsSize(input.value)) {
+            sizeWrap.style.display = '';
+        } else {
+            sizeWrap.style.display = 'none';
+            sizeWrap.querySelector('input').value = '';
+        }
+    }
+
+    function addItemRow() {
+        var idx = itemRowCount++;
+        var div = document.createElement('div');
+        div.className   = 'item-row';
+        div.dataset.idx = idx;
+        div.innerHTML =
+            '<div class="item-row-top">' +
+                '<div class="item-name-wrap">' +
+                    '<div class="item-field-label">Item Name</div>' +
+                    '<input class="item-input" type="text" list="item-options" placeholder="e.g. Gloves…" autocomplete="off" oninput="onItemNameChange(this)">' +
+                '</div>' +
+                '<div class="item-qty-wrap">' +
+                    '<div class="item-field-label">Qty</div>' +
+                    '<input class="item-input" type="number" min="1" value="1">' +
+                '</div>' +
+            '</div>' +
+            '<div class="item-row-bottom">' +
+                '<div class="item-size-wrap" style="display:none;flex:1;">' +
+                    '<div class="item-field-label">Size</div>' +
+                    '<input class="item-input" type="text" placeholder="e.g. 7, 8, 9…">' +
+                '</div>' +
+                '<button class="remove-item-btn" onclick="removeItemRow(this)">' +
+                    '<i class="fa-solid fa-trash-can" style="font-size:11px;"></i> Remove' +
+                '</button>' +
+            '</div>';
+        document.getElementById('add-items-list').appendChild(div);
+    }
+
+    function removeItemRow(btn) {
+        var row = btn.closest('.item-row');
+        if (document.querySelectorAll('.item-row').length > 1) row.remove();
+    }
+
+    function showToast(msg, type) {
+        var t = document.getElementById('submit-toast');
+        t.textContent = msg;
+        t.className   = type;
+        t.style.display = 'flex';
+        setTimeout(function(){ t.style.display = 'none'; }, 3200);
+    }
+
+    function submitEntry() {
+        var date    = document.getElementById('add-date').value;
+        var cardNo  = document.getElementById('add-card').value.trim();
+        var name    = document.getElementById('add-name').value.trim();
+        var section = document.getElementById('add-section').value.trim();
+        if (!date || !cardNo || !name) { showToast('Please fill Date, Card No and Name', 'error'); return; }
+        var items = [];
+        document.querySelectorAll('.item-row').forEach(function(row) {
+            var itemInput = row.querySelector('.item-name-wrap input');
+            var qtyInput  = row.querySelector('.item-qty-wrap input');
+            var sizeWrap  = row.querySelector('.item-size-wrap');
+            var sizeInput = sizeWrap ? sizeWrap.querySelector('input') : null;
+            var item = itemInput ? itemInput.value.trim() : '';
+            var qty  = qtyInput  ? qtyInput.value.trim()  : '1';
+            var size = (sizeInput && sizeWrap.style.display !== 'none') ? sizeInput.value.trim() : '';
+            if (item) items.push({ item: item, qty: qty || '1', size: size });
+        });
+        if (!items.length) { showToast('Add at least one PPE item', 'error'); return; }
+        var btn = document.getElementById('form-submit-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:15px;"></i> Saving…';
+        var payload = { action:'add', issuedOn:date, cardNo:cardNo, name:name, section:section, items:items };
+        fetch(API, { method:'POST', headers:{'Content-Type':'text/plain;charset=UTF-8'}, body:JSON.stringify(payload) })
+        .then(function(r){ return r.json(); })
+        .then(function(res){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk" style="font-size:15px;"></i> Save Entry';
+            if (res.error) { showToast('Error: ' + res.error, 'error'); return; }
+            showToast('✓ Entry saved — ' + items.length + ' row' + (items.length>1?'s':''), 'success');
+            closeAddModal();
+            try { localStorage.removeItem(CK_RECENT); localStorage.removeItem(CK_OLDER); } catch(e){}
+            items.forEach(function(it){
+                allData.unshift({ cardNo:cardNo, name:name, section:section, issuedOn:formatNewDate(date), item:it.item, qty:it.qty, size:it.size });
+            });
+            filtered = allData.slice();
+            updateLastUpdated(allData);
+            goToPage(1);
+        })
+        .catch(function(){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-floppy-disk" style="font-size:15px;"></i> Save Entry'; showToast('Network error — try again','error'); });
+    }
+
+    function formatNewDate(ymd) {
+        var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var p=ymd.split('-');
+        if(p.length===3) return p[2]+'-'+M[parseInt(p[1],10)-1]+'-'+p[0];
+        return ymd;
+    }
+
+    function triggerInstall() {
+        if (!window._pwaPrompt) return;
+        window._pwaPrompt.prompt();
+        window._pwaPrompt.userChoice.then(function(r) {
+            if (r.outcome==='accepted') document.getElementById('install-banner').style.display='none';
+            window._pwaPrompt = null;
+        });
+    }
+
+    function initInstallBanner() {
+        var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+        var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        if (isStandalone) return;
+        var banner = document.getElementById('install-banner');
+        if (isIOS) { document.getElementById('ios-hint').style.display='flex'; banner.style.display=''; }
+        else if (window._pwaPrompt) { document.getElementById('install-btn').style.display='flex'; banner.style.display=''; }
+        else {
+            var tries=0, wait=setInterval(function(){
+                if(window._pwaPrompt||tries++>60){ clearInterval(wait);
+                    if(window._pwaPrompt){document.getElementById('install-btn').style.display='flex';banner.style.display='';}
+                }
+            },1000);
+        }
+    }
+
+    function toggleTheme() {
+        var dark=document.body.getAttribute('data-theme')==='dark';
+        var ic=document.getElementById('theme-icon');
+        if(dark){document.body.removeAttribute('data-theme');ic.className='fa-solid fa-sun';ic.style.color='#F9A825';}
+        else{document.body.setAttribute('data-theme','dark');ic.className='fa-solid fa-moon';ic.style.color='#BAC3FF';}
+    }
+
+    function parseDate(str){
+        if(!str) return null; str=str.toString().trim();
+        var m=str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+        if(m) return new Date(+m[3],+m[2]-1,+m[1]);
+        m=str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+        if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+        m=str.match(/^(\d{1,2})[\/\-]([A-Za-z]+)[\/\-](\d{4})$/);
+        if(m){var mo={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};var idx=mo[m[2].toLowerCase().substring(0,3)];if(idx!==undefined)return new Date(+m[3],idx,+m[1]);}
+        var d=new Date(str); return isNaN(d)?null:d;
+    }
+    function fmtDate(d){if(!d)return'—';var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear();}
+
+    var CK_RECENT='ppe_recent_v3', CK_OLDER='ppe_older_v3', CK_CUTOFF='ppe_cutoff_v3';
+    function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+    function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){try{localStorage.clear();localStorage.setItem(k,v);}catch(e2){}}}
+    function saveRecent(c,d){lsSet(CK_CUTOFF,c);lsSet(CK_RECENT,JSON.stringify(d));}
+    function saveOlder(d){lsSet(CK_OLDER,JSON.stringify(d));}
+
+    function consolidateNames(data){
+        var reg={};
+        data.forEach(function(r){var c=(r.cardNo||'').toString().trim(),n=(r.name||'').toString().trim();if(!c||!n)return;if(!reg[c])reg[c]={};reg[c][n]=(reg[c][n]||0)+1;});
+        var can={};for(var c in reg){var top=-1,w='';for(var n in reg[c])if(reg[c][n]>top){top=reg[c][n];w=n;}can[c]=w;}
+        data.forEach(function(r){var c=(r.cardNo||'').toString().trim();if(can[c])r.name=can[c];});
+        return data;
+    }
+    function updateDatalist(data){
+        var dl=document.getElementById('item-options');
+        var ex=new Set(Array.from(dl.options).map(function(o){return o.value;}));
+        var items=[...new Set(data.map(function(r){return(r.item||'').toString().trim();}).filter(Boolean))].sort();
+        items.forEach(function(v){if(!ex.has(v)){var o=document.createElement('option');o.value=v;dl.appendChild(o);}});
+    }
+    function updateLastUpdated(data){
+        var mx=null;
+        data.forEach(function(r){var d=parseDate(r.issuedOn);if(d&&(!mx||d>mx))mx=d;});
+        if(mx)document.getElementById('last-updated-val').textContent=fmtDate(mx);
+    }
+    function getCutoffDate(){var d=new Date();d.setFullYear(d.getFullYear()-3);return d.toISOString().split('T')[0];}
+    function showError(msg){document.getElementById('loading-overlay').innerHTML='<div class="loader-card"><i class="fa-solid fa-triangle-exclamation" style="color:var(--error);font-size:28px;display:block;margin-bottom:12px;"></i><div style="font-size:14px;font-weight:500;color:var(--error);">Sync Error</div><div style="font-size:12px;color:var(--on-surface-var);margin-top:6px;">'+msg+'</div></div>';}
+    function showMainUI(){document.getElementById('loading-overlay').style.display='none';document.getElementById('inline-loader').style.display='none';document.getElementById('master-records-deck').style.display='';document.getElementById('pagination-footer').style.display='flex';}
+
+    function loadFromCache(cutoff){
+        try{
+            if(lsGet(CK_CUTOFF)!==cutoff)return false;
+            var raw=lsGet(CK_RECENT);if(!raw)return false;
+            var recent=JSON.parse(raw);if(!recent||!recent.length)return false;
+            var older=null;try{var ro=lsGet(CK_OLDER);if(ro)older=JSON.parse(ro);}catch(e){}
+            allData=older?recent.concat(older):recent;
+            updateDatalist(allData);updateLastUpdated(allData);filtered=allData.slice();return true;
+        }catch(e){return false;}
+    }
+
+    function fetchPhase1(cutoff,silent){
+        fetch(API+'?from='+cutoff)
+        .then(function(r){if(!r.ok)throw new Error('Network error');return r.json();})
+        .then(function(data){
+            if(data.error)throw new Error(data.error);
+            consolidateNames(data);var reversed=data.reverse();saveRecent(cutoff,reversed);
+            if(!silent){allData=reversed;filtered=allData.slice();updateDatalist(allData);updateLastUpdated(allData);showMainUI();goToPage(1);}
+            fetchPhase2(cutoff);
+        }).catch(function(err){if(!silent)showError(err.message);});
+    }
+
+    function fetchPhase2(cutoff){
+        var toast=document.getElementById('bg-loader');toast.style.display='flex';
+        fetch(API+'?before='+cutoff)
+        .then(function(r){if(!r.ok)throw new Error();return r.json();})
+        .then(function(older){
+            toast.style.opacity='0';setTimeout(function(){toast.style.display='none';toast.style.opacity='1';},500);
+            if(!older||older.error||!older.length)return;
+            consolidateNames(older);saveOlder(older);
+            try{var raw=lsGet(CK_RECENT);var recent=raw?JSON.parse(raw):allData;allData=recent.concat(older);}catch(e){allData=allData.concat(older);}
+            updateDatalist(allData);
+            var c=document.getElementById('search-card').value.toLowerCase().trim();
+            var n=document.getElementById('search-name').value.toLowerCase().trim();
+            var d=document.getElementById('search-dept').value.toLowerCase().trim();
+            var it=document.getElementById('search-item').value.toLowerCase().trim();
+            filtered=allData.filter(function(row){return row.cardNo.toLowerCase().includes(c)&&row.name.toLowerCase().includes(n)&&row.section.toLowerCase().includes(d)&&row.item.toLowerCase().includes(it);});
+            document.getElementById('filtered-count').textContent=filtered.length;
+        }).catch(function(){toast.style.display='none';});
+    }
+
+    window.onload=function(){
+        initInstallBanner();
+        var cutoff=getCutoffDate();
+        if(loadFromCache(cutoff)){showMainUI();goToPage(1);fetchPhase1(cutoff,true);}
+        else{fetchPhase1(cutoff,false);}
+    };
+
+    function render(){
+        var deck=document.getElementById('master-records-deck');
+        var noRes=document.getElementById('no-results');
+        var footer=document.getElementById('pagination-footer');
+        deck.innerHTML='';
+        var total=filtered.length;
+        document.getElementById('filtered-count').textContent=total;
+        if(total===0){noRes.style.display='';footer.style.display='none';document.getElementById('page-start').textContent='0';document.getElementById('page-end').textContent='0';document.getElementById('btn-prev').disabled=true;document.getElementById('btn-next').disabled=true;return;}
+        noRes.style.display='none';footer.style.display='flex';
+        var s=(page-1)*perPage,e=Math.min(s+perPage,total),slice=filtered.slice(s,e);
+        document.getElementById('page-start').textContent=s+1;document.getElementById('page-end').textContent=e;
+        document.getElementById('btn-prev').disabled=page===1;document.getElementById('btn-next').disabled=e>=total;
+
+        var empMap={},empOrder=[];
+        slice.forEach(function(row){
+            var k=row.cardNo+'_'+row.name;
+            if(!empMap[k]){empMap[k]={name:row.name,cardNo:row.cardNo,section:row.section,items:{}};empOrder.push(k);}
+            if(!empMap[k].items[row.item])empMap[k].items[row.item]=[];
+            empMap[k].items[row.item].push({date:row.issuedOn,qty:row.qty,size:row.size});
+        });
+
+        var frag=document.createDocumentFragment();
+        empOrder.forEach(function(k,i){
+            var emp=empMap[k],el=document.createElement('div');
+            el.className='record-card';el.style.animationDelay=(i*18)+'ms';
+            var itemsHTML='';
+            for(var name in emp.items){
+                var rows=emp.items[name].map(function(r){
+                    var sz=r.size?'<span class="ppe-size">Sz: '+r.size+'</span>':'';
+                    return '<div class="ppe-row"><span class="ppe-date">'+r.date+'</span><div class="ppe-tags"><span class="ppe-qty">'+r.qty+' Qty</span>'+sz+'</div></div>';
+                }).join('');
+                itemsHTML+='<div class="ppe-item"><div class="ppe-item-header">'+name+'</div><div class="ppe-rows">'+rows+'</div></div>';
+            }
+            el.innerHTML='<div class="id-strip"><div class="id-main"><div class="id-name">'+emp.name+'</div><div class="id-card"><i class="fa-solid fa-id-card" style="font-size:10px;"></i> '+emp.cardNo+'</div></div><span class="dept-badge">'+emp.section+'</span></div><div class="history-wrap"><div class="history-label"><i class="fa-solid fa-clock-rotate-left" style="font-size:10px;"></i>Issue History</div><div class="items-stack">'+itemsHTML+'</div></div>';
+            frag.appendChild(el);
+        });
+        deck.appendChild(frag);
+    }
+
+    function debounceSearch(){clearTimeout(timer);timer=setTimeout(filterData,220);}
+    function filterData(){
+        var c=document.getElementById('search-card').value.toLowerCase().trim();
+        var n=document.getElementById('search-name').value.toLowerCase().trim();
+        var d=document.getElementById('search-dept').value.toLowerCase().trim();
+        var it=document.getElementById('search-item').value.toLowerCase().trim();
+        filtered=allData.filter(function(e){return e.cardNo.toLowerCase().includes(c)&&e.name.toLowerCase().includes(n)&&e.section.toLowerCase().includes(d)&&e.item.toLowerCase().includes(it);});
+        goToPage(1);
+    }
+    function goToPage(p){page=p;render();window.scrollTo({top:0,behavior:'smooth'});}
+    function changePage(d){page+=d;render();window.scrollTo({top:0,behavior:'smooth'});}
+    function resetFilters(){['search-card','search-name','search-dept','search-item'].forEach(function(id){document.getElementById(id).value='';});filtered=allData.slice();goToPage(1);}
+</script>
+
+<script>
+    if('serviceWorker' in navigator){
+        window.addEventListener('load',function(){
+            navigator.serviceWorker.register('./sw.js')
+                .then(function(r){console.log('SW registered',r);})
+                .catch(function(e){console.error('SW error',e);});
+        });
+    }
+</script>
+</body>
+</html>
