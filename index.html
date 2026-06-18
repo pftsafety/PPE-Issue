@@ -1029,29 +1029,57 @@
         if(mx)document.getElementById('last-updated-val').textContent=fmtDate(mx);
     }
     function getCutoffDate(){var d=new Date();d.setFullYear(d.getFullYear()-3);return d.toISOString().split('T')[0];}
-    function showError(msg){document.getElementById('loading-overlay').innerHTML='<div class="loader-card"><i class="fa-solid fa-triangle-exclamation" style="color:var(--error);font-size:28px;display:block;margin-bottom:12px;"></i><div style="font-size:14px;font-weight:500;color:var(--error);">Sync Error</div><div style="font-size:12px;color:var(--on-surface-var);margin-top:6px;">'+msg+'</div></div>';}
-    function showMainUI(){document.getElementById('loading-overlay').style.display='none';document.getElementById('inline-loader').style.display='none';document.getElementById('master-records-deck').style.display='';document.getElementById('pagination-footer').style.display='flex';}
-
-    function loadFromCache(cutoff){
-        try{
-            if(lsGet(CK_CUTOFF)!==cutoff)return false;
-            var raw=lsGet(CK_RECENT);if(!raw)return false;
-            var recent=JSON.parse(raw);if(!recent||!recent.length)return false;
-            var older=null;try{var ro=lsGet(CK_OLDER);if(ro)older=JSON.parse(ro);}catch(e){}
-            allData=older?recent.concat(older):recent;
-            updateDatalist(allData);updateLastUpdated(allData);filtered=allData.slice();return true;
-        }catch(e){return false;}
+    function showError(msg) {
+        document.getElementById('loading-overlay').innerHTML =
+            '<div class="loader-card" style="text-align:center;max-width:290px;">' +
+            '<i class="fa-solid fa-triangle-exclamation" style="color:var(--error);font-size:32px;display:block;margin-bottom:14px;"></i>' +
+            '<div style="font-size:16px;font-weight:500;color:var(--error);margin-bottom:6px;">Failed to Load</div>' +
+            '<div style="font-size:13px;color:var(--on-surface-var);margin-bottom:20px;line-height:1.5;">' + msg + '</div>' +
+            '<button onclick="location.reload()" style="background:var(--primary);color:var(--on-primary);border:none;border-radius:20px;padding:10px 28px;font-size:14px;font-weight:500;font-family:var(--md-font);cursor:pointer;box-shadow:var(--elev2);">Retry</button>' +
+            '</div>';
     }
 
-    function fetchPhase1(cutoff,silent){
-        fetch(API+'?from='+cutoff)
-        .then(function(r){if(!r.ok)throw new Error('Network error');return r.json();})
-        .then(function(data){
-            if(data.error)throw new Error(data.error);
-            consolidateNames(data);var reversed=data.reverse();saveRecent(cutoff,reversed);
-            if(!silent){allData=reversed;filtered=allData.slice();updateDatalist(allData);updateLastUpdated(allData);showMainUI();goToPage(1);}
-            fetchPhase2(cutoff);
-        }).catch(function(err){if(!silent)showError(err.message);});
+    function fetchPhase1(cutoff, silent) {
+        // Show "taking too long" message after 20 seconds
+        var slowTimer = null;
+        if (!silent) {
+            slowTimer = setTimeout(function() {
+                var overlay = document.getElementById('loading-overlay');
+                if (overlay && overlay.style.display !== 'none') {
+                    var sub = overlay.querySelector('.loader-sub');
+                    if (sub) sub.textContent = 'Taking longer than usual… please wait';
+                }
+            }, 20000);
+        }
+
+        fetch(API + '?from=' + cutoff)
+            .then(function(r) {
+                if (!r.ok) throw new Error('Server error ' + r.status);
+                return r.json();
+            })
+            .then(function(data) {
+                clearTimeout(slowTimer);
+                if (data && data.error) throw new Error(data.error);
+                if (!Array.isArray(data)) throw new Error('Unexpected response format');
+
+                consolidateNames(data);
+                var reversed = data.reverse();
+                saveRecent(cutoff, reversed);
+
+                if (!silent) {
+                    allData   = reversed;
+                    filtered  = allData.slice();
+                    updateDatalist(allData);
+                    updateLastUpdated(allData);
+                    showMainUI();
+                    goToPage(1);
+                }
+                fetchPhase2(cutoff);
+            })
+            .catch(function(err) {
+                clearTimeout(slowTimer);
+                if (!silent) showError(err.message || 'Network error — check your connection');
+            });
     }
 
     function fetchPhase2(cutoff){
