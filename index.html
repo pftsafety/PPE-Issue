@@ -1039,7 +1039,29 @@
             '</div>';
     }
 
-    function fetchPhase1(cutoff, silent) {
+    function showMainUI() {
+        document.getElementById('loading-overlay').style.display = 'none';
+        document.getElementById('inline-loader').style.display   = 'none';
+        document.getElementById('master-records-deck').style.display = '';
+        document.getElementById('pagination-footer').style.display   = 'flex';
+    }
+
+    function loadFromCache(cutoff) {
+        try {
+            if (lsGet(CK_CUTOFF) !== cutoff) return false;
+            var raw = lsGet(CK_RECENT);
+            if (!raw) return false;
+            var recent = JSON.parse(raw);
+            if (!recent || !recent.length) return false;
+            var older = null;
+            try { var ro = lsGet(CK_OLDER); if (ro) older = JSON.parse(ro); } catch(e) {}
+            allData  = older ? recent.concat(older) : recent;
+            updateDatalist(allData);
+            updateLastUpdated(allData);
+            filtered = allData.slice();
+            return true;
+        } catch(e) { return false; }
+    }
         // Show "taking too long" message after 20 seconds
         var slowTimer = null;
         if (!silent) {
