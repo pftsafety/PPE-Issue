@@ -961,6 +961,8 @@
             showToast('Could not capture card', 'error');
         });
     }
+
+    function triggerInstall() {
         if (!window._pwaPrompt) return;
         window._pwaPrompt.prompt();
         window._pwaPrompt.userChoice.then(function(r) {
@@ -1004,132 +1006,89 @@
     }
     function fmtDate(d){if(!d)return'—';var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear();}
 
-    var CK_RECENT='ppe_recent_v3', CK_OLDER='ppe_older_v3', CK_CUTOFF='ppe_cutoff_v3';
-    function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
-    function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){try{localStorage.clear();localStorage.setItem(k,v);}catch(e2){}}}
-    function saveRecent(c,d){lsSet(CK_CUTOFF,c);lsSet(CK_RECENT,JSON.stringify(d));}
-    function saveOlder(d){lsSet(CK_OLDER,JSON.stringify(d));}
+    var CK_DATA  = 'ppe_data_v4';
+    var CK_STAMP = 'ppe_stamp_v4';
+    var CACHE_AGE = 30 * 60 * 1000; // 30 min
 
-    function consolidateNames(data){
+    function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+    function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ try{ localStorage.clear(); localStorage.setItem(k,v); }catch(e2){} } }
+
+    function processAndStore(data) {
+        // Name consolidation
         var reg={};
-        data.forEach(function(r){var c=(r.cardNo||'').toString().trim(),n=(r.name||'').toString().trim();if(!c||!n)return;if(!reg[c])reg[c]={};reg[c][n]=(reg[c][n]||0)+1;});
-        var can={};for(var c in reg){var top=-1,w='';for(var n in reg[c])if(reg[c][n]>top){top=reg[c][n];w=n;}can[c]=w;}
+        data.forEach(function(r){
+            var c=(r.cardNo||'').toString().trim(), n=(r.name||'').toString().trim();
+            if(!c||!n) return;
+            if(!reg[c]) reg[c]={};
+            reg[c][n]=(reg[c][n]||0)+1;
+        });
+        var can={};
+        for(var c in reg){var top=-1,w='';for(var n in reg[c])if(reg[c][n]>top){top=reg[c][n];w=n;}can[c]=w;}
         data.forEach(function(r){var c=(r.cardNo||'').toString().trim();if(can[c])r.name=can[c];});
-        return data;
-    }
-    function updateDatalist(data){
-        var dl=document.getElementById('item-options');
-        var ex=new Set(Array.from(dl.options).map(function(o){return o.value;}));
+
+        // Datalist
+        var dl=document.getElementById('item-options'); dl.innerHTML='';
         var items=[...new Set(data.map(function(r){return(r.item||'').toString().trim();}).filter(Boolean))].sort();
-        items.forEach(function(v){if(!ex.has(v)){var o=document.createElement('option');o.value=v;dl.appendChild(o);}});
-    }
-    function updateLastUpdated(data){
+        items.forEach(function(v){var o=document.createElement('option');o.value=v;dl.appendChild(o);});
+
+        // Last updated
         var mx=null;
         data.forEach(function(r){var d=parseDate(r.issuedOn);if(d&&(!mx||d>mx))mx=d;});
-        if(mx)document.getElementById('last-updated-val').textContent=fmtDate(mx);
-    }
-    function getCutoffDate(){var d=new Date();d.setFullYear(d.getFullYear()-3);return d.toISOString().split('T')[0];}
-    function showError(msg) {
-        document.getElementById('loading-overlay').innerHTML =
-            '<div class="loader-card" style="text-align:center;max-width:290px;">' +
-            '<i class="fa-solid fa-triangle-exclamation" style="color:var(--error);font-size:32px;display:block;margin-bottom:14px;"></i>' +
-            '<div style="font-size:16px;font-weight:500;color:var(--error);margin-bottom:6px;">Failed to Load</div>' +
-            '<div style="font-size:13px;color:var(--on-surface-var);margin-bottom:20px;line-height:1.5;">' + msg + '</div>' +
-            '<button onclick="location.reload()" style="background:var(--primary);color:var(--on-primary);border:none;border-radius:20px;padding:10px 28px;font-size:14px;font-weight:500;font-family:var(--md-font);cursor:pointer;box-shadow:var(--elev2);">Retry</button>' +
-            '</div>';
+        if(mx) document.getElementById('last-updated-val').textContent=fmtDate(mx);
+
+        // Cache
+        try{ lsSet(CK_DATA,JSON.stringify(data)); lsSet(CK_STAMP,Date.now().toString()); }catch(e){}
+
+        allData  = data;
+        filtered = data.slice();
     }
 
-    function showMainUI() {
-        document.getElementById('loading-overlay').style.display = 'none';
-        document.getElementById('inline-loader').style.display   = 'none';
-        document.getElementById('master-records-deck').style.display = '';
-        document.getElementById('pagination-footer').style.display   = 'flex';
-    }
+    window.onload = function() {
+        initInstallBanner();
 
-    function loadFromCache(cutoff) {
+        // Show cached data instantly if fresh
         try {
-            if (lsGet(CK_CUTOFF) !== cutoff) return false;
-            var raw = lsGet(CK_RECENT);
-            if (!raw) return false;
-            var recent = JSON.parse(raw);
-            if (!recent || !recent.length) return false;
-            var older = null;
-            try { var ro = lsGet(CK_OLDER); if (ro) older = JSON.parse(ro); } catch(e) {}
-            allData  = older ? recent.concat(older) : recent;
-            updateDatalist(allData);
-            updateLastUpdated(allData);
-            filtered = allData.slice();
-            return true;
-        } catch(e) { return false; }
-    }
-        // Show "taking too long" message after 20 seconds
-        var slowTimer = null;
-        if (!silent) {
-            slowTimer = setTimeout(function() {
-                var overlay = document.getElementById('loading-overlay');
-                if (overlay && overlay.style.display !== 'none') {
-                    var sub = overlay.querySelector('.loader-sub');
-                    if (sub) sub.textContent = 'Taking longer than usual… please wait';
-                }
-            }, 20000);
-        }
-
-        fetch(API + '?from=' + cutoff)
-            .then(function(r) {
-                if (!r.ok) throw new Error('Server error ' + r.status);
-                return r.json();
-            })
-            .then(function(data) {
-                clearTimeout(slowTimer);
-                if (data && data.error) throw new Error(data.error);
-                if (!Array.isArray(data)) throw new Error('Unexpected response format');
-
-                consolidateNames(data);
-                var reversed = data.reverse();
-                saveRecent(cutoff, reversed);
-
-                if (!silent) {
-                    allData   = reversed;
-                    filtered  = allData.slice();
-                    updateDatalist(allData);
-                    updateLastUpdated(allData);
+            var raw   = lsGet(CK_DATA);
+            var stamp = parseInt(lsGet(CK_STAMP)||'0', 10);
+            if (raw && (Date.now()-stamp) < CACHE_AGE) {
+                var cached = JSON.parse(raw);
+                if (Array.isArray(cached) && cached.length) {
+                    processAndStore(cached);
                     showMainUI();
                     goToPage(1);
+                    // Silent background refresh
+                    doFetch(true);
+                    return;
                 }
-                fetchPhase2(cutoff);
-            })
-            .catch(function(err) {
-                clearTimeout(slowTimer);
-                if (!silent) showError(err.message || 'Network error — check your connection');
-            });
-    }
+            }
+        } catch(e) {}
 
-    function fetchPhase2(cutoff){
-        var toast=document.getElementById('bg-loader');toast.style.display='flex';
-        fetch(API+'?before='+cutoff)
-        .then(function(r){if(!r.ok)throw new Error();return r.json();})
-        .then(function(older){
-            toast.style.opacity='0';setTimeout(function(){toast.style.display='none';toast.style.opacity='1';},500);
-            if(!older||older.error||!older.length)return;
-            consolidateNames(older);saveOlder(older);
-            try{var raw=lsGet(CK_RECENT);var recent=raw?JSON.parse(raw):allData;allData=recent.concat(older);}catch(e){allData=allData.concat(older);}
-            updateDatalist(allData);
-            var c=document.getElementById('search-card').value.toLowerCase().trim();
-            var n=document.getElementById('search-name').value.toLowerCase().trim();
-            var d=document.getElementById('search-dept').value.toLowerCase().trim();
-            var it=document.getElementById('search-item').value.toLowerCase().trim();
-            filtered=allData.filter(function(row){return row.cardNo.toLowerCase().includes(c)&&row.name.toLowerCase().includes(n)&&row.section.toLowerCase().includes(d)&&row.item.toLowerCase().includes(it);});
-            document.getElementById('filtered-count').textContent=filtered.length;
-        }).catch(function(){toast.style.display='none';});
-    }
-
-    window.onload=function(){
-        initInstallBanner();
-        var cutoff=getCutoffDate();
-        if(loadFromCache(cutoff)){showMainUI();goToPage(1);fetchPhase1(cutoff,true);}
-        else{fetchPhase1(cutoff,false);}
+        doFetch(false);
     };
 
+    function doFetch(silent) {
+        var slowTimer = !silent ? setTimeout(function(){
+            var sub = document.querySelector('#loading-overlay .loader-sub');
+            if(sub) sub.textContent = 'Still loading… this can take up to 15 seconds';
+        }, 12000) : null;
+
+        fetch(API)
+            .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+            .then(function(data){
+                if(slowTimer) clearTimeout(slowTimer);
+                if(!Array.isArray(data)){
+                    throw new Error((data&&data.error) ? data.error : 'Unexpected server response');
+                }
+                data.reverse();
+                processAndStore(data);
+                if(!silent){ showMainUI(); goToPage(1); }
+                else { filterData(); }
+            })
+            .catch(function(err){
+                if(slowTimer) clearTimeout(slowTimer);
+                if(!silent) showError(err.message);
+            });
+    }
     function render(){
         var deck=document.getElementById('master-records-deck');
         var noRes=document.getElementById('no-results');
