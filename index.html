@@ -122,44 +122,108 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        /* ── LOADING OVERLAY ── */
+        /* ── LOADING OVERLAY — Full screen splash ── */
         #loading-overlay {
             position: fixed; inset: 0; z-index: 999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: var(--bg); gap: 24px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: linear-gradient(160deg, #1a237e 0%, #283593 35%, #3949ab 65%, #4355B9 100%);
+            overflow: hidden;
         }
+
+        /* Animated background circles */
+        #loading-overlay::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(circle at 15% 25%, rgba(255,255,255,0.07) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(255,255,255,0.05) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .splash-ring {
+            position: absolute; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.07);
+            pointer-events: none;
+        }
+        .splash-ring-1 { width: 320px; height: 320px; top: -80px;  right: -80px;  animation: ringFloat 8s ease-in-out infinite; }
+        .splash-ring-2 { width: 240px; height: 240px; bottom: -60px; left: -60px; animation: ringFloat 11s ease-in-out infinite reverse; }
+        .splash-ring-3 { width: 160px; height: 160px; top: 40%;   left: -40px;   animation: ringFloat 9s ease-in-out infinite 2s; }
+
+        @keyframes ringFloat {
+            0%,100% { transform: scale(1) translate(0,0); }
+            50%      { transform: scale(1.08) translate(10px,-10px); }
+        }
+
+        /* Content */
+        .splash-content {
+            position: relative; z-index: 1;
+            display: flex; flex-direction: column;
+            align-items: center; text-align: center;
+            padding: 0 32px;
+        }
+
+        /* Icon */
+        .splash-icon-wrap {
+            width: 96px; height: 96px; border-radius: 28px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3);
+            animation: iconPulse 2.4s ease-in-out infinite;
+        }
+        .splash-icon-wrap i { font-size: 44px; color: #fff; }
+
+        @keyframes iconPulse {
+            0%,100% { box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3), 0 0 0 0 rgba(255,255,255,0.15); }
+            50%      { box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3), 0 0 0 18px rgba(255,255,255,0); }
+        }
+
+        /* Title */
+        .splash-title {
+            font-size: 32px; font-weight: 700;
+            color: #fff; letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+        .splash-subtitle {
+            font-size: 13px; font-weight: 400;
+            color: rgba(255,255,255,0.65);
+            letter-spacing: 0.04em; text-transform: uppercase;
+            margin-bottom: 52px;
+        }
+
+        /* Linear progress bar at bottom */
+        .splash-progress-wrap {
+            width: 180px; height: 3px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 99px; overflow: hidden;
+        }
+        .splash-progress-fill {
+            height: 100%; width: 45%; border-radius: 99px;
+            background: rgba(255,255,255,0.85);
+            animation: splashProgress 1.6s ease-in-out infinite;
+        }
+        @keyframes splashProgress {
+            0%   { transform: translateX(-150%); }
+            100% { transform: translateX(320%); }
+        }
+
+        /* Loading message shown after 12s */
+        .splash-slow-msg {
+            position: absolute; bottom: calc(52px + env(safe-area-inset-bottom,0px));
+            font-size: 12px; color: rgba(255,255,255,0.50);
+            font-weight: 400; letter-spacing: 0.02em;
+        }
+
+        /* Error card that replaces content on failure */
         .loader-card {
-            background: var(--surface);
-            border-radius: 28px;
-            padding: 40px 52px;
-            text-align: center;
-            box-shadow: var(--elev3);
-            min-width: 240px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.20);
+            border-radius: 24px; padding: 36px 40px;
+            text-align: center; max-width: 290px;
+            position: relative; z-index: 1;
         }
-        .md-progress-ring {
-            width: 48px; height: 48px;
-            margin: 0 auto 20px;
-            position: relative;
-        }
-        .md-progress-ring svg {
-            transform: rotate(-90deg);
-            animation: ringRotate 1.4s linear infinite;
-        }
-        .md-progress-ring circle {
-            fill: none; stroke: var(--primary);
-            stroke-width: 4; stroke-linecap: round;
-            stroke-dasharray: 120;
-            stroke-dashoffset: 90;
-            animation: ringDash 1.4s ease-in-out infinite;
-        }
-        @keyframes ringRotate { to { transform: rotate(270deg); } }
-        @keyframes ringDash {
-            0%   { stroke-dashoffset: 110; }
-            50%  { stroke-dashoffset: 30; }
-            100% { stroke-dashoffset: 110; }
-        }
-        .loader-heading { font-size: 20px; font-weight: 500; color: var(--on-surface); letter-spacing: 0; margin-bottom: 4px; }
-        .loader-sub { font-size: 13px; color: var(--on-surface-var); font-weight: 400; }
 
         /* ── TOP APP BAR ── */
         nav {
@@ -556,21 +620,24 @@
         #submit-toast.success { background: var(--on-surface); color: var(--surface); }
         #submit-toast.error   { background: var(--error);     color: #FFFFFF; }
 
-        /* ── SHARE BUTTON ── */
+        /* ── CARD ACTION BAR & SHARE BUTTON ── */
+        .card-actions {
+            display: flex; justify-content: flex-end; align-items: center;
+            padding: 8px 12px 10px;
+            border-top: 1px solid var(--outline-variant);
+            background: var(--surface-container);
+        }
         .share-btn {
-            position: absolute; top: 12px; right: 12px; z-index: 5;
-            display: flex; align-items: center; gap: 6px;
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
             background: var(--primary-container);
             color: var(--on-primary-cont);
-            border: none; border-radius: 20px;
-            padding: 7px 12px 7px 10px;
-            font-size: 12px; font-weight: 600; font-family: var(--md-font);
-            cursor: pointer; letter-spacing: 0.02em;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+            border: none; font-size: 15px;
+            cursor: pointer;
             transition: background 0.15s, transform 0.15s;
         }
-        .share-btn:active { transform: scale(0.92); }
-        .share-btn:disabled { opacity: 0.45; cursor: default; }
+        .share-btn:active { transform: scale(0.88); }
+        .share-btn:disabled { opacity: 0.40; cursor: default; }
 
         /* ── ANIMATIONS ── */
         @keyframes fadeUp {
@@ -586,16 +653,28 @@
 </head>
 <body>
 
-    <!-- Loading -->
+    <!-- Loading Splash Screen -->
     <div id="loading-overlay">
-        <div class="loader-card">
-            <div class="md-progress-ring">
-                <svg viewBox="0 0 48 48" width="48" height="48">
-                    <circle cx="24" cy="24" r="20"/>
-                </svg>
+        <!-- Floating background rings -->
+        <div class="splash-ring splash-ring-1"></div>
+        <div class="splash-ring splash-ring-2"></div>
+        <div class="splash-ring splash-ring-3"></div>
+
+        <!-- Main content -->
+        <div class="splash-content">
+            <div class="splash-icon-wrap">
+                <i class="fa-solid fa-shield-halved"></i>
             </div>
-            <div class="loader-heading">Loading...</div>
-            <div class="loader-sub">Fetching PPE records</div>
+            <div class="splash-title">PPE Issue</div>
+            <div class="splash-subtitle">Distribution Register</div>
+            <div class="splash-progress-wrap">
+                <div class="splash-progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Shown after 12s if still loading -->
+        <div class="splash-slow-msg" id="splash-slow-msg" style="display:none;">
+            Taking longer than usual…
         </div>
     </div>
 
@@ -911,42 +990,73 @@
     // ── SHARE CARD AS JPG ─────────────────────────────────────────
     function shareCard(btn) {
         var card = btn.closest('.record-card');
-        var origIcon = btn.innerHTML;
+        var origHTML = btn.innerHTML;
 
-        // Show spinner on button
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:12px;"></i>';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:13px;"></i>';
 
-        // Determine background based on current theme
         var isDark = document.body.getAttribute('data-theme') === 'dark';
-        var bgColor = isDark ? '#1B1C23' : '#FFFFFF';
 
         html2canvas(card, {
             scale: 2.5,
-            backgroundColor: bgColor,
+            backgroundColor: isDark ? '#1B1C23' : '#FFFFFF',
             useCORS: true,
             logging: false,
             allowTaint: true,
-            removeContainer: true
+            foreignObjectRendering: false,
+            onclone: function(clonedDoc, clonedEl) {
+                // Resolve all CSS custom properties to their computed values
+                // so html2canvas can render them correctly
+                var allEls = clonedEl.querySelectorAll('*');
+                allEls = [clonedEl].concat(Array.prototype.slice.call(allEls));
+                allEls.forEach(function(el) {
+                    try {
+                        var src = card.querySelector('#' + el.id) || card;
+                        var cs = window.getComputedStyle(
+                            el.classList.contains('record-card') ? card :
+                            card.querySelector('.' + (el.className||'').toString().trim().split(' ')[0]) || card
+                        );
+                        el.style.color           = cs.color;
+                        el.style.backgroundColor = cs.backgroundColor;
+                        el.style.borderColor     = cs.borderColor;
+                        el.style.fontSize        = cs.fontSize;
+                        el.style.fontWeight      = cs.fontWeight;
+                    } catch(e) {}
+                });
+                // Force solid backgrounds on key containers
+                clonedEl.style.background      = isDark ? '#1B1C23' : '#FFFFFF';
+                clonedEl.style.border          = '1px solid ' + (isDark ? '#46464F' : '#C7C5D0');
+                clonedEl.style.boxShadow       = 'none';
+                clonedEl.style.borderRadius    = '16px';
+                clonedEl.style.overflow        = 'hidden';
+
+                var strip = clonedEl.querySelector('.id-strip');
+                if (strip) strip.style.backgroundColor = isDark ? '#292A34' : '#ECEDF5';
+
+                var actions = clonedEl.querySelector('.card-actions');
+                if (actions) actions.style.display = 'none'; // hide share btn from image
+
+                var headers = clonedEl.querySelectorAll('.ppe-item-header');
+                headers.forEach(function(h){ h.style.backgroundColor = isDark ? '#2B3D9E' : '#DEE1FF'; h.style.color = isDark ? '#DEE1FF' : '#00105C'; });
+
+                var qty = clonedEl.querySelectorAll('.ppe-qty');
+                qty.forEach(function(q){ q.style.backgroundColor = isDark ? '#424459' : '#DFE0F9'; q.style.color = isDark ? '#DFE0F9' : '#171A30'; });
+
+                var badges = clonedEl.querySelectorAll('.dept-badge');
+                badges.forEach(function(b){ b.style.backgroundColor = isDark ? '#2B3D9E' : '#DEE1FF'; b.style.color = isDark ? '#DEE1FF' : '#00105C'; });
+            }
         }).then(function(canvas) {
             canvas.toBlob(function(blob) {
-                // Restore button
                 btn.disabled = false;
-                btn.innerHTML = origIcon;
+                btn.innerHTML = origHTML;
 
                 var empName = card.querySelector('.id-name') ? card.querySelector('.id-name').textContent.trim() : 'PPE-Record';
                 var fileName = 'PPE_' + empName.replace(/\s+/g, '_') + '.jpg';
                 var file = new File([blob], fileName, { type: 'image/jpeg' });
 
-                // Try Web Share API (Android Chrome supports file sharing)
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        title: 'PPE Issue — ' + empName,
-                        text: 'PPE Issue Record',
-                        files: [file]
-                    }).catch(function() {}); // ignore user cancel
+                    navigator.share({ title: 'PPE Issue — ' + empName, files: [file] }).catch(function(){});
                 } else {
-                    // Fallback: download the JPG
                     var url = URL.createObjectURL(blob);
                     var a = document.createElement('a');
                     a.href = url; a.download = fileName;
@@ -955,10 +1065,10 @@
                     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
                 }
             }, 'image/jpeg', 0.94);
-        }).catch(function() {
+        }).catch(function(err) {
             btn.disabled = false;
-            btn.innerHTML = origIcon;
-            showToast('Could not capture card', 'error');
+            btn.innerHTML = origHTML;
+            showToast('Share failed — try again', 'error');
         });
     }
 
@@ -1015,11 +1125,13 @@
 
     function showError(msg) {
         document.getElementById('loading-overlay').innerHTML =
-            '<div class="loader-card" style="text-align:center;max-width:290px;">' +
-            '<i class="fa-solid fa-triangle-exclamation" style="color:var(--error);font-size:32px;display:block;margin-bottom:14px;"></i>' +
-            '<div style="font-size:16px;font-weight:500;color:var(--error);margin-bottom:6px;">Failed to Load</div>' +
-            '<div style="font-size:13px;color:var(--on-surface-var);margin-bottom:20px;line-height:1.5;">' + (msg||'Unknown error') + '</div>' +
-            '<button onclick="location.reload()" style="background:var(--primary);color:var(--on-primary);border:none;border-radius:20px;padding:10px 28px;font-size:14px;font-weight:500;font-family:var(--md-font);cursor:pointer;">Retry</button>' +
+            '<div class="splash-ring splash-ring-1"></div>' +
+            '<div class="splash-ring splash-ring-2"></div>' +
+            '<div class="loader-card">' +
+            '<i class="fa-solid fa-triangle-exclamation" style="color:#ffb4ab;font-size:36px;display:block;margin-bottom:16px;"></i>' +
+            '<div style="font-size:17px;font-weight:600;color:#fff;margin-bottom:8px;">Failed to Load</div>' +
+            '<div style="font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:24px;line-height:1.6;">' + (msg||'Unknown error') + '</div>' +
+            '<button onclick="location.reload()" style="background:#fff;color:#1a237e;border:none;border-radius:20px;padding:11px 32px;font-size:14px;font-weight:600;font-family:var(--md-font);cursor:pointer;">Retry</button>' +
             '</div>';
     }
 
@@ -1091,8 +1203,8 @@
 
     function doFetch(silent) {
         var slowTimer = !silent ? setTimeout(function(){
-            var sub = document.querySelector('#loading-overlay .loader-sub');
-            if(sub) sub.textContent = 'Still loading… this can take up to 15 seconds';
+            var el = document.getElementById('splash-slow-msg');
+            if(el) el.style.display = 'block';
         }, 12000) : null;
 
         fetch(API)
@@ -1158,8 +1270,8 @@
                     '<div class="items-stack">'+itemsHTML+'</div>'+
                 '</div>'+
                 '<div class="card-actions">'+
-                    '<button class="share-btn" onclick="shareCard(this)">'+
-                        '<i class="fa-solid fa-share-nodes" style="font-size:13px;"></i> Share'+
+                    '<button class="share-btn" onclick="shareCard(this)" title="Share as image">'+
+                        '<i class="fa-solid fa-share-nodes"></i>'+
                     '</button>'+
                 '</div>';
             frag.appendChild(el);
