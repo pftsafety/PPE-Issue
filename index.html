@@ -257,6 +257,8 @@
             display: flex; align-items: center; gap: 8px;
         }
         .updated-pill i { color: var(--primary); font-size: 13px; flex-shrink: 0; }
+        #updated-pill { cursor: pointer; transition: transform 0.15s, background 0.15s; }
+        #updated-pill:active { transform: scale(0.95); background: var(--secondary-cont); }
         .updated-label { font-size: 9px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--on-primary-cont); opacity: 0.65; line-height: 1; margin-bottom: 2px; }
         #last-updated-val { font-size: 11px; font-weight: 700; color: var(--on-primary-cont); display: block; line-height: 1; font-family: var(--md-mono); }
 
@@ -639,6 +641,144 @@
         .share-btn:active { transform: scale(0.88); }
         .share-btn:disabled { opacity: 0.40; cursor: default; }
 
+        /* ── PULL-TO-REFRESH ── */
+        #ptr-indicator {
+            position: fixed; top: 0; left: 50%; transform: translateX(-50%) translateY(-56px);
+            z-index: 49; display: flex; align-items: center; gap: 8px;
+            background: var(--primary); color: var(--on-primary);
+            padding: 9px 20px; border-radius: 0 0 20px 20px;
+            font-size: 13px; font-weight: 500; font-family: var(--md-font);
+            box-shadow: var(--elev2); transition: transform 0.2s ease, opacity 0.2s ease;
+            opacity: 0; pointer-events: none;
+        }
+        #ptr-indicator.visible  { opacity: 1; }
+        #ptr-indicator.released { transform: translateX(-50%) translateY(0px); opacity: 1; }
+
+        /* ── ANALYTICS PANEL ── */
+        .analytics-panel {
+            background: var(--surface); border: 1px solid var(--outline-variant);
+            border-radius: 16px; overflow: hidden; box-shadow: var(--elev1);
+        }
+        .analytics-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px 12px;
+            border-bottom: 1px solid var(--outline-variant);
+            background: var(--surface-container);
+        }
+        .analytics-title {
+            font-size: 13px; font-weight: 600; color: var(--on-surface);
+            display: flex; align-items: center; gap: 7px;
+        }
+        .analytics-title i { color: var(--primary); font-size: 14px; }
+        .analytics-toggle {
+            background: none; border: none; cursor: pointer;
+            color: var(--on-surface-var); font-size: 13px; padding: 4px 8px;
+            border-radius: 8px; transition: background 0.15s; font-family: var(--md-font);
+        }
+        .analytics-toggle:active { background: var(--surface-variant); }
+        .analytics-body { padding: 14px 16px 16px; }
+
+        .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .stat-card {
+            background: var(--surface-container); border-radius: 12px;
+            padding: 12px 14px; border: 1px solid var(--outline-variant);
+        }
+        .stat-label { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--on-surface-var); opacity: 0.7; margin-bottom: 4px; }
+        .stat-value { font-size: 22px; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; line-height: 1; }
+        .stat-sub   { font-size: 11px; color: var(--on-surface-var); margin-top: 3px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .chart-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--on-surface-var); margin-bottom: 10px; }
+        .bar-row { margin-bottom: 9px; }
+        .bar-name { font-size: 12px; color: var(--on-surface); font-weight: 500; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .bar-track { height: 7px; background: var(--surface-variant); border-radius: 99px; overflow: hidden; }
+        .bar-fill  { height: 100%; background: var(--primary); border-radius: 99px; transition: width 0.8s cubic-bezier(0.2,0,0,1); }
+        .bar-count { font-size: 11px; color: var(--primary); font-weight: 700; margin-top: 2px; }
+
+        /* ── EMPLOYEE PROFILE MODAL ── */
+        #profile-modal { position: fixed; inset: 0; z-index: 80; display: none; align-items: flex-end; }
+        #profile-modal.open { display: flex; }
+        .profile-sheet {
+            position: relative; z-index: 1; width: 100%;
+            background: var(--surface-container);
+            border-radius: 28px 28px 0 0;
+            box-shadow: 0 -4px 32px rgba(0,0,0,0.18);
+            padding: 0 0 calc(24px + var(--sab));
+            max-height: 90vh; overflow-y: auto;
+            animation: sheetUp 0.35s cubic-bezier(0.2,0,0,1);
+        }
+        .profile-header-band {
+            background: linear-gradient(135deg,#1a237e,#4355B9);
+            padding: 20px 20px 18px; position: relative;
+        }
+        .profile-close {
+            position: absolute; top: 16px; right: 16px;
+            width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer;
+            background: rgba(255,255,255,0.18); color: #fff; font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .profile-emp-name { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+        .profile-emp-meta { font-size: 12px; color: rgba(255,255,255,0.70); margin-top: 4px; font-family: var(--md-mono); }
+        .profile-dept {
+            display: inline-block; background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.25); border-radius: 8px;
+            padding: 3px 10px; font-size: 12px; font-weight: 600; color: #fff;
+            margin-top: 8px;
+        }
+        .profile-body { padding: 16px 16px 0; }
+        .profile-stats { display: flex; gap: 10px; margin-bottom: 16px; }
+        .profile-stat {
+            flex: 1; background: var(--surface); border: 1px solid var(--outline-variant);
+            border-radius: 12px; padding: 10px 12px; text-align: center;
+        }
+        .profile-stat-val { font-size: 20px; font-weight: 700; color: var(--primary); }
+        .profile-stat-lbl { font-size: 10px; color: var(--on-surface-var); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+        .profile-section-label {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--on-surface-var); margin-bottom: 10px; padding-top: 4px;
+        }
+        .profile-item-card {
+            background: var(--surface); border: 1px solid var(--outline-variant);
+            border-radius: 12px; overflow: hidden; margin-bottom: 10px;
+        }
+        .profile-item-name {
+            background: var(--primary-container); padding: 8px 14px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+            color: var(--on-primary-cont);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .profile-item-total { font-size: 10px; font-weight: 700; color: var(--on-primary-cont); opacity: 0.75; }
+        .profile-item-rows { padding: 4px 14px 8px; }
+        .profile-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 5px 0; border-bottom: 1px solid var(--outline-variant);
+            font-size: 12px;
+        }
+        .profile-row:last-child { border-bottom: none; }
+        .profile-row-date { color: var(--on-surface-var); font-family: var(--md-mono); }
+        .profile-row-tags { display: flex; gap: 4px; }
+
+        /* ── OFFLINE QUEUE BANNER ── */
+        #queue-banner {
+            position: fixed; bottom: calc(88px + var(--sab)); left: 50%;
+            transform: translateX(-50%); z-index: 39;
+            display: none; align-items: center; gap: 8px;
+            background: var(--tertiary-cont); color: var(--tertiary);
+            border: 1px solid rgba(118,84,110,0.25);
+            padding: 9px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+            font-family: var(--md-font); white-space: nowrap; box-shadow: var(--elev2);
+            cursor: pointer;
+        }
+        /* ── FAB queue badge ── */
+        #fab-badge {
+            position: absolute; top: -4px; right: -4px;
+            min-width: 18px; height: 18px; border-radius: 99px; padding: 0 5px;
+            background: var(--error); color: #fff;
+            font-size: 10px; font-weight: 700; font-family: var(--md-font);
+            display: none; align-items: center; justify-content: center;
+            border: 2px solid var(--bg);
+        }
+        #add-fab { position: relative; }
+
         /* ── ANIMATIONS ── */
         @keyframes fadeUp {
             from { opacity:0; transform:translateY(12px); }
@@ -694,8 +834,8 @@
             <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
                 <i class="fa-solid fa-sun" id="theme-icon" style="color:#F9A825;"></i>
             </button>
-            <div class="updated-pill">
-                <i class="fa-solid fa-calendar-check"></i>
+            <div class="updated-pill" id="updated-pill" onclick="forceRefreshDate()" title="Tap to refresh">
+                <i class="fa-solid fa-calendar-check" id="updated-pill-icon"></i>
                 <div>
                     <div class="updated-label">Last Updated</div>
                     <span id="last-updated-val">—</span>
@@ -704,7 +844,11 @@
         </div>
     </nav>
 
-    <!-- Install banner -->
+    <!-- Pull-to-Refresh indicator -->
+    <div id="ptr-indicator">
+        <i class="fa-solid fa-arrows-rotate" id="ptr-icon"></i>
+        <span id="ptr-label">Pull to refresh</span>
+    </div>
     <div id="install-banner" style="display:none;">
         <div class="banner-inner">
             <div class="banner-top">
@@ -773,6 +917,42 @@
                 </button>
             </div>
 
+            <!-- Analytics Panel -->
+            <div class="analytics-panel">
+                <div class="analytics-header">
+                    <div class="analytics-title"><i class="fa-solid fa-chart-simple"></i>This Month's Overview</div>
+                    <button class="analytics-toggle" onclick="toggleAnalytics()" id="analytics-toggle-btn">Hide</button>
+                </div>
+                <div class="analytics-body" id="analytics-body">
+                    <div class="stat-row">
+                        <div class="stat-card">
+                            <div class="stat-label">Issued This Month</div>
+                            <div class="stat-value" id="stat-month-total">0</div>
+                            <div class="stat-sub">total items</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Top Item</div>
+                            <div class="stat-value" id="stat-top-item" style="font-size:15px;">—</div>
+                            <div class="stat-sub" id="stat-top-item-count">0 issued</div>
+                        </div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-card">
+                            <div class="stat-label">Top Department</div>
+                            <div class="stat-value" id="stat-top-dept" style="font-size:15px;">—</div>
+                            <div class="stat-sub" id="stat-top-dept-count">0 items</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Employees Served</div>
+                            <div class="stat-value" id="stat-emp-count">0</div>
+                            <div class="stat-sub">this month</div>
+                        </div>
+                    </div>
+                    <div class="chart-label">Top 5 Items This Month</div>
+                    <div id="chart-bars"></div>
+                </div>
+            </div>
+
             <div id="inline-loader" class="state-box">
                 <div class="state-icon"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
                 <div class="state-title">Loading Records…</div>
@@ -804,13 +984,51 @@
         </div>
     </div>
 
+    <!-- Offline queue banner -->
+    <div id="queue-banner" onclick="syncQueueNow()">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <span id="queue-banner-text">1 entry pending sync</span>
+    </div>
+
     <!-- FAB -->
     <button id="add-fab" onclick="openAddModal()" aria-label="Add PPE Issue">
         <i class="fa-solid fa-plus"></i>
+        <span id="fab-badge">0</span>
     </button>
 
     <!-- Submit toast -->
     <div id="submit-toast"></div>
+
+    <!-- Employee Profile Modal -->
+    <div id="profile-modal">
+        <div class="modal-backdrop" onclick="closeProfileModal()"></div>
+        <div class="profile-sheet">
+            <div class="profile-header-band">
+                <button class="profile-close" onclick="closeProfileModal()">✕</button>
+                <div class="profile-emp-name" id="profile-name">—</div>
+                <div class="profile-emp-meta" id="profile-card">—</div>
+                <span class="profile-dept" id="profile-dept">—</span>
+            </div>
+            <div class="profile-body">
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="profile-stat-val" id="profile-stat-items">0</div>
+                        <div class="profile-stat-lbl">Total Items</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-val" id="profile-stat-types">0</div>
+                        <div class="profile-stat-lbl">PPE Types</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-val" id="profile-stat-last">—</div>
+                        <div class="profile-stat-lbl">Last Issued</div>
+                    </div>
+                </div>
+                <div class="profile-section-label"><i class="fa-solid fa-clock-rotate-left" style="margin-right:5px;"></i>Complete Issue History</div>
+                <div id="profile-items-list"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- Add Modal -->
     <div id="add-modal">
@@ -957,27 +1175,49 @@
             if (item) items.push({ item: item, qty: qty || '1', size: size });
         });
         if (!items.length) { showToast('Add at least one PPE item', 'error'); return; }
+
         var btn = document.getElementById('form-submit-btn');
+        var payload = { action:'add', issuedOn:date, cardNo:cardNo, name:name, section:section, items:items };
+
+        // Optimistically add to local view immediately
+        items.forEach(function(it){
+            allData.unshift({ cardNo:cardNo, name:name, section:section, issuedOn:formatNewDate(date), item:it.item, qty:it.qty, size:it.size });
+        });
+        filtered = allData.slice();
+        updateLastUpdated(allData);
+        try{ lsSet(CK_DATA, JSON.stringify(allData)); lsSet(CK_STAMP, Date.now().toString()); }catch(e){}
+        goToPage(1);
+        renderAnalytics();
+
+        // ── OFFLINE: queue and exit early ──────────────────────────
+        if (!navigator.onLine) {
+            queueAdd(payload);
+            showToast('📥 Offline — entry saved, will sync automatically', 'success');
+            closeAddModal();
+            return;
+        }
+
+        // ── ONLINE: submit now ──────────────────────────────────────
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:15px;"></i> Saving…';
-        var payload = { action:'add', issuedOn:date, cardNo:cardNo, name:name, section:section, items:items };
+
         fetch(API, { method:'POST', headers:{'Content-Type':'text/plain;charset=UTF-8'}, body:JSON.stringify(payload) })
         .then(function(r){ return r.json(); })
         .then(function(res){
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-floppy-disk" style="font-size:15px;"></i> Save Entry';
-            if (res.error) { showToast('Error: ' + res.error, 'error'); return; }
+            if (res.error) throw new Error(res.error);
             showToast('✓ Entry saved — ' + items.length + ' row' + (items.length>1?'s':''), 'success');
             closeAddModal();
-            try { localStorage.removeItem(CK_RECENT); localStorage.removeItem(CK_OLDER); } catch(e){}
-            items.forEach(function(it){
-                allData.unshift({ cardNo:cardNo, name:name, section:section, issuedOn:formatNewDate(date), item:it.item, qty:it.qty, size:it.size });
-            });
-            filtered = allData.slice();
-            updateLastUpdated(allData);
-            goToPage(1);
         })
-        .catch(function(){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-floppy-disk" style="font-size:15px;"></i> Save Entry'; showToast('Network error — try again','error'); });
+        .catch(function(err){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk" style="font-size:15px;"></i> Save Entry';
+            // Network/server failure — fall back to offline queue so data isn't lost
+            queueAdd(payload);
+            showToast('⚠ Save failed — queued for retry', 'error');
+            closeAddModal();
+        });
     }
 
     function formatNewDate(ymd) {
@@ -989,69 +1229,100 @@
 
     // ── SHARE CARD AS JPG ─────────────────────────────────────────
     function shareCard(btn) {
-        var card = btn.closest('.record-card');
+        var card    = btn.closest('.record-card');
         var origHTML = btn.innerHTML;
-
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:13px;"></i>';
 
-        var isDark = document.body.getAttribute('data-theme') === 'dark';
+        var isDark   = document.body.getAttribute('data-theme') === 'dark';
+        var bg       = isDark ? '#1B1C23' : '#FFFFFF';
+        var surface  = isDark ? '#292A34' : '#F3F4FB';
+        var textMain = isDark ? '#E5E1E6' : '#1B1B1F';
+        var textSub  = isDark ? '#C7C5D0' : '#46464F';
+        var primary  = isDark ? '#BAC3FF' : '#4355B9';
+        var priCont  = isDark ? '#2B3D9E' : '#DEE1FF';
+        var onPriCont= isDark ? '#DEE1FF' : '#00105C';
+        var border   = isDark ? '#46464F' : '#C7C5D0';
+        var orange   = isDark ? '#FFBA63' : '#7B4900';
 
-        html2canvas(card, {
-            scale: 2.5,
-            backgroundColor: isDark ? '#1B1C23' : '#FFFFFF',
+        // Gather card data
+        var empName = (card.querySelector('.id-name')||{}).textContent || '';
+        var cardNo  = (card.querySelector('.id-card')||{}).textContent || '';
+        var section = (card.querySelector('.dept-badge')||{}).textContent || '';
+
+        // Build items HTML from the card
+        var itemsHTML = '';
+        card.querySelectorAll('.ppe-item').forEach(function(item) {
+            var itemName = (item.querySelector('.ppe-item-header')||{}).textContent || '';
+            var rowsHTML = '';
+            item.querySelectorAll('.ppe-row').forEach(function(row) {
+                var date = (row.querySelector('.ppe-date')||{}).textContent || '';
+                var qty  = (row.querySelector('.ppe-qty')||{}).textContent || '';
+                var sz   = row.querySelector('.ppe-size');
+                var szHTML = sz ? '<span style="background:rgba(118,84,110,0.15);color:#76546E;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;margin-left:4px;">' + sz.textContent + '</span>' : '';
+                rowsHTML += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid ' + border + ';">' +
+                    '<span style="font-size:13px;color:' + textSub + ';font-family:Roboto Mono,monospace;">' + date + '</span>' +
+                    '<div style="display:flex;align-items:center;">' +
+                    '<span style="background:' + (isDark?'#424459':'#DFE0F9') + ';color:' + (isDark?'#DFE0F9':'#171A30') + ';border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700;">' + qty + '</span>' +
+                    szHTML + '</div></div>';
+            });
+            itemsHTML += '<div style="background:' + surface + ';border:1px solid ' + border + ';border-radius:12px;overflow:hidden;margin-bottom:10px;">' +
+                '<div style="background:' + priCont + ';padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:' + onPriCont + ';">' + itemName + '</div>' +
+                '<div style="padding:4px 14px 2px;">' + rowsHTML + '</div>' +
+                '</div>';
+        });
+
+        // Build the share image container
+        var wrap = document.createElement('div');
+        wrap.style.cssText = 'position:fixed;left:-9999px;top:-9999px;z-index:-1;';
+        wrap.innerHTML =
+            '<div id="__share_card__" style="width:760px;font-family:Roboto,Arial,sans-serif;background:' + bg + ';border-radius:0;overflow:hidden;">' +
+
+            // Header band
+            '<div style="background:linear-gradient(135deg,#1a237e 0%,#3949ab 60%,#4355B9 100%);padding:22px 28px;display:flex;align-items:center;gap:14px;">' +
+            '<div style="width:48px;height:48px;background:rgba(255,255,255,0.18);border-radius:14px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.25);font-size:24px;color:#fff;">⛨</div>' +
+            '<div><div style="font-size:20px;font-weight:700;color:#fff;letter-spacing:-0.3px;">PPE Issue Register</div>' +
+            '<div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:2px;letter-spacing:0.05em;text-transform:uppercase;">Distribution Record</div></div>' +
+            '</div>' +
+
+            // Employee info strip
+            '<div style="background:' + surface + ';padding:18px 28px;border-bottom:1px solid ' + border + ';display:flex;justify-content:space-between;align-items:flex-start;">' +
+            '<div><div style="font-size:22px;font-weight:700;color:' + textMain + ';letter-spacing:-0.3px;">' + empName + '</div>' +
+            '<div style="font-size:13px;color:' + primary + ';margin-top:4px;font-family:Roboto Mono,monospace;font-weight:500;">' + cardNo.replace(/^\s*\S+\s*/,'') + '</div></div>' +
+            '<span style="background:' + priCont + ';color:' + onPriCont + ';border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;margin-top:4px;">' + section + '</span>' +
+            '</div>' +
+
+            // Items
+            '<div style="padding:18px 28px 10px;">' +
+            '<div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:' + orange + ';margin-bottom:14px;display:flex;align-items:center;gap:6px;">↺ Issue History</div>' +
+            itemsHTML +
+            '</div>' +
+
+            // Footer
+            '<div style="padding:12px 28px 16px;border-top:1px solid ' + border + ';display:flex;justify-content:space-between;align-items:center;">' +
+            '<span style="font-size:11px;color:' + textSub + ';">Generated from PPE Issue Register</span>' +
+            '<span style="font-size:11px;color:' + textSub + ';">' + new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) + '</span>' +
+            '</div>' +
+            '</div>';
+
+        document.body.appendChild(wrap);
+
+        var shareEl = wrap.querySelector('#__share_card__');
+
+        html2canvas(shareEl, {
+            scale: 3,
+            backgroundColor: bg,
             useCORS: true,
             logging: false,
             allowTaint: true,
-            foreignObjectRendering: false,
-            onclone: function(clonedDoc, clonedEl) {
-                // Resolve all CSS custom properties to their computed values
-                // so html2canvas can render them correctly
-                var allEls = clonedEl.querySelectorAll('*');
-                allEls = [clonedEl].concat(Array.prototype.slice.call(allEls));
-                allEls.forEach(function(el) {
-                    try {
-                        var src = card.querySelector('#' + el.id) || card;
-                        var cs = window.getComputedStyle(
-                            el.classList.contains('record-card') ? card :
-                            card.querySelector('.' + (el.className||'').toString().trim().split(' ')[0]) || card
-                        );
-                        el.style.color           = cs.color;
-                        el.style.backgroundColor = cs.backgroundColor;
-                        el.style.borderColor     = cs.borderColor;
-                        el.style.fontSize        = cs.fontSize;
-                        el.style.fontWeight      = cs.fontWeight;
-                    } catch(e) {}
-                });
-                // Force solid backgrounds on key containers
-                clonedEl.style.background      = isDark ? '#1B1C23' : '#FFFFFF';
-                clonedEl.style.border          = '1px solid ' + (isDark ? '#46464F' : '#C7C5D0');
-                clonedEl.style.boxShadow       = 'none';
-                clonedEl.style.borderRadius    = '16px';
-                clonedEl.style.overflow        = 'hidden';
-
-                var strip = clonedEl.querySelector('.id-strip');
-                if (strip) strip.style.backgroundColor = isDark ? '#292A34' : '#ECEDF5';
-
-                var actions = clonedEl.querySelector('.card-actions');
-                if (actions) actions.style.display = 'none'; // hide share btn from image
-
-                var headers = clonedEl.querySelectorAll('.ppe-item-header');
-                headers.forEach(function(h){ h.style.backgroundColor = isDark ? '#2B3D9E' : '#DEE1FF'; h.style.color = isDark ? '#DEE1FF' : '#00105C'; });
-
-                var qty = clonedEl.querySelectorAll('.ppe-qty');
-                qty.forEach(function(q){ q.style.backgroundColor = isDark ? '#424459' : '#DFE0F9'; q.style.color = isDark ? '#DFE0F9' : '#171A30'; });
-
-                var badges = clonedEl.querySelectorAll('.dept-badge');
-                badges.forEach(function(b){ b.style.backgroundColor = isDark ? '#2B3D9E' : '#DEE1FF'; b.style.color = isDark ? '#DEE1FF' : '#00105C'; });
-            }
+            foreignObjectRendering: false
         }).then(function(canvas) {
+            document.body.removeChild(wrap);
             canvas.toBlob(function(blob) {
                 btn.disabled = false;
                 btn.innerHTML = origHTML;
 
-                var empName = card.querySelector('.id-name') ? card.querySelector('.id-name').textContent.trim() : 'PPE-Record';
-                var fileName = 'PPE_' + empName.replace(/\s+/g, '_') + '.jpg';
+                var fileName = 'PPE_' + empName.trim().replace(/\s+/g,'_') + '.jpg';
                 var file = new File([blob], fileName, { type: 'image/jpeg' });
 
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -1064,8 +1335,9 @@
                     document.body.removeChild(a);
                     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
                 }
-            }, 'image/jpeg', 0.94);
-        }).catch(function(err) {
+            }, 'image/jpeg', 0.95);
+        }).catch(function() {
+            document.body.removeChild(wrap);
             btn.disabled = false;
             btn.innerHTML = origHTML;
             showToast('Share failed — try again', 'error');
@@ -1100,9 +1372,26 @@
     function toggleTheme() {
         var dark=document.body.getAttribute('data-theme')==='dark';
         var ic=document.getElementById('theme-icon');
-        if(dark){document.body.removeAttribute('data-theme');ic.className='fa-solid fa-sun';ic.style.color='#F9A825';}
-        else{document.body.setAttribute('data-theme','dark');ic.className='fa-solid fa-moon';ic.style.color='#BAC3FF';}
+        if(dark){
+            document.body.removeAttribute('data-theme');ic.className='fa-solid fa-sun';ic.style.color='#F9A825';
+            try{localStorage.setItem('ppe_theme','light');}catch(e){}
+        }else{
+            document.body.setAttribute('data-theme','dark');ic.className='fa-solid fa-moon';ic.style.color='#BAC3FF';
+            try{localStorage.setItem('ppe_theme','dark');}catch(e){}
+        }
     }
+
+    // Apply saved theme immediately (before paint) to avoid flash
+    (function applySavedTheme(){
+        try{
+            var saved = localStorage.getItem('ppe_theme');
+            if(saved === 'dark'){
+                document.body.setAttribute('data-theme','dark');
+                var ic = document.getElementById('theme-icon');
+                if(ic){ ic.className='fa-solid fa-moon'; ic.style.color='#BAC3FF'; }
+            }
+        }catch(e){}
+    })();
 
     function parseDate(str){
         if(!str) return null; str=str.toString().trim();
@@ -1139,6 +1428,31 @@
         var mx = null;
         data.forEach(function(r){ var d = parseDate(r.issuedOn); if(d&&(!mx||d>mx)) mx=d; });
         if(mx) document.getElementById('last-updated-val').textContent = fmtDate(mx);
+    }
+
+    // Manual refresh — bypasses both localStorage AND GAS-side cache
+    // to guarantee the true latest entry date from the sheet.
+    function forceRefreshDate() {
+        var icon = document.getElementById('updated-pill-icon');
+        icon.className = 'fa-solid fa-circle-notch fa-spin';
+
+        fetch(API + '?nocache=1')
+            .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+            .then(function(data){
+                if(!Array.isArray(data)) throw new Error((data&&data.error)||'Unexpected response');
+                data.reverse();
+                processAndStore(data);
+                renderAnalytics();
+                if (document.getElementById('master-records-deck').style.display !== 'none') {
+                    filterData();
+                }
+                icon.className = 'fa-solid fa-calendar-check';
+                showToast('✓ Refreshed — showing latest data', 'success');
+            })
+            .catch(function(err){
+                icon.className = 'fa-solid fa-calendar-check';
+                showToast('Refresh failed — check connection', 'error');
+            });
     }
 
     var CK_DATA  = 'ppe_data_v4';
@@ -1180,6 +1494,8 @@
 
     window.onload = function() {
         initInstallBanner();
+        updateQueueUI();
+        if (navigator.onLine && getQueue().length) processQueue();
 
         // Show cached data instantly if fresh
         try {
@@ -1191,6 +1507,7 @@
                     processAndStore(cached);
                     showMainUI();
                     goToPage(1);
+                    renderAnalytics();
                     // Silent background refresh
                     doFetch(true);
                     return;
@@ -1216,6 +1533,7 @@
                 }
                 data.reverse();
                 processAndStore(data);
+                renderAnalytics();
                 if(!silent){ showMainUI(); goToPage(1); }
                 else { filterData(); }
             })
@@ -1224,6 +1542,281 @@
                 if(!silent) showError(err.message);
             });
     }
+    // ════════════════════════════════════════════════════════════
+    // FEATURE: ANALYTICS PANEL
+    // ════════════════════════════════════════════════════════════
+    var analyticsVisible = true;
+
+    function toggleAnalytics() {
+        analyticsVisible = !analyticsVisible;
+        document.getElementById('analytics-body').style.display = analyticsVisible ? '' : 'none';
+        document.getElementById('analytics-toggle-btn').textContent = analyticsVisible ? 'Hide' : 'Show';
+    }
+
+    function isThisMonth(dateStr) {
+        var d = parseDate(dateStr);
+        if (!d) return false;
+        var now = new Date();
+        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    }
+
+    function renderAnalytics() {
+        var monthRows = allData.filter(function(r){ return isThisMonth(r.issuedOn); });
+
+        var totalQty = 0;
+        var itemCounts = {};
+        var deptCounts = {};
+        var empSet = {};
+
+        monthRows.forEach(function(r) {
+            var qty = parseInt(r.qty, 10) || 1;
+            totalQty += qty;
+            var item = (r.item||'').trim();
+            var dept = (r.section||'').trim();
+            var emp  = (r.cardNo||'') + '_' + (r.name||'');
+            if (item) itemCounts[item] = (itemCounts[item]||0) + qty;
+            if (dept) deptCounts[dept] = (deptCounts[dept]||0) + qty;
+            if (emp.length > 1) empSet[emp] = true;
+        });
+
+        // Top item
+        var topItem = '—', topItemCount = 0;
+        Object.keys(itemCounts).forEach(function(k){ if(itemCounts[k] > topItemCount){ topItemCount = itemCounts[k]; topItem = k; } });
+
+        // Top dept
+        var topDept = '—', topDeptCount = 0;
+        Object.keys(deptCounts).forEach(function(k){ if(deptCounts[k] > topDeptCount){ topDeptCount = deptCounts[k]; topDept = k; } });
+
+        document.getElementById('stat-month-total').textContent = totalQty;
+        document.getElementById('stat-top-item').textContent = topItem;
+        document.getElementById('stat-top-item-count').textContent = topItemCount + ' issued';
+        document.getElementById('stat-top-dept').textContent = topDept;
+        document.getElementById('stat-top-dept-count').textContent = topDeptCount + ' items';
+        document.getElementById('stat-emp-count').textContent = Object.keys(empSet).length;
+
+        // Top 5 bar chart
+        var sorted = Object.keys(itemCounts).map(function(k){ return {name:k, count:itemCounts[k]}; })
+            .sort(function(a,b){ return b.count - a.count; }).slice(0, 5);
+        var maxCount = sorted.length ? sorted[0].count : 1;
+
+        var barsHTML = '';
+        if (sorted.length === 0) {
+            barsHTML = '<div style="font-size:12px;color:var(--on-surface-var);text-align:center;padding:12px 0;">No issues recorded this month yet</div>';
+        } else {
+            sorted.forEach(function(s) {
+                var pct = Math.max(6, Math.round((s.count / maxCount) * 100));
+                barsHTML += '<div class="bar-row">' +
+                    '<div class="bar-name">' + s.name + '</div>' +
+                    '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;"></div></div>' +
+                    '<div class="bar-count">' + s.count + ' units</div>' +
+                    '</div>';
+            });
+        }
+        document.getElementById('chart-bars').innerHTML = barsHTML;
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // FEATURE: EMPLOYEE PROFILE MODAL
+    // ════════════════════════════════════════════════════════════
+    function openProfile(cardNo, name) {
+        var rows = allData.filter(function(r){ return r.cardNo === cardNo && r.name === name; });
+        if (!rows.length) return;
+
+        var section = rows[0].section || '—';
+        var itemMap = {};
+        var totalItems = 0;
+        var lastDate = null;
+
+        rows.forEach(function(r) {
+            var qty = parseInt(r.qty,10) || 1;
+            totalItems += qty;
+            var item = r.item || 'Unknown';
+            if (!itemMap[item]) itemMap[item] = [];
+            itemMap[item].push({ date: r.issuedOn, qty: r.qty, size: r.size });
+
+            var d = parseDate(r.issuedOn);
+            if (d && (!lastDate || d > lastDate)) lastDate = d;
+        });
+
+        document.getElementById('profile-name').textContent = name;
+        document.getElementById('profile-card').innerHTML = '<i class="fa-solid fa-id-card" style="font-size:11px;"></i> ' + cardNo;
+        document.getElementById('profile-dept').textContent = section;
+        document.getElementById('profile-stat-items').textContent = totalItems;
+        document.getElementById('profile-stat-types').textContent = Object.keys(itemMap).length;
+        document.getElementById('profile-stat-last').textContent = lastDate ? fmtDate(lastDate) : '—';
+
+        var itemsHTML = '';
+        Object.keys(itemMap).forEach(function(itemName) {
+            var entries = itemMap[itemName];
+            var totalQty = entries.reduce(function(sum,e){ return sum + (parseInt(e.qty,10)||1); }, 0);
+            var rowsHTML = entries.map(function(e) {
+                var sz = e.size ? '<span class="ppe-size">Sz: ' + e.size + '</span>' : '';
+                return '<div class="profile-row">' +
+                    '<span class="profile-row-date">' + e.date + '</span>' +
+                    '<div class="profile-row-tags"><span class="ppe-qty">' + e.qty + ' Qty</span>' + sz + '</div>' +
+                    '</div>';
+            }).join('');
+            itemsHTML += '<div class="profile-item-card">' +
+                '<div class="profile-item-name"><span>' + itemName + '</span><span class="profile-item-total">' + totalQty + ' total</span></div>' +
+                '<div class="profile-item-rows">' + rowsHTML + '</div>' +
+                '</div>';
+        });
+        document.getElementById('profile-items-list').innerHTML = itemsHTML;
+
+        document.getElementById('profile-modal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeProfileModal() {
+        document.getElementById('profile-modal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // FEATURE: PULL-TO-REFRESH
+    // ════════════════════════════════════════════════════════════
+    (function setupPullToRefresh() {
+        var startY = 0, currentY = 0, pulling = false, refreshing = false;
+        var THRESHOLD = 70;
+        var indicator = document.getElementById('ptr-indicator');
+        var icon = document.getElementById('ptr-icon');
+        var label = document.getElementById('ptr-label');
+
+        document.addEventListener('touchstart', function(e) {
+            if (window.scrollY === 0 && !refreshing) {
+                startY = e.touches[0].clientY;
+                pulling = true;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', function(e) {
+            if (!pulling || refreshing) return;
+            currentY = e.touches[0].clientY;
+            var diff = currentY - startY;
+            if (diff > 0 && window.scrollY === 0) {
+                var capped = Math.min(diff, 120);
+                indicator.classList.add('visible');
+                indicator.style.transform = 'translateX(-50%) translateY(' + (Math.min(capped - 56, 0)) + 'px)';
+                if (capped > THRESHOLD) {
+                    icon.style.transform = 'rotate(180deg)';
+                    label.textContent = 'Release to refresh';
+                } else {
+                    icon.style.transform = 'rotate(0deg)';
+                    label.textContent = 'Pull to refresh';
+                }
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', function() {
+            if (!pulling || refreshing) { pulling = false; return; }
+            var diff = currentY - startY;
+            pulling = false;
+
+            if (diff > THRESHOLD) {
+                refreshing = true;
+                icon.className = 'fa-solid fa-circle-notch fa-spin';
+                label.textContent = 'Refreshing…';
+                indicator.classList.add('released');
+
+                doFetch(true);
+                setTimeout(function() {
+                    indicator.classList.remove('visible', 'released');
+                    indicator.style.transform = '';
+                    icon.className = 'fa-solid fa-arrows-rotate';
+                    icon.style.transform = '';
+                    label.textContent = 'Pull to refresh';
+                    refreshing = false;
+                    render();
+                    renderAnalytics();
+                }, 1000);
+            } else {
+                indicator.classList.remove('visible');
+                indicator.style.transform = '';
+            }
+            startY = 0; currentY = 0;
+        }, { passive: true });
+    })();
+
+    // ════════════════════════════════════════════════════════════
+    // FEATURE: OFFLINE ENTRY QUEUE
+    // ════════════════════════════════════════════════════════════
+    var QUEUE_KEY = 'ppe_offline_queue';
+
+    function getQueue() {
+        try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); } catch(e) { return []; }
+    }
+    function setQueue(q) {
+        try { localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); } catch(e) {}
+    }
+    function queueAdd(payload) {
+        var q = getQueue();
+        q.push(payload);
+        setQueue(q);
+        updateQueueUI();
+    }
+    function updateQueueUI() {
+        var q = getQueue();
+        var badge  = document.getElementById('fab-badge');
+        var banner = document.getElementById('queue-banner');
+        if (q.length > 0) {
+            badge.textContent = q.length;
+            badge.style.display = 'flex';
+            document.getElementById('queue-banner-text').textContent =
+                q.length + ' ' + (q.length === 1 ? 'entry' : 'entries') + ' pending sync — tap to retry';
+            banner.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+            banner.style.display = 'none';
+        }
+    }
+
+    function syncQueueNow() {
+        if (!navigator.onLine) {
+            showToast('Still offline — will sync automatically', 'error');
+            return;
+        }
+        processQueue();
+    }
+
+    function processQueue() {
+        var q = getQueue();
+        if (!q.length) return;
+
+        var remaining = q.slice();
+        var item = remaining.shift();
+
+        fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+            body: JSON.stringify(item)
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(res){
+            if (res.error) throw new Error(res.error);
+            setQueue(remaining);
+            updateQueueUI();
+            if (remaining.length > 0) {
+                processQueue(); // continue with next
+            } else {
+                showToast('✓ All pending entries synced', 'success');
+                doFetch(true); // refresh data silently
+            }
+        })
+        .catch(function(){
+            // Leave in queue, try again later
+            updateQueueUI();
+        });
+    }
+
+    // Auto-sync when connection returns
+    window.addEventListener('online', function() {
+        var q = getQueue();
+        if (q.length > 0) {
+            showToast('Back online — syncing pending entries…', 'success');
+            processQueue();
+        }
+    });
+
     function render(){
         var deck=document.getElementById('master-records-deck');
         var noRes=document.getElementById('no-results');
@@ -1258,9 +1851,9 @@
                 itemsHTML+='<div class="ppe-item"><div class="ppe-item-header">'+name+'</div><div class="ppe-rows">'+rows+'</div></div>';
             }
             el.innerHTML=
-                '<div class="id-strip">'+
+                '<div class="id-strip" onclick="openProfile(\''+emp.cardNo.replace(/'/g,"\\'")+'\',\''+emp.name.replace(/'/g,"\\'")+'\')" style="cursor:pointer;">'+
                     '<div class="id-main">'+
-                        '<div class="id-name">'+emp.name+'</div>'+
+                        '<div class="id-name">'+emp.name+' <i class="fa-solid fa-chevron-right" style="font-size:11px;opacity:0.35;margin-left:4px;"></i></div>'+
                         '<div class="id-card"><i class="fa-solid fa-id-card" style="font-size:10px;"></i> '+emp.cardNo+'</div>'+
                     '</div>'+
                     '<span class="dept-badge">'+emp.section+'</span>'+
