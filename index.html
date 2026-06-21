@@ -122,6 +122,18 @@
             transition: background 0.3s, color 0.3s;
         }
 
+        /* ── FIXED UI LAYER ──
+           Wraps floating elements (FAB, toasts, banners) so they stay
+           aligned to the 480px content column instead of anchoring to
+           the raw browser viewport on wider screens (tablet/desktop),
+           which would otherwise push them far off to the side. */
+        #fixed-ui-layer {
+            position: fixed; inset: 0;
+            max-width: 480px; margin: 0 auto;
+            pointer-events: none; z-index: 38;
+        }
+        #fixed-ui-layer > * { pointer-events: auto; }
+
         /* ── LOADING OVERLAY — Full screen splash ── */
         #loading-overlay {
             position: fixed; inset: 0; z-index: 999;
@@ -300,7 +312,7 @@
 
         /* ── BG LOADER TOAST ── */
         #bg-loader {
-            position: fixed; bottom: calc(20px + var(--sab)); left: 50%;
+            position: absolute; bottom: calc(20px + var(--sab)); left: 50%;
             transform: translateX(-50%); z-index: 40;
             display: none; align-items: center; gap: 10px;
             background: var(--on-surface); color: var(--surface);
@@ -363,10 +375,58 @@
             background: none; border: none; cursor: pointer;
             font-size: 13px; font-weight: 500; color: var(--error);
             font-family: var(--md-font); display: flex; align-items: center; gap: 6px;
-            padding: 8px 12px; border-radius: 99px; margin-top: 14px; margin-left: auto;
+            padding: 8px 12px; border-radius: 99px; margin-top: 10px; margin-left: auto;
             transition: background 0.15s; letter-spacing: 0.01em;
         }
         .reset-btn:active { background: var(--error-cont); }
+
+        /* ── SEARCH SUBMIT BUTTON ── */
+        .search-submit-btn {
+            width: 100%; margin-top: 16px;
+            background: var(--primary); border: none; border-radius: 100px;
+            color: var(--on-primary); font-size: 15px; font-weight: 600;
+            font-family: var(--md-font); padding: 14px;
+            cursor: pointer; letter-spacing: 0.02em;
+            display: flex; align-items: center; justify-content: center; gap: 9px;
+            box-shadow: var(--elev2);
+            transition: transform 0.15s, filter 0.15s;
+        }
+        .search-submit-btn:active { transform: scale(0.97); filter: brightness(0.93); }
+
+        /* ── ADVANCED FILTERS TOGGLE ── */
+        .search-toggle-adv {
+            width: 100%; background: none; border: none; cursor: pointer;
+            color: var(--primary); font-size: 12px; font-weight: 600;
+            font-family: var(--md-font); padding: 10px 4px 4px;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            letter-spacing: 0.02em;
+        }
+        #adv-toggle-chevron { transition: transform 0.2s ease; }
+        .search-toggle-adv.open #adv-toggle-chevron { transform: rotate(180deg); }
+        #adv-filters { padding-top: 4px; }
+
+        /* ── SEARCH PROMPT (default empty state) ── */
+        .search-prompt-box {
+            background: var(--surface); border: 1px solid var(--outline-variant);
+            border-radius: 16px; text-align: center; padding: 48px 28px;
+            box-shadow: var(--elev1);
+        }
+        .search-prompt-icon {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: var(--primary-container); color: var(--on-primary-cont);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; margin: 0 auto 18px;
+        }
+        .search-prompt-title { font-size: 16px; font-weight: 600; color: var(--on-surface); margin-bottom: 6px; }
+        .search-prompt-sub { font-size: 13px; color: var(--on-surface-var); line-height: 1.6; max-width: 260px; margin: 0 auto; }
+
+        /* ── MULTI-MATCH RESULT BANNER ── */
+        .match-banner {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 12px; font-weight: 600; color: var(--on-surface-var);
+            padding: 2px 4px 4px;
+        }
+        .match-banner i { color: var(--primary); }
 
         /* ── RECORD CARD ── */
         .record-card {
@@ -481,7 +541,7 @@
 
         /* ── FAB ── */
         #add-fab {
-            position: fixed; bottom: calc(24px + var(--sab)); right: 20px; z-index: 40;
+            position: absolute; bottom: calc(24px + var(--sab)); right: 20px; z-index: 40;
             width: 56px; height: 56px; border-radius: 16px; border: none; cursor: pointer;
             background: var(--primary-container); color: var(--on-primary-cont);
             font-size: 22px; display: flex; align-items: center; justify-content: center;
@@ -500,6 +560,7 @@
         }
         .modal-sheet {
             position: relative; z-index: 1; width: 100%;
+            max-width: 480px; margin: 0 auto;
             background: var(--surface-container);
             border-radius: 28px 28px 0 0;
             box-shadow: 0 -4px 32px rgba(0,0,0,0.18);
@@ -588,15 +649,22 @@
         }
         .remove-item-btn:active { filter: brightness(0.9); }
         .add-item-btn {
-            width: 100%; background: var(--surface);
-            border: 1.5px solid var(--primary); border-radius: 12px;
-            color: var(--primary); font-size: 14px; font-weight: 500;
-            font-family: var(--md-font); padding: 12px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            margin-bottom: 16px; letter-spacing: 0.01em;
-            transition: background 0.15s;
+            width: 100%;
+            background: var(--primary, #4355B9);
+            border: none; border-radius: 12px;
+            color: var(--on-primary, #FFFFFF);
+            font-size: 14px; font-weight: 600;
+            font-family: var(--md-font); padding: 13px;
+            cursor: pointer;
+            display: flex !important; align-items: center; justify-content: center; gap: 8px;
+            margin: 4px 0 16px; letter-spacing: 0.01em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: transform 0.15s, filter 0.15s;
+            min-height: 46px;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
-        .add-item-btn:active { background: var(--primary-container); }
+        .add-item-btn:active { transform: scale(0.97); filter: brightness(0.92); }
         .submit-btn {
             width: 100%; padding: 15px;
             background: var(--primary); border: none; border-radius: 100px; cursor: pointer;
@@ -611,7 +679,7 @@
 
         /* ── SUBMIT TOAST ── */
         #submit-toast {
-            position: fixed; top: calc(16px + var(--sat)); left: 50%;
+            position: absolute; top: calc(16px + var(--sat)); left: 50%;
             transform: translateX(-50%); z-index: 999;
             display: none; align-items: center; gap: 8px;
             border-radius: 28px; padding: 12px 20px;
@@ -643,7 +711,7 @@
 
         /* ── PULL-TO-REFRESH ── */
         #ptr-indicator {
-            position: fixed; top: 0; left: 50%; transform: translateX(-50%) translateY(-56px);
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%) translateY(-56px);
             z-index: 49; display: flex; align-items: center; gap: 8px;
             background: var(--primary); color: var(--on-primary);
             padding: 9px 20px; border-radius: 0 0 20px 20px;
@@ -699,6 +767,7 @@
         #profile-modal.open { display: flex; }
         .profile-sheet {
             position: relative; z-index: 1; width: 100%;
+            max-width: 480px; margin: 0 auto;
             background: var(--surface-container);
             border-radius: 28px 28px 0 0;
             box-shadow: 0 -4px 32px rgba(0,0,0,0.18);
@@ -828,9 +897,6 @@
             </div>
         </div>
         <div class="nav-right">
-            <button id="install-btn" onclick="triggerInstall()">
-                <i class="fa-solid fa-download" style="font-size:11px;"></i> Install
-            </button>
             <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
                 <i class="fa-solid fa-sun" id="theme-icon" style="color:#F9A825;"></i>
             </button>
@@ -844,11 +910,36 @@
         </div>
     </nav>
 
-    <!-- Pull-to-Refresh indicator -->
-    <div id="ptr-indicator">
-        <i class="fa-solid fa-arrows-rotate" id="ptr-icon"></i>
-        <span id="ptr-label">Pull to refresh</span>
+    <!-- Fixed UI layer — keeps floating controls aligned to the 480px column -->
+    <div id="fixed-ui-layer">
+        <!-- Pull-to-Refresh indicator -->
+        <div id="ptr-indicator">
+            <i class="fa-solid fa-arrows-rotate" id="ptr-icon"></i>
+            <span id="ptr-label">Pull to refresh</span>
+        </div>
+
+        <!-- BG loader toast -->
+        <div id="bg-loader">
+            <div class="bg-spinner"></div>
+            <span>Loading older records…</span>
+        </div>
+
+        <!-- Offline queue banner -->
+        <div id="queue-banner" onclick="syncQueueNow()">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span id="queue-banner-text">1 entry pending sync</span>
+        </div>
+
+        <!-- FAB -->
+        <button id="add-fab" onclick="openAddModal()" aria-label="Add PPE Issue">
+            <i class="fa-solid fa-plus"></i>
+            <span id="fab-badge">0</span>
+        </button>
+
+        <!-- Submit toast -->
+        <div id="submit-toast"></div>
     </div>
+
     <div id="install-banner" style="display:none;">
         <div class="banner-inner">
             <div class="banner-top">
@@ -869,51 +960,59 @@
         </div>
     </div>
 
-    <!-- BG loader toast -->
-    <div id="bg-loader">
-        <div class="bg-spinner"></div>
-        <span>Loading older records…</span>
-    </div>
-
     <!-- Page -->
     <div class="page">
         <div class="stack">
 
             <!-- Search -->
             <div class="search-panel">
-                <div class="panel-label"><i class="fa-solid fa-magnifying-glass"></i>Filter &amp; Search</div>
+                <div class="panel-label"><i class="fa-solid fa-magnifying-glass"></i>Find Employee History</div>
                 <div class="field">
                     <div class="field-label"><i class="fa-solid fa-id-card"></i>Card Number</div>
                     <div class="field-wrap">
                         <i class="fa-solid fa-id-card fi"></i>
-                        <input class="lg-input" type="search" id="search-card" oninput="debounceSearch()" placeholder="Search card ID…" autocomplete="off" autocorrect="off" spellcheck="false">
+                        <input class="lg-input" type="search" id="search-card" onkeydown="handleSearchKey(event)" placeholder="Enter card ID…" autocomplete="off" autocorrect="off" spellcheck="false">
                     </div>
                 </div>
                 <div class="field">
                     <div class="field-label"><i class="fa-solid fa-user"></i>Employee Name</div>
                     <div class="field-wrap">
                         <i class="fa-solid fa-user fi"></i>
-                        <input class="lg-input" type="search" id="search-name" oninput="debounceSearch()" placeholder="Search name…" autocomplete="off" autocorrect="off" spellcheck="false">
+                        <input class="lg-input" type="search" id="search-name" onkeydown="handleSearchKey(event)" placeholder="Enter name…" autocomplete="off" autocorrect="off" spellcheck="false">
                     </div>
                 </div>
-                <div class="field">
-                    <div class="field-label"><i class="fa-solid fa-building"></i>Section / Branch</div>
-                    <div class="field-wrap">
-                        <i class="fa-solid fa-building fi"></i>
-                        <input class="lg-input" type="search" id="search-dept" oninput="debounceSearch()" placeholder="Search department…" autocomplete="off" autocorrect="off" spellcheck="false">
+
+                <button class="search-toggle-adv" onclick="toggleAdvancedFilters()" id="adv-toggle-btn">
+                    <i class="fa-solid fa-sliders" style="font-size:11px;"></i>
+                    More filters
+                    <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:2px;" id="adv-toggle-chevron"></i>
+                </button>
+
+                <div id="adv-filters" style="display:none;">
+                    <div class="field">
+                        <div class="field-label"><i class="fa-solid fa-building"></i>Section / Branch</div>
+                        <div class="field-wrap">
+                            <i class="fa-solid fa-building fi"></i>
+                            <input class="lg-input" type="search" id="search-dept" onkeydown="handleSearchKey(event)" placeholder="Search department…" autocomplete="off" autocorrect="off" spellcheck="false">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label"><i class="fa-solid fa-helmet-safety"></i>PPE Gear Type</div>
+                        <div class="field-wrap">
+                            <i class="fa-solid fa-helmet-safety fi"></i>
+                            <input class="lg-input" type="search" id="search-item" list="item-options" onkeydown="handleSearchKey(event)" placeholder="Select gear type…" autocomplete="off">
+                            <datalist id="item-options"></datalist>
+                        </div>
                     </div>
                 </div>
-                <div class="field">
-                    <div class="field-label"><i class="fa-solid fa-helmet-safety"></i>PPE Gear Type</div>
-                    <div class="field-wrap">
-                        <i class="fa-solid fa-helmet-safety fi"></i>
-                        <input class="lg-input" type="search" id="search-item" list="item-options" oninput="debounceSearch()" placeholder="Select gear type…" autocomplete="off">
-                        <datalist id="item-options"></datalist>
-                    </div>
-                </div>
+
+                <button class="search-submit-btn" onclick="performSearch()">
+                    <i class="fa-solid fa-magnifying-glass" style="font-size:14px;"></i>
+                    Search
+                </button>
                 <button class="reset-btn" onclick="resetFilters()">
                     <i class="fa-solid fa-arrow-rotate-left" style="font-size:11px;"></i>
-                    Reset Filters
+                    Clear
                 </button>
             </div>
 
@@ -958,12 +1057,24 @@
                 <div class="state-title">Loading Records…</div>
             </div>
 
+            <!-- Default state — shown before any search is performed -->
+            <div id="search-prompt" class="search-prompt-box" style="display:none;">
+                <div class="search-prompt-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                <div class="search-prompt-title">Find an Employee's PPE History</div>
+                <div class="search-prompt-sub">Enter a card number or employee name above, then tap Search to view their full issue history.</div>
+            </div>
+
+            <div class="match-banner" id="match-banner" style="display:none;">
+                <i class="fa-solid fa-users"></i>
+                <span id="match-banner-text">Multiple matches found — tap a result to view full history</span>
+            </div>
+
             <div id="master-records-deck" class="stack" style="display:none;"></div>
 
             <div id="no-results" class="state-box" style="display:none;">
-                <div class="state-icon"><i class="fa-solid fa-filter-circle-xmark"></i></div>
-                <div class="state-title">No Results Found</div>
-                <div class="state-sub">Try adjusting your filters</div>
+                <div class="state-icon"><i class="fa-solid fa-magnifying-glass-minus"></i></div>
+                <div class="state-title">No Employee Found</div>
+                <div class="state-sub" id="no-results-sub">Check the card number or name and try again</div>
             </div>
 
             <div id="pagination-footer" class="page-info" style="display:none;">
@@ -983,21 +1094,6 @@
 
         </div>
     </div>
-
-    <!-- Offline queue banner -->
-    <div id="queue-banner" onclick="syncQueueNow()">
-        <i class="fa-solid fa-cloud-arrow-up"></i>
-        <span id="queue-banner-text">1 entry pending sync</span>
-    </div>
-
-    <!-- FAB -->
-    <button id="add-fab" onclick="openAddModal()" aria-label="Add PPE Issue">
-        <i class="fa-solid fa-plus"></i>
-        <span id="fab-badge">0</span>
-    </button>
-
-    <!-- Submit toast -->
-    <div id="submit-toast"></div>
 
     <!-- Employee Profile Modal -->
     <div id="profile-modal">
@@ -1061,8 +1157,8 @@
                     <i class="fa-solid fa-helmet-safety" style="font-size:12px;"></i>PPE Items Issued
                 </div>
                 <div id="add-items-list"></div>
-                <button class="add-item-btn" onclick="addItemRow()">
-                    <i class="fa-solid fa-plus" style="font-size:13px;"></i>Add Item
+                <button class="add-item-btn" onclick="addItemRow()" style="display:flex;">
+                    <i class="fa-solid fa-circle-plus" style="font-size:15px;"></i>Add Another Item
                 </button>
                 <button class="submit-btn" id="form-submit-btn" onclick="submitEntry()">
                     <i class="fa-solid fa-floppy-disk" style="font-size:15px;"></i>Save Entry
@@ -1183,11 +1279,12 @@
         items.forEach(function(it){
             allData.unshift({ cardNo:cardNo, name:name, section:section, issuedOn:formatNewDate(date), item:it.item, qty:it.qty, size:it.size });
         });
-        filtered = allData.slice();
         updateLastUpdated(allData);
         try{ lsSet(CK_DATA, JSON.stringify(allData)); lsSet(CK_STAMP, Date.now().toString()); }catch(e){}
-        goToPage(1);
         renderAnalytics();
+        // Only refresh visible results if a search was already active —
+        // otherwise stay on whatever screen the user was on (search-first design)
+        if (searchPerformed) { performSearch(true); }
 
         // ── OFFLINE: queue and exit early ──────────────────────────
         if (!navigator.onLine) {
@@ -1408,8 +1505,7 @@
     function showMainUI() {
         document.getElementById('loading-overlay').style.display = 'none';
         document.getElementById('inline-loader').style.display   = 'none';
-        document.getElementById('master-records-deck').style.display = '';
-        document.getElementById('pagination-footer').style.display   = 'flex';
+        document.getElementById('search-prompt').style.display   = '';
     }
 
     function showError(msg) {
@@ -1443,8 +1539,8 @@
                 data.reverse();
                 processAndStore(data);
                 renderAnalytics();
-                if (document.getElementById('master-records-deck').style.display !== 'none') {
-                    filterData();
+                if (searchPerformed) {
+                    performSearch(true);
                 }
                 icon.className = 'fa-solid fa-calendar-check';
                 showToast('✓ Refreshed — showing latest data', 'success');
@@ -1492,6 +1588,10 @@
         filtered = data.slice();
     }
 
+    // Tracks whether a search has been performed this session,
+    // so silent background refreshes know whether to re-run it.
+    var searchPerformed = false;
+
     window.onload = function() {
         initInstallBanner();
         updateQueueUI();
@@ -1506,7 +1606,6 @@
                 if (Array.isArray(cached) && cached.length) {
                     processAndStore(cached);
                     showMainUI();
-                    goToPage(1);
                     renderAnalytics();
                     // Silent background refresh
                     doFetch(true);
@@ -1534,8 +1633,8 @@
                 data.reverse();
                 processAndStore(data);
                 renderAnalytics();
-                if(!silent){ showMainUI(); goToPage(1); }
-                else { filterData(); }
+                if(!silent){ showMainUI(); }
+                else if (searchPerformed) { performSearch(true); }
             })
             .catch(function(err){
                 if(slowTimer) clearTimeout(slowTimer);
@@ -1726,7 +1825,6 @@
                     icon.style.transform = '';
                     label.textContent = 'Pull to refresh';
                     refreshing = false;
-                    render();
                     renderAnalytics();
                 }, 1000);
             } else {
@@ -1821,11 +1919,13 @@
         var deck=document.getElementById('master-records-deck');
         var noRes=document.getElementById('no-results');
         var footer=document.getElementById('pagination-footer');
+        var prompt=document.getElementById('search-prompt');
+        prompt.style.display='none';
         deck.innerHTML='';
         var total=filtered.length;
         document.getElementById('filtered-count').textContent=total;
-        if(total===0){noRes.style.display='';footer.style.display='none';document.getElementById('page-start').textContent='0';document.getElementById('page-end').textContent='0';document.getElementById('btn-prev').disabled=true;document.getElementById('btn-next').disabled=true;return;}
-        noRes.style.display='none';footer.style.display='flex';
+        if(total===0){noRes.style.display='';footer.style.display='none';deck.style.display='none';document.getElementById('page-start').textContent='0';document.getElementById('page-end').textContent='0';document.getElementById('btn-prev').disabled=true;document.getElementById('btn-next').disabled=true;return;}
+        noRes.style.display='none';footer.style.display='flex';deck.style.display='';
         var s=(page-1)*perPage,e=Math.min(s+perPage,total),slice=filtered.slice(s,e);
         document.getElementById('page-start').textContent=s+1;document.getElementById('page-end').textContent=e;
         document.getElementById('btn-prev').disabled=page===1;document.getElementById('btn-next').disabled=e>=total;
@@ -1872,18 +1972,92 @@
         deck.appendChild(frag);
     }
 
-    function debounceSearch(){clearTimeout(timer);timer=setTimeout(filterData,220);}
-    function filterData(){
-        var c=document.getElementById('search-card').value.toLowerCase().trim();
-        var n=document.getElementById('search-name').value.toLowerCase().trim();
-        var d=document.getElementById('search-dept').value.toLowerCase().trim();
-        var it=document.getElementById('search-item').value.toLowerCase().trim();
-        filtered=allData.filter(function(e){return e.cardNo.toLowerCase().includes(c)&&e.name.toLowerCase().includes(n)&&e.section.toLowerCase().includes(d)&&e.item.toLowerCase().includes(it);});
+    // ════════════════════════════════════════════════════════════
+    // FEATURE: SEARCH → PROFILE LOOKUP FLOW
+    // ════════════════════════════════════════════════════════════
+    function toggleAdvancedFilters() {
+        var panel = document.getElementById('adv-filters');
+        var btn   = document.getElementById('adv-toggle-btn');
+        var open  = panel.style.display !== 'none';
+        panel.style.display = open ? 'none' : '';
+        btn.classList.toggle('open', !open);
+        document.getElementById('adv-toggle-chevron').style.transform = open ? '' : 'rotate(180deg)';
+    }
+
+    function handleSearchKey(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch();
+        }
+    }
+
+    // silent=true is used for background re-application after a data
+    // refresh (e.g. pull-to-refresh) — it skips the "empty fields"
+    // nudge toast and doesn't auto re-open the profile modal again.
+    function performSearch(silent) {
+        var c  = document.getElementById('search-card').value.toLowerCase().trim();
+        var n  = document.getElementById('search-name').value.toLowerCase().trim();
+        var d  = document.getElementById('search-dept').value.toLowerCase().trim();
+        var it = document.getElementById('search-item').value.toLowerCase().trim();
+
+        if (!c && !n && !d && !it) {
+            if (!silent) showToast('Enter a card number or name to search', 'error');
+            return;
+        }
+
+        searchPerformed = true;
+        document.getElementById('match-banner').style.display = 'none';
+
+        filtered = allData.filter(function(row){
+            return row.cardNo.toLowerCase().includes(c) &&
+                   row.name.toLowerCase().includes(n) &&
+                   row.section.toLowerCase().includes(d) &&
+                   row.item.toLowerCase().includes(it);
+        });
+
+        // Group matches by unique employee (cardNo + name)
+        var empKeys = {};
+        filtered.forEach(function(row){ empKeys[row.cardNo + '_' + row.name] = true; });
+        var uniqueCount = Object.keys(empKeys).length;
+
+        if (uniqueCount === 0) {
+            document.getElementById('no-results-sub').textContent = 'Check the card number or name and try again';
+            goToPage(1);
+            return;
+        }
+
+        if (uniqueCount === 1) {
+            // Exactly one employee — show their card AND auto-open the
+            // full profile history view directly.
+            goToPage(1);
+            if (!silent) {
+                var first = filtered[0];
+                openProfile(first.cardNo, first.name);
+            }
+            return;
+        }
+
+        // Multiple employees matched — show the picker list
+        document.getElementById('match-banner-text').textContent =
+            uniqueCount + ' employees found — tap a result to view full history';
+        document.getElementById('match-banner').style.display = 'flex';
         goToPage(1);
     }
+
     function goToPage(p){page=p;render();window.scrollTo({top:0,behavior:'smooth'});}
     function changePage(d){page+=d;render();window.scrollTo({top:0,behavior:'smooth'});}
-    function resetFilters(){['search-card','search-name','search-dept','search-item'].forEach(function(id){document.getElementById(id).value='';});filtered=allData.slice();goToPage(1);}
+
+    function resetFilters(){
+        ['search-card','search-name','search-dept','search-item'].forEach(function(id){document.getElementById(id).value='';});
+        filtered = [];
+        searchPerformed = false;
+        document.getElementById('match-banner').style.display = 'none';
+        document.getElementById('master-records-deck').style.display = 'none';
+        document.getElementById('master-records-deck').innerHTML = '';
+        document.getElementById('no-results').style.display = 'none';
+        document.getElementById('pagination-footer').style.display = 'none';
+        document.getElementById('search-prompt').style.display = '';
+    }
 </script>
 
 <script>
