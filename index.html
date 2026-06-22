@@ -1170,7 +1170,8 @@
 <script>
     var API = "https://script.google.com/macros/s/AKfycbydwxwb1CYJtjLcWG_OKpcKIBdl4KQ7xeKe12PvJzwOzxu3Mvwu-OU9kvybNTji3iIX/exec";
     var allData = [], filtered = [];
-    var page = 1, perPage = 30, timer = null;
+    var page = 1, perPage = 30;
+    var _openProfileCardNo = null, _openProfileName = null;
 
     // ── ADD ENTRY FORM ────────────────────────────────────────────
 
@@ -1764,11 +1765,15 @@
 
         document.getElementById('profile-modal').classList.add('open');
         document.body.style.overflow = 'hidden';
+        _openProfileCardNo = cardNo;
+        _openProfileName   = name;
     }
 
     function closeProfileModal() {
         document.getElementById('profile-modal').classList.remove('open');
         document.body.style.overflow = '';
+        _openProfileCardNo = null;
+        _openProfileName   = null;
     }
 
     // ════════════════════════════════════════════════════════════
@@ -2027,11 +2032,15 @@
         }
 
         if (uniqueCount === 1) {
-            // Exactly one employee — show their card AND auto-open the
-            // full profile history view directly.
+            // Exactly one employee — show their card AND open/refresh the
+            // full profile history view. In silent mode (background sync)
+            // we only refresh it if it's already open, so we don't
+            // unexpectedly pop the modal open during a quiet refresh —
+            // but if it WAS already open, keep its content from going stale.
             goToPage(1);
-            if (!silent) {
-                var first = filtered[0];
+            var first = filtered[0];
+            var modalOpen = document.getElementById('profile-modal').classList.contains('open');
+            if (!silent || modalOpen) {
                 openProfile(first.cardNo, first.name);
             }
             return;
@@ -2042,6 +2051,12 @@
             uniqueCount + ' employees found — tap a result to view full history';
         document.getElementById('match-banner').style.display = 'flex';
         goToPage(1);
+
+        // If a profile modal is open (opened from a previous match), refresh
+        // its content silently so it never shows stale data after a background sync
+        if (silent && _openProfileCardNo) {
+            openProfile(_openProfileCardNo, _openProfileName);
+        }
     }
 
     function goToPage(p){page=p;render();window.scrollTo({top:0,behavior:'smooth'});}
