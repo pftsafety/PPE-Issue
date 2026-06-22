@@ -119,6 +119,7 @@
             overflow-x: hidden;
             max-width: 480px;
             margin: 0 auto;
+            position: relative;
             transition: background 0.3s, color 0.3s;
         }
 
@@ -128,7 +129,7 @@
            the raw browser viewport on wider screens (tablet/desktop),
            which would otherwise push them far off to the side. */
         #fixed-ui-layer {
-            position: fixed; inset: 0;
+            position: absolute; inset: 0;
             max-width: 480px; margin: 0 auto;
             pointer-events: none; z-index: 38;
         }
@@ -541,7 +542,7 @@
 
         /* ── FAB ── */
         #add-fab {
-            position: fixed; bottom: calc(24px + var(--sab)); right: 20px; z-index: 99;
+            position: absolute; bottom: calc(24px + var(--sab)); right: 20px; z-index: 40;
             width: 56px; height: 56px; border-radius: 16px; border: none; cursor: pointer;
             background: var(--primary-container); color: var(--on-primary-cont);
             font-size: 22px; display: flex; align-items: center; justify-content: center;
