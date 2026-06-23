@@ -142,7 +142,7 @@
     .sctrl{display:flex;justify-content:space-between;align-items:center;margin-top:6px;}
     .atog{background:none;border:none;cursor:pointer;color:var(--pri);font-size:11px;font-weight:600;font-family:var(--f);padding:5px 2px 2px;display:flex;align-items:center;gap:5px;}
     #ac{transition:transform .2s;}
-    #ap{display:none;padding-top:6px;}
+    #ap{display:none;flex-direction:column;padding-top:6px;}
     .sarow{display:flex;gap:8px;margin-top:4px;}
     .cbtn{background:none;border:none;cursor:pointer;font-size:11px;font-weight:500;color:var(--err);font-family:var(--f);padding:5px 8px;border-radius:99px;display:flex;align-items:center;gap:4px;transition:background .15s;}
     .cbtn:active{background:var(--err-c);}
@@ -215,7 +215,6 @@
     .ptags{display:flex;gap:3px;align-items:center;}
     .pq{background:var(--sec-c);border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700;color:var(--on-sec-c);}
     .psz{background:var(--ter-c);border-radius:5px;padding:2px 6px;font-size:9px;font-weight:700;color:var(--ter);}
-    .ca{display:flex;justify-content:flex-end;padding:7px 11px 9px;border-top:1px solid var(--out-v);background:var(--sur-c);}
     .shb{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--sec-c);color:var(--on-sec-c);border:none;font-size:13px;cursor:pointer;transition:background .15s,transform .15s;}
     .shb:active{transform:scale(.88);}
     .shb:disabled{opacity:.4;cursor:default;}
@@ -773,8 +772,12 @@ function procQ(){var q=getQ();if(!q.length)return;var rem=q.slice(),item=rem.shi
         if(rem.length>0)procQ();else{toast('✓ All synced','success');doFetch(true);}}).catch(function(){updQUI();});}
 window.addEventListener('online',function(){var q=getQ();if(q.length>0){toast('Back online — syncing…','success');procQ();}});
 
-function togAdv(){var p=document.getElementById('ap'),b=document.getElementById('atb'),o=p.style.display!=='none';
-    p.style.display=o?'none':'';document.getElementById('ac').style.transform=o?'':'rotate(180deg)';}
+function togAdv(){
+    var p=document.getElementById('ap');
+    var open=window.getComputedStyle(p).display!=='none';
+    p.style.display=open?'none':'flex';
+    document.getElementById('ac').style.transform=open?'':'rotate(180deg)';
+}
 function hsk(e){if(e.key==='Enter'){e.preventDefault();doSearch();}}
 
 function doSearch(silent){
@@ -810,8 +813,15 @@ function renderCards(){
             '<div><div class="idn">'+emp.name+' <i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.3;margin-left:3px;"></i></div>'+
             '<div class="idc"><i class="fa-solid fa-id-card" style="font-size:9px;"></i> '+emp.cardNo+'</div></div>'+
             '<span class="db">'+emp.section+'</span></div>'+
-            '<div class="hw"><div class="hl"><i class="fa-solid fa-clock-rotate-left" style="font-size:9px;"></i>Issue History</div><div class="istk">'+ih+'</div></div>'+
-            '<div class="ca"><button class="shb" onclick="shareCard(this)"><i class="fa-solid fa-share-nodes"></i></button></div>';
+            '<div class="hw">'+
+                '<div class="hl">'+
+                    '<i class="fa-solid fa-clock-rotate-left" style="font-size:9px;"></i>Issue History'+
+                    '<button class="shb" onclick="event.stopPropagation();shareCard(this)" title="Share" style="margin-left:auto;width:28px;height:28px;font-size:12px;">'+
+                        '<i class="fa-solid fa-share-nodes"></i>'+
+                    '</button>'+
+                '</div>'+
+                '<div class="istk">'+ih+'</div>'+
+            '</div>';
         frag.appendChild(el);});
     deck.appendChild(frag);
 }
