@@ -626,7 +626,23 @@ function fds(d){if(!d)return'—';return d.getDate()+' '+MO[d.getMonth()];}
 
 function showUI(){document.getElementById('loading-overlay').style.display='none';document.getElementById('il').style.display='none';document.getElementById('sp').style.display='';}
 function showErr(msg){document.getElementById('loading-overlay').innerHTML='<div class="sring sring-1"></div><div class="sring sring-2"></div><div class="lcard"><i class="fa-solid fa-triangle-exclamation" style="color:#ffb4ab;font-size:32px;display:block;margin-bottom:13px;"></i><div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:7px;">Failed to Load</div><div style="font-size:12px;color:rgba(255,255,255,.65);margin-bottom:20px;line-height:1.6;">'+(msg||'Unknown')+'</div><button onclick="location.reload()" style="background:#fff;color:#1a237e;border:none;border-radius:20px;padding:10px 30px;font-size:14px;font-weight:600;font-family:var(--f);cursor:pointer;">Retry</button></div>';}
-function updLU(data){var mx=null;data.forEach(function(r){var d=pd(r.issuedOn);if(d&&(!mx||d>mx))mx=d;});if(mx)document.getElementById('luv').textContent=fd(mx);}
+function updLU(data){
+    if(!data||!data.length) return;
+    // data is newest-first after reverse() in doFetch
+    // Scan all rows to find the true maximum issuedOn date
+    var mx=null;
+    for(var i=0;i<data.length;i++){
+        var d=pd(data[i].issuedOn);
+        if(d&&(!mx||d>mx)) mx=d;
+    }
+    var el=document.getElementById('luv');
+    if(mx){
+        el.textContent=fd(mx);
+    } else if(data[0]&&data[0].issuedOn){
+        // Fallback: show raw date string if parsing fails
+        el.textContent=data[0].issuedOn;
+    }
+}
 function forceRefresh(){
     var ico=document.getElementById('uico');ico.className='fa-solid fa-circle-notch fa-spin';
     fetch(API+'?nocache=1').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
