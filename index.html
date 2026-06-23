@@ -106,7 +106,6 @@
     #afab{position:absolute;bottom:calc(66px + var(--sab));right:14px;z-index:40;width:52px;height:52px;border-radius:16px;border:none;cursor:pointer;background:var(--pri-c);color:var(--on-pri-c);font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:var(--e3);font-family:var(--f);transition:transform .2s cubic-bezier(.34,1.56,.64,1);}
     #afab:active{transform:scale(.88);}
     #fbb{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:99px;padding:0 5px;background:var(--err);color:#fff;font-size:10px;font-weight:700;font-family:var(--f);display:none;align-items:center;justify-content:center;border:2px solid var(--bg);}
-    #afab{position:relative;}
     #stst{position:absolute;top:calc(16px + var(--sat));left:50%;transform:translateX(-50%);z-index:999;display:none;align-items:center;gap:8px;border-radius:28px;padding:12px 20px;font-size:13px;font-weight:500;font-family:var(--f);box-shadow:var(--e3);white-space:nowrap;animation:tIn .3s cubic-bezier(.2,0,0,1);}
     #stst.success{background:var(--on-s);color:var(--sur);}
     #stst.error{background:var(--err);color:#fff;}
@@ -246,9 +245,12 @@
     .trn{font-size:13px;font-weight:500;color:var(--on-s);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .trmt{font-size:10px;color:var(--on-sv);margin-top:1px;}
     .tri{font-size:11px;font-weight:500;color:var(--on-s);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .trr{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+    .trr{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
     .trq{background:var(--sec-c);border-radius:7px;padding:2px 8px;font-size:10px;font-weight:700;color:var(--on-sec-c);}
     .trs{background:var(--pri-c);border-radius:6px;padding:2px 7px;font-size:9px;font-weight:500;color:var(--on-pri-c);}
+    .trshb{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--sur-v);color:var(--on-sv);border:none;font-size:12px;cursor:pointer;transition:background .15s,transform .15s;flex-shrink:0;}
+    .trshb:active{transform:scale(.88);}
+    .trshb:disabled{opacity:.4;cursor:default;}
 
     /* MODALS */
     #pm,#am{position:fixed;inset:0;z-index:80;display:none;align-items:flex-end;}
@@ -546,6 +548,12 @@ function saveEntry(){
 }
 function fnd(y){var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],p=y.split('-');return p.length===3?p[2]+'-'+M[+p[1]-1]+'-'+p[0]:y;}
 
+function shareTRow(btn){
+    // Find the parent row and get the data attributes stored on it
+    var row = btn.closest('.tr');
+    var cn = row.dataset.cn, nm = row.dataset.nm;
+    if(cn && nm){ openPM(cn, nm); }
+}
 function shareCard(btn){
     var card=btn.closest('.rc'),orig=btn.innerHTML;
     btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin" style="font-size:12px;"></i>';
@@ -709,10 +717,11 @@ function rTbl(){
     document.getElementById('tpp').disabled=tPg===1;document.getElementById('tpn').disabled=e>=tot;
     var frag=document.createDocumentFragment();
     sl.forEach(function(r,i){var el=document.createElement('div');el.className='tr';el.style.animationDelay=(i*7)+'ms';
+        el.dataset.cn=r.cardNo; el.dataset.nm=r.name;
         var d=pd(r.issuedOn),ds=d?(d.getDate()+' '+MO[d.getMonth()]):(r.issuedOn||''),yr=d?String(d.getFullYear()).slice(-2):'';
-        el.innerHTML='<div class="trd">'+ds+'<br><span style="font-size:9px;color:var(--out);">\''+yr+'</span></div>'+
+        el.innerHTML='<div class="trd">'+ds+(yr?" '"+yr:'')+'</div>'+
             '<div class="trm"><div class="trn">'+r.name+'</div><div class="trmt" style="font-family:var(--fm);font-size:10px;">'+r.cardNo+'</div><div class="tri">'+r.item+(r.size?' <span style="color:var(--ter);font-size:10px;">['+r.size+']</span>':'')+' </div></div>'+
-            '<div class="trr"><span class="trq">'+r.qty+' Qty</span><span class="trs">'+r.section+'</span></div>';
+            '<div class="trr"><span class="trq">'+r.qty+' Qty</span><span class="trs">'+r.section+'</span><button class="trshb" onclick="event.stopPropagation();shareTRow(this)" title="Share"><i class="fa-solid fa-share-nodes"></i></button></div>';
         el.onclick=function(){openPM(r.cardNo,r.name);};frag.appendChild(el);});
     rows.innerHTML='';rows.appendChild(frag);
 }
