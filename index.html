@@ -554,49 +554,112 @@ function shareTRow(btn){
     if(cn && nm){ openPM(cn, nm); }
 }
 function shareCard(btn){
-    var card=btn.closest('.rc'),orig=btn.innerHTML;
-    btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin" style="font-size:12px;"></i>';
-    var dk=document.body.getAttribute('data-theme')==='dark';
-    var bg=dk?'#1B1C23':'#FFF',sur=dk?'#292A34':'#F3F4FB',tm=dk?'#E5E1E6':'#1B1B1F',
-        ts=dk?'#C7C5D0':'#46464F',pr=dk?'#BAC3FF':'#4355B9',pc=dk?'#2B3D9E':'#DEE1FF',
-        op=dk?'#DEE1FF':'#00105C',bd=dk?'#46464F':'#C7C5D0',or=dk?'#FFBA63':'#7B4900';
-    var en=(card.querySelector('.idn')||{}).textContent||'',cno=(card.querySelector('.idc')||{}).textContent||'',sec=(card.querySelector('.db')||{}).textContent||'';
-    var ih='';
-    card.querySelectorAll('.pi').forEach(function(pi){
-        var hn=(pi.querySelector('.pih')||{}).textContent||'',rh='';
-        pi.querySelectorAll('.prw').forEach(function(rw){
-            var d=(rw.querySelector('.pd')||{}).textContent||'',q=(rw.querySelector('.pq')||{}).textContent||'',sz=rw.querySelector('.psz');
-            var sh=sz?'<span style="background:rgba(118,84,110,.15);color:#76546E;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;margin-left:4px;">'+sz.textContent+'</span>':'';
-            rh+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid '+bd+';">'+
-                '<span style="font-size:13px;color:'+ts+';font-family:Roboto Mono,monospace;">'+d+'</span>'+
-                '<div><span style="background:'+(dk?'#424459':'#DFE0F9')+';color:'+(dk?'#DFE0F9':'#171A30')+';border-radius:8px;padding:2px 9px;font-size:11px;font-weight:700;">'+q+'</span>'+sh+'</div></div>';
-        });
-        ih+='<div style="background:'+sur+';border:1px solid '+bd+';border-radius:12px;overflow:hidden;margin-bottom:9px;">'+
-            '<div style="background:'+pc+';padding:7px 13px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:'+op+';">'+hn+'</div>'+
-            '<div style="padding:4px 13px 2px;">'+rh+'</div></div>';
+    var cn=btn.getAttribute('data-cn'), nm=btn.getAttribute('data-nm');
+    if(!cn||!nm){ toast('Share data missing','error'); return; }
+
+    var orig=btn.innerHTML;
+    btn.disabled=true;
+    btn.innerHTML='<i class="fa-solid fa-spinner fa-spin" style="font-size:11px;"></i>';
+
+    // Build item history from allData directly — no DOM scraping
+    var rows=allData.filter(function(r){ return r.cardNo===cn&&r.name===nm; });
+    if(!rows.length){ btn.disabled=false; btn.innerHTML=orig; toast('No data to share','error'); return; }
+
+    var sec=rows[0].section||'', itemMap={};
+    rows.forEach(function(r){
+        var it=r.item||'?';
+        if(!itemMap[it]) itemMap[it]=[];
+        itemMap[it].push({date:r.issuedOn,qty:r.qty,size:r.size});
     });
-    var w=document.createElement('div');w.style.cssText='position:fixed;left:-9999px;top:-9999px;z-index:-1;';
-    w.innerHTML='<div id="__sc__" style="width:760px;font-family:Roboto,Arial,sans-serif;background:'+bg+';overflow:hidden;">'+
-        '<div style="background:linear-gradient(135deg,#1a237e,#4355B9);padding:20px 24px;display:flex;align-items:center;gap:12px;">'+
-        '<div style="width:44px;height:44px;background:rgba(255,255,255,.18);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px;color:#fff;">⛨</div>'+
-        '<div><div style="font-size:18px;font-weight:700;color:#fff;">PPE Issue Register</div><div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;letter-spacing:.05em;text-transform:uppercase;">Distribution Record</div></div></div>'+
-        '<div style="background:'+sur+';padding:14px 24px;border-bottom:1px solid '+bd+';display:flex;justify-content:space-between;align-items:flex-start;">'+
-        '<div><div style="font-size:20px;font-weight:700;color:'+tm+';letter-spacing:-.3px;">'+en+'</div>'+
-        '<div style="font-size:12px;color:'+pr+';margin-top:3px;font-family:Roboto Mono,monospace;">'+cno+'</div></div>'+
-        '<span style="background:'+pc+';color:'+op+';border-radius:8px;padding:4px 11px;font-size:11px;font-weight:600;margin-top:3px;">'+sec+'</span></div>'+
-        '<div style="padding:14px 24px 9px;"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:'+or+';margin-bottom:12px;">↺ Issue History</div>'+ih+'</div>'+
-        '<div style="padding:10px 24px 13px;border-top:1px solid '+bd+';display:flex;justify-content:space-between;">'+
-        '<span style="font-size:11px;color:'+ts+';">PPE Issue Register</span>'+
-        '<span style="font-size:11px;color:'+ts+';">'+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+'</span></div></div>';
+
+    var dk=document.body.getAttribute('data-theme')==='dark';
+    var bg=dk?'#1B1C23':'#FFFFFF', sur=dk?'#292A34':'#F3F4FB',
+        tm=dk?'#E5E1E6':'#1B1B1F', ts=dk?'#C7C5D0':'#46464F',
+        pr=dk?'#BAC3FF':'#4355B9', pc=dk?'#2B3D9E':'#DEE1FF',
+        op=dk?'#DEE1FF':'#00105C', bd=dk?'#46464F':'#C7C5D0',
+        or=dk?'#FFBA63':'#7B4900', sq=dk?'#424459':'#DFE0F9', oq=dk?'#DFE0F9':'#171A30';
+
+    // Build items HTML with full inline styles
+    var ih='';
+    Object.keys(itemMap).forEach(function(iName){
+        var rh=itemMap[iName].map(function(e){
+            var szH=e.size
+                ?'<span style="background:rgba(118,84,110,.15);color:#76546E;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;margin-left:4px;">Sz: '+e.size+'</span>'
+                :'';
+            return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid '+bd+';">'+
+                '<span style="font-size:13px;color:'+ts+';font-family:Roboto Mono,monospace;">'+e.date+'</span>'+
+                '<div style="display:flex;align-items:center;">'+
+                    '<span style="background:'+sq+';color:'+oq+';border-radius:8px;padding:2px 9px;font-size:11px;font-weight:700;">'+e.qty+' Qty</span>'+szH+
+                '</div></div>';
+        }).join('');
+        ih+='<div style="background:'+sur+';border:1px solid '+bd+';border-radius:12px;overflow:hidden;margin-bottom:9px;">'+
+            '<div style="background:'+pc+';padding:7px 13px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:'+op+';">'+iName+'</div>'+
+            '<div style="padding:4px 13px 2px;">'+rh+'</div>'+
+        '</div>';
+    });
+
+    var today=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+    var w=document.createElement('div');
+    w.style.cssText='position:absolute;left:-9999px;top:0;z-index:-1;';
+    w.innerHTML=
+        '<div id="__sc__" style="width:760px;font-family:Roboto,Arial,sans-serif;background:'+bg+';overflow:hidden;">'+
+            // Header band
+            '<div style="background:linear-gradient(135deg,#1a237e,#4355B9);padding:20px 24px;display:flex;align-items:center;gap:12px;">'+
+                '<div style="width:44px;height:44px;background:rgba(255,255,255,.18);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px;color:#fff;border:1px solid rgba(255,255,255,.25);">⛨</div>'+
+                '<div>'+
+                    '<div style="font-size:18px;font-weight:700;color:#fff;">PPE Issue Register</div>'+
+                    '<div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;letter-spacing:.05em;text-transform:uppercase;">Distribution Record</div>'+
+                '</div>'+
+            '</div>'+
+            // Employee strip
+            '<div style="background:'+sur+';padding:14px 24px;border-bottom:1px solid '+bd+';display:flex;justify-content:space-between;align-items:flex-start;">'+
+                '<div>'+
+                    '<div style="font-size:20px;font-weight:700;color:'+tm+';letter-spacing:-.3px;">'+nm+'</div>'+
+                    '<div style="font-size:12px;color:'+pr+';margin-top:3px;font-family:Roboto Mono,monospace;font-weight:500;">'+cn+'</div>'+
+                '</div>'+
+                '<span style="background:'+pc+';color:'+op+';border-radius:8px;padding:4px 11px;font-size:11px;font-weight:600;margin-top:3px;">'+sec+'</span>'+
+            '</div>'+
+            // Items
+            '<div style="padding:14px 24px 9px;">'+
+                '<div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:'+or+';margin-bottom:12px;">↺ Issue History</div>'+
+                ih+
+            '</div>'+
+            // Footer
+            '<div style="padding:10px 24px 13px;border-top:1px solid '+bd+';display:flex;justify-content:space-between;">'+
+                '<span style="font-size:11px;color:'+ts+';">PPE Issue Register</span>'+
+                '<span style="font-size:11px;color:'+ts+';">'+today+'</span>'+
+            '</div>'+
+        '</div>';
+
     document.body.appendChild(w);
-    html2canvas(w.querySelector('#__sc__'),{scale:3,backgroundColor:bg,useCORS:true,logging:false,allowTaint:true,foreignObjectRendering:false})
-    .then(function(cv){document.body.removeChild(w);cv.toBlob(function(bl){
-        btn.disabled=false;btn.innerHTML=orig;
-        var fn='PPE_'+en.trim().replace(/\s+/g,'_')+'.jpg',f=new File([bl],fn,{type:'image/jpeg'});
-        if(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({title:'PPE — '+en,files:[f]}).catch(function(){});}
-        else{var u=URL.createObjectURL(bl),a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},1000);}
-    },'image/jpeg',.95);})
-    .catch(function(){document.body.removeChild(w);btn.disabled=false;btn.innerHTML=orig;toast('Share failed','error');});
+    var target=w.querySelector('#__sc__');
+
+    html2canvas(target,{
+        scale:3, backgroundColor:bg,
+        useCORS:true, logging:false, allowTaint:true, foreignObjectRendering:false
+    })
+    .then(function(cv){
+        document.body.removeChild(w);
+        cv.toBlob(function(bl){
+            btn.disabled=false; btn.innerHTML=orig;
+            var fn='PPE_'+nm.trim().replace(/\s+/g,'_')+'.jpg';
+            var f=new File([bl],fn,{type:'image/jpeg'});
+            if(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})){
+                navigator.share({title:'PPE — '+nm, files:[f]}).catch(function(){});
+            } else {
+                var u=URL.createObjectURL(bl), a=document.createElement('a');
+                a.href=u; a.download=fn;
+                document.body.appendChild(a); a.click();
+                document.body.removeChild(a);
+                setTimeout(function(){ URL.revokeObjectURL(u); }, 1000);
+            }
+        },'image/jpeg',.95);
+    })
+    .catch(function(err){
+        if(w.parentNode) document.body.removeChild(w);
+        btn.disabled=false; btn.innerHTML=orig;
+        toast('Share failed','error');
+    });
 }
 
 function triggerInstall(){if(!window._pwaPrompt)return;window._pwaPrompt.prompt();window._pwaPrompt.userChoice.then(function(r){if(r.outcome==='accepted')document.getElementById('install-banner').style.display='none';window._pwaPrompt=null;});}
@@ -825,17 +888,24 @@ function renderCards(){
         var ih='';for(var nm in emp.items){var rh=emp.items[nm].map(function(r){var sz=r.size?'<span class="psz">Sz: '+r.size+'</span>':'';
             return '<div class="prw"><span class="pd">'+r.date+'</span><div class="ptags"><span class="pq">'+r.qty+' Qty</span>'+sz+'</div></div>';}).join('');
             ih+='<div class="pi"><div class="pih">'+nm+'</div><div class="pir">'+rh+'</div></div>';}
-        el.innerHTML='<div class="ids" onclick="openPM(\''+emp.cardNo.replace(/'/g,"\\'")+'\',\''+emp.name.replace(/'/g,"\\'")+'\'))" style="cursor:pointer;">'+
-            '<div><div class="idn">'+emp.name+' <i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.3;margin-left:3px;"></i></div>'+
-            '<div class="idc"><i class="fa-solid fa-id-card" style="font-size:9px;"></i> '+emp.cardNo+'</div></div>'+
-            '<span class="db">'+emp.section+'</span></div>'+
-            '<div class="hw">'+
-                '<div class="hl">'+
-                    '<i class="fa-solid fa-clock-rotate-left" style="font-size:9px;"></i>Issue History'+
-                    '<button class="shb" onclick="event.stopPropagation();shareCard(this)" title="Share" style="margin-left:auto;width:28px;height:28px;font-size:12px;">'+
+        el.innerHTML=
+            '<div class="ids" onclick="openPM(\''+emp.cardNo.replace(/'/g,"\\'")+'\',\''+emp.name.replace(/'/g,"\\'")+'\'))" style="cursor:pointer;">'+
+                '<div style="flex:1;min-width:0;">'+
+                    '<div class="idn">'+emp.name+' <i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.3;margin-left:3px;"></i></div>'+
+                    '<div class="idc"><i class="fa-solid fa-id-card" style="font-size:9px;"></i> '+emp.cardNo+'</div>'+
+                '</div>'+
+                '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">'+
+                    '<span class="db">'+emp.section+'</span>'+
+                    '<button class="shb" onclick="event.stopPropagation();shareCard(this)"'+
+                        ' data-cn="'+emp.cardNo.replace(/"/g,'&quot;')+'"'+
+                        ' data-nm="'+emp.name.replace(/"/g,'&quot;')+'"'+
+                        ' title="Share" style="width:28px;height:28px;font-size:12px;flex-shrink:0;">'+
                         '<i class="fa-solid fa-share-nodes"></i>'+
                     '</button>'+
                 '</div>'+
+            '</div>'+
+            '<div class="hw">'+
+                '<div class="hl"><i class="fa-solid fa-clock-rotate-left" style="font-size:9px;"></i>Issue History</div>'+
                 '<div class="istk">'+ih+'</div>'+
             '</div>';
         frag.appendChild(el);});
