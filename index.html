@@ -600,17 +600,17 @@ function shareCard(btn){
     Object.keys(itemMap).forEach(function(iName){
         var rh=itemMap[iName].map(function(e){
             var szH=e.size
-                ?'<span style="background:rgba(118,84,110,.15);color:#76546E;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;margin-left:4px;">Sz: '+e.size+'</span>'
+                ?'<span style="background:rgba(118,84,110,.15);color:#76546E;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;margin-left:4px;">Sz: '+e.size+'</span>'
                 :'';
             return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid '+bd+';">'+
-                '<span style="font-size:13px;color:'+ts+';font-family:Roboto Mono,monospace;">'+e.date+'</span>'+
+                '<span style="font-size:12px;color:'+ts+';font-family:Roboto Mono,monospace;">'+e.date+'</span>'+
                 '<div style="display:flex;align-items:center;">'+
-                    '<span style="background:'+sq+';color:'+oq+';border-radius:8px;padding:2px 9px;font-size:11px;font-weight:700;">'+e.qty+' Qty</span>'+szH+
+                    '<span style="background:'+sq+';color:'+oq+';border-radius:7px;padding:2px 8px;font-size:10px;font-weight:700;">'+e.qty+' Qty</span>'+szH+
                 '</div></div>';
         }).join('');
-        ih+='<div style="background:'+sur+';border:1px solid '+bd+';border-radius:12px;overflow:hidden;margin-bottom:9px;">'+
-            '<div style="background:'+pc+';padding:7px 13px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:'+op+';">'+iName+'</div>'+
-            '<div style="padding:4px 13px 2px;">'+rh+'</div>'+
+        ih+='<div style="background:'+sur+';border:1px solid '+bd+';border-radius:10px;overflow:hidden;margin-bottom:8px;">'+
+            '<div style="background:'+pc+';padding:6px 12px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:'+op+';">'+iName+'</div>'+
+            '<div style="padding:3px 12px 2px;">'+rh+'</div>'+
         '</div>';
     });
 
@@ -618,32 +618,32 @@ function shareCard(btn){
     var w=document.createElement('div');
     w.style.cssText='position:absolute;left:-9999px;top:0;z-index:-1;';
     w.innerHTML=
-        '<div id="__sc__" style="width:760px;font-family:Roboto,Arial,sans-serif;background:'+bg+';overflow:hidden;">'+
+        '<div id="__sc__" style="width:480px;font-family:Roboto,Arial,sans-serif;background:'+bg+';overflow:hidden;">'+
             // Header band
-            '<div style="background:linear-gradient(135deg,#1a237e,#4355B9);padding:20px 24px;display:flex;align-items:center;gap:12px;">'+
-                '<div style="width:44px;height:44px;background:rgba(255,255,255,.18);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px;color:#fff;border:1px solid rgba(255,255,255,.25);">⛨</div>'+
+            '<div style="background:linear-gradient(135deg,#1a237e,#4355B9);padding:18px 20px;display:flex;align-items:center;gap:12px;">'+
+                '<div style="width:40px;height:40px;background:rgba(255,255,255,.18);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;border:1px solid rgba(255,255,255,.25);flex-shrink:0;">⛨</div>'+
                 '<div>'+
-                    '<div style="font-size:18px;font-weight:700;color:#fff;">PPE Issue Register</div>'+
-                    '<div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;letter-spacing:.05em;text-transform:uppercase;">Distribution Record</div>'+
+                    '<div style="font-size:15px;font-weight:700;color:#fff;">PPE Issue Register</div>'+
+                    '<div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:1px;letter-spacing:.05em;text-transform:uppercase;">Distribution Record</div>'+
                 '</div>'+
             '</div>'+
             // Employee strip
-            '<div style="background:'+sur+';padding:14px 24px;border-bottom:1px solid '+bd+';display:flex;justify-content:space-between;align-items:flex-start;">'+
-                '<div>'+
-                    '<div style="font-size:20px;font-weight:700;color:'+tm+';letter-spacing:-.3px;">'+nm+'</div>'+
-                    '<div style="font-size:12px;color:'+pr+';margin-top:3px;font-family:Roboto Mono,monospace;font-weight:500;">'+cn+'</div>'+
+            '<div style="background:'+sur+';padding:14px 20px;border-bottom:1px solid '+bd+';display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">'+
+                '<div style="flex:1;min-width:0;">'+
+                    '<div style="font-size:18px;font-weight:700;color:'+tm+';letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+nm+'</div>'+
+                    '<div style="font-size:11px;color:'+pr+';margin-top:3px;font-family:Roboto Mono,monospace;font-weight:500;">'+cn+'</div>'+
                 '</div>'+
-                '<span style="background:'+pc+';color:'+op+';border-radius:8px;padding:4px 11px;font-size:11px;font-weight:600;margin-top:3px;">'+sec+'</span>'+
+                '<span style="background:'+pc+';color:'+op+';border-radius:8px;padding:4px 10px;font-size:11px;font-weight:600;margin-top:3px;flex-shrink:0;">'+sec+'</span>'+
             '</div>'+
             // Items
-            '<div style="padding:14px 24px 9px;">'+
-                '<div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:'+or+';margin-bottom:12px;">↺ Issue History</div>'+
+            '<div style="padding:14px 20px 10px;">'+
+                '<div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:'+or+';margin-bottom:11px;">↺ Issue History</div>'+
                 ih+
             '</div>'+
             // Footer
-            '<div style="padding:10px 24px 13px;border-top:1px solid '+bd+';display:flex;justify-content:space-between;">'+
-                '<span style="font-size:11px;color:'+ts+';">PPE Issue Register</span>'+
-                '<span style="font-size:11px;color:'+ts+';">'+today+'</span>'+
+            '<div style="padding:9px 20px 12px;border-top:1px solid '+bd+';display:flex;justify-content:space-between;align-items:center;">'+
+                '<span style="font-size:10px;color:'+ts+';">PPE Issue Register</span>'+
+                '<span style="font-size:10px;color:'+ts+';">'+today+'</span>'+
             '</div>'+
         '</div>';
 
