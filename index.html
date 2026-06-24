@@ -548,10 +548,13 @@ function saveEntry(){
 function fnd(y){var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],p=y.split('-');return p.length===3?p[2]+'-'+M[+p[1]-1]+'-'+p[0]:y;}
 
 function shareTRow(btn){
-    // Find the parent row and get the data attributes stored on it
-    var row = btn.closest('.tr');
-    var cn = row.dataset.cn, nm = row.dataset.nm;
-    if(cn && nm){ openPM(cn, nm); }
+    var row=btn.closest('.tr');
+    if(!row) return;
+    var cn=row.dataset.cn, nm=row.dataset.nm;
+    if(!cn||!nm){ toast('Share data missing','error'); return; }
+    btn.setAttribute('data-cn', cn);
+    btn.setAttribute('data-nm', nm);
+    shareCard(btn);
 }
 function shareCard(btn){
     var cn=btn.getAttribute('data-cn'), nm=btn.getAttribute('data-nm');
