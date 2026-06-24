@@ -289,6 +289,9 @@
     .subb:disabled{opacity:.5;cursor:default;}
     .phb{background:linear-gradient(135deg,#1a237e,#4355B9);padding:18px 18px 16px;position:relative;}
     .pcls{position:absolute;top:13px;right:13px;width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,.18);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;}
+    .pshbtn{position:absolute;top:13px;right:49px;width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,.18);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+    .pshbtn:active{background:rgba(255,255,255,.35);}
+    .pshbtn:disabled{opacity:.45;cursor:default;}
     .pen{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px;}
     .pem{font-size:11px;color:rgba(255,255,255,.7);margin-top:4px;font-family:var(--fm);}
     .pdt{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:7px;padding:3px 9px;font-size:11px;font-weight:600;color:#fff;margin-top:7px;}
@@ -458,6 +461,9 @@
   <div class="ps">
     <div class="phb">
       <button class="pcls" onclick="closePM()">✕</button>
+      <button class="pshbtn" id="pm-share-btn" onclick="shareProfile(this)" title="Share as image">
+        <i class="fa-solid fa-share-nodes"></i>
+      </button>
       <div class="pen" id="pn">—</div><div class="pem" id="pc">—</div><span class="pdt" id="pd">—</span>
     </div>
     <div class="pbdy">
@@ -548,6 +554,12 @@ function saveEntry(){
 }
 function fnd(y){var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],p=y.split('-');return p.length===3?p[2]+'-'+M[+p[1]-1]+'-'+p[0]:y;}
 
+function shareProfile(btn){
+    if(!_opCN||!_opN){ toast('No profile open','error'); return; }
+    btn.setAttribute('data-cn', _opCN);
+    btn.setAttribute('data-nm', _opN);
+    shareCard(btn);
+}
 function shareTRow(btn){
     var row=btn.closest('.tr');
     if(!row) return;
@@ -695,20 +707,14 @@ function showUI(){document.getElementById('loading-overlay').style.display='none
 function showErr(msg){document.getElementById('loading-overlay').innerHTML='<div class="sring sring-1"></div><div class="sring sring-2"></div><div class="lcard"><i class="fa-solid fa-triangle-exclamation" style="color:#ffb4ab;font-size:32px;display:block;margin-bottom:13px;"></i><div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:7px;">Failed to Load</div><div style="font-size:12px;color:rgba(255,255,255,.65);margin-bottom:20px;line-height:1.6;">'+(msg||'Unknown')+'</div><button onclick="location.reload()" style="background:#fff;color:#1a237e;border:none;border-radius:20px;padding:10px 30px;font-size:14px;font-weight:600;font-family:var(--f);cursor:pointer;">Retry</button></div>';}
 function updLU(data){
     if(!data||!data.length) return;
-    // data is newest-first after reverse() in doFetch
-    // Scan all rows to find the true maximum issuedOn date
+    // data[0] is newest after reverse() — but scan all for true max
     var mx=null;
     for(var i=0;i<data.length;i++){
         var d=pd(data[i].issuedOn);
         if(d&&(!mx||d>mx)) mx=d;
     }
     var el=document.getElementById('luv');
-    if(mx){
-        el.textContent=fd(mx);
-    } else if(data[0]&&data[0].issuedOn){
-        // Fallback: show raw date string if parsing fails
-        el.textContent=data[0].issuedOn;
-    }
+    if(el) el.textContent = mx ? fd(mx) : (data[0].issuedOn||'—');
 }
 function forceRefresh(){
     var ico=document.getElementById('uico');ico.className='fa-solid fa-circle-notch fa-spin';
@@ -803,7 +809,7 @@ function rTbl(){
         var d=pd(r.issuedOn),ds=d?(d.getDate()+' '+MO[d.getMonth()]):(r.issuedOn||''),yr=d?String(d.getFullYear()).slice(-2):'';
         el.innerHTML='<div class="trd">'+ds+(yr?" '"+yr:'')+'</div>'+
             '<div class="trm"><div class="trn">'+r.name+'</div><div class="trmt" style="font-family:var(--fm);font-size:10px;">'+r.cardNo+'</div><div class="tri">'+r.item+(r.size?' <span style="color:var(--ter);font-size:10px;">['+r.size+']</span>':'')+' </div></div>'+
-            '<div class="trr"><span class="trq">'+r.qty+' Qty</span><span class="trs">'+r.section+'</span><button class="trshb" onclick="event.stopPropagation();shareTRow(this)" title="Share"><i class="fa-solid fa-share-nodes"></i></button></div>';
+            '<div class="trr"><span class="trq">'+r.qty+' Qty</span><span class="trs">'+r.section+'</span></div>';
         el.onclick=function(){openPM(r.cardNo,r.name);};frag.appendChild(el);});
     rows.innerHTML='';rows.appendChild(frag);
 }
