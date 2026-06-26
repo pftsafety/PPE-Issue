@@ -231,6 +231,58 @@
     .adate{display:inline-block;margin-top:3px;font-size:10px;color:var(--on-pri-c);font-family:var(--fm);background:var(--pri-c);padding:1px 7px;border-radius:5px;}
     .shint{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--on-sv);padding:8px 0;opacity:.55;}
 
+    /* Week-over-week cards */
+    .wow-card{background:var(--sur-c);border:1px solid var(--out-v);border-radius:13px;padding:12px 13px;animation:cardIn .5s cubic-bezier(.2,0,0,1) both;text-align:center;}
+    .wow-card.wow-full{grid-column:span 1;}
+    .wow-lbl{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--on-sv);opacity:.7;margin-bottom:5px;}
+    .wow-val{font-size:22px;font-weight:700;color:var(--on-s);letter-spacing:-.3px;}
+    .wow-sub{font-size:10px;color:var(--on-sv);margin-top:2px;}
+    .wow-trend{font-size:20px;font-weight:700;letter-spacing:-.3px;}
+    .wow-trend.up{color:#00897b;}
+    .wow-trend.dn{color:#e53935;}
+    .wow-trend.eq{color:var(--out);}
+    #wow-this{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-color:#a5d6a7;}
+    #wow-last{background:linear-gradient(135deg,#fce4ec,#f8bbd0);border-color:#f48fb1;}
+    [data-theme="dark"] #wow-this{background:linear-gradient(135deg,#1b5e20,#2e7d32);border-color:#388e3c;}
+    [data-theme="dark"] #wow-last{background:linear-gradient(135deg,#880e4f,#ad1457);border-color:#c2185b;}
+    #wow-this .wow-val{color:#1b5e20;}
+    #wow-last .wow-val{color:#880e4f;}
+    [data-theme="dark"] #wow-this .wow-val{color:#a5d6a7;}
+    [data-theme="dark"] #wow-last .wow-val{color:#f48fb1;}
+
+    /* Coverage ring */
+    .ring-row{display:flex;align-items:center;gap:16px;}
+    .ring-wrap{position:relative;flex-shrink:0;}
+    .ring-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--pri);}
+    .ring-stats{flex:1;display:flex;flex-direction:column;gap:8px;}
+    .ring-stat{display:flex;flex-direction:column;}
+    .ring-num{font-size:18px;font-weight:700;color:var(--on-s);letter-spacing:-.3px;}
+    .ring-lbl{font-size:10px;color:var(--on-sv);margin-top:1px;}
+
+    /* Heatmap */
+    .hmap{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:4px;}
+    .hmap-day{border-radius:8px;padding:8px 4px 5px;text-align:center;font-size:9px;font-weight:700;color:#fff;letter-spacing:.03em;transition:transform .15s;cursor:default;}
+    .hmap-day:active{transform:scale(.93);}
+    .hmap-val{font-size:14px;font-weight:700;display:block;margin-bottom:2px;}
+    .hmap-lbl{font-size:8px;opacity:.85;letter-spacing:.03em;}
+
+    /* Top recipients */
+    .trec-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--out-v);animation:slideIn .4s cubic-bezier(.2,0,0,1) both;}
+    .trec-row:last-child{border-bottom:none;}
+    .trec-medal{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+    .trec-info{flex:1;min-width:0;}
+    .trec-name{font-size:12px;font-weight:600;color:var(--on-s);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .trec-sub{font-size:10px;color:var(--on-sv);margin-top:1px;}
+    .trec-badge{background:var(--pri-c);color:var(--on-pri-c);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:700;flex-shrink:0;}
+
+    /* Category chart */
+    .cat-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;animation:slideIn .4s cubic-bezier(.2,0,0,1) both;}
+    .cat-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+    .cat-name{font-size:11px;font-weight:500;color:var(--on-s);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .cat-bar-wrap{width:100px;height:7px;background:var(--sur-v);border-radius:99px;overflow:hidden;flex-shrink:0;}
+    .cat-bar{height:100%;border-radius:99px;width:0%;transition:width 1s cubic-bezier(.2,0,0,1);}
+    .cat-cnt{font-size:10px;font-weight:700;color:var(--on-sv);min-width:32px;text-align:right;}
+
     /* RECORD CARDS */
     .rc{background:var(--sur);border:1px solid var(--out-v);border-radius:14px;box-shadow:var(--e1);overflow:hidden;position:relative;animation:fup .3s cubic-bezier(.2,0,0,1) both;}
     .ids{padding:12px 13px 10px;border-bottom:1px solid var(--out-v);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;background:var(--sur-c);}
@@ -460,6 +512,81 @@
       <div class="dsh"><div class="dstit"><i class="fa-solid fa-clock-rotate-left"></i>Recent</div>
         <div class="cc"><div class="ct"><i class="fa-solid fa-list-ul"></i>Last 8 entries</div><div id="rl"></div></div>
       </div>
+
+      <!-- Week-over-week comparison -->
+      <div class="dsh"><div class="dstit"><i class="fa-solid fa-arrow-trend-up"></i>Weekly Pulse</div>
+        <div class="kg">
+          <div class="wow-card" id="wow-this">
+            <div class="wow-lbl">This Week</div>
+            <div class="wow-val" id="wow-tw">0</div>
+            <div class="wow-sub">issues</div>
+          </div>
+          <div class="wow-card" id="wow-last">
+            <div class="wow-lbl">Last Week</div>
+            <div class="wow-val" id="wow-lw">0</div>
+            <div class="wow-sub">issues</div>
+          </div>
+          <div class="wow-card wow-full" id="wow-trend-card">
+            <div class="wow-lbl">Week Change</div>
+            <div class="wow-trend" id="wow-trend">—</div>
+            <div class="wow-sub" id="wow-trend-sub">vs last week</div>
+          </div>
+          <div class="wow-card wow-full" style="background:var(--sur);">
+            <div class="wow-lbl">Daily Avg</div>
+            <div class="wow-val" id="wow-avg" style="color:var(--pri);">0</div>
+            <div class="wow-sub">this month</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coverage ring -->
+      <div class="dsh"><div class="dstit"><i class="fa-solid fa-circle-dot"></i>Monthly Coverage</div>
+        <div class="cc">
+          <div class="ct"><i class="fa-solid fa-users-rays"></i>Employees served this month</div>
+          <div class="ring-row">
+            <div class="ring-wrap">
+              <svg id="cov-svg" viewBox="0 0 80 80" width="80" height="80">
+                <circle cx="40" cy="40" r="32" fill="none" stroke="var(--sur-v)" stroke-width="8"/>
+                <circle id="cov-arc" cx="40" cy="40" r="32" fill="none" stroke="#5c6bc0"
+                  stroke-width="8" stroke-linecap="round" stroke-dasharray="201"
+                  stroke-dashoffset="201" transform="rotate(-90 40 40)"
+                  style="transition:stroke-dashoffset 1.2s cubic-bezier(.2,0,0,1)"/>
+              </svg>
+              <div class="ring-center" id="cov-pct">0%</div>
+            </div>
+            <div class="ring-stats">
+              <div class="ring-stat"><span id="cov-emp" class="ring-num">0</span><span class="ring-lbl">Served</span></div>
+              <div class="ring-stat"><span id="cov-total-emp" class="ring-num">0</span><span class="ring-lbl">Total employees</span></div>
+              <div class="ring-stat"><span id="cov-items" class="ring-num">0</span><span class="ring-lbl">Items issued</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day-of-week heatmap -->
+      <div class="dsh"><div class="dstit"><i class="fa-solid fa-calendar-week"></i>Day Activity</div>
+        <div class="cc">
+          <div class="ct"><i class="fa-solid fa-fire"></i>Issues by day of week (all time)</div>
+          <div class="hmap" id="hmap"></div>
+        </div>
+      </div>
+
+      <!-- Top Recipients -->
+      <div class="dsh"><div class="dstit"><i class="fa-solid fa-medal"></i>Top Recipients</div>
+        <div class="cc">
+          <div class="ct"><i class="fa-solid fa-trophy"></i>Most PPE items received</div>
+          <div id="top-rec"></div>
+        </div>
+      </div>
+
+      <!-- PPE Category summary -->
+      <div class="dsh"><div class="dstit"><i class="fa-solid fa-layer-group"></i>Category Summary</div>
+        <div class="cc">
+          <div class="ct"><i class="fa-solid fa-tags"></i>Item distribution (all time)</div>
+          <div id="cat-chart"></div>
+        </div>
+      </div>
+
     </div>
 
     <div class="shint"><i class="fa-solid fa-arrow-left" style="font-size:10px;"></i>Swipe left for full register</div>
@@ -898,9 +1025,149 @@ function rDash(){
             '</div>';
         }).join('')+
         '</div>';
+    // Call extra dashboards
+    rDashExtra();
 }
 
-var tFilt=[],tPg=1,tPP=40;
+function rDashExtra(){
+    if(!allData.length) return;
+    var now=new Date();
+
+    // ── 1. WEEK-OVER-WEEK ──────────────────────────────────────
+    function startOfWeek(d){
+        var s=new Date(d); s.setHours(0,0,0,0);
+        s.setDate(s.getDate()-s.getDay()); return s;
+    }
+    var thisWeekStart=startOfWeek(now);
+    var lastWeekStart=new Date(thisWeekStart); lastWeekStart.setDate(lastWeekStart.getDate()-7);
+    var lastWeekEnd=new Date(thisWeekStart); lastWeekEnd.setTime(lastWeekEnd.getTime()-1);
+
+    var tw=0, lw=0;
+    allData.forEach(function(r){
+        var d=pd(r.issuedOn); if(!d) return;
+        if(d>=thisWeekStart) tw++;
+        else if(d>=lastWeekStart&&d<=lastWeekEnd) lw++;
+    });
+
+    // Month avg per day
+    var mStart=new Date(now.getFullYear(),now.getMonth(),1);
+    var mDays=Math.max(1, Math.ceil((now-mStart)/(1000*60*60*24)));
+    var mTotal=0;
+    allData.forEach(function(r){var d=pd(r.issuedOn);if(d&&d>=mStart)mTotal++;});
+    var avg=(mTotal/mDays).toFixed(1);
+
+    countUp(document.getElementById('wow-tw'), tw, 500);
+    countUp(document.getElementById('wow-lw'), lw, 500);
+    document.getElementById('wow-avg').textContent = avg;
+
+    var diff=tw-lw, trendEl=document.getElementById('wow-trend'),
+        subEl=document.getElementById('wow-trend-sub');
+    if(lw===0&&tw===0){ trendEl.textContent='—'; trendEl.className='wow-trend eq'; subEl.textContent='no data yet'; }
+    else if(lw===0){ trendEl.textContent='↑ NEW'; trendEl.className='wow-trend up'; subEl.textContent='first activity'; }
+    else {
+        var pct=Math.round((diff/lw)*100);
+        if(diff>0){ trendEl.textContent='↑ +'+pct+'%'; trendEl.className='wow-trend up'; subEl.textContent='+'+diff+' vs last week'; }
+        else if(diff<0){ trendEl.textContent='↓ '+pct+'%'; trendEl.className='wow-trend dn'; subEl.textContent=diff+' vs last week'; }
+        else { trendEl.textContent='→ 0%'; trendEl.className='wow-trend eq'; subEl.textContent='same as last week'; }
+    }
+
+    // ── 2. COVERAGE RING ──────────────────────────────────────
+    var mEmpSet={}, mItems=0, allEmpSet={};
+    allData.forEach(function(r){
+        var d=pd(r.issuedOn), qty=parseInt(r.qty,10)||1;
+        allEmpSet[r.cardNo]=true;
+        if(d&&d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()){
+            mEmpSet[r.cardNo+'_'+r.name]=true;
+            mItems+=qty;
+        }
+    });
+    var served=Object.keys(mEmpSet).length, totalEmp=Object.keys(allEmpSet).length;
+    var pct=totalEmp>0?Math.round((served/totalEmp)*100):0;
+    var circumference=201;
+    var offset=circumference-(circumference*(pct/100));
+
+    document.getElementById('cov-pct').textContent=pct+'%';
+    countUp(document.getElementById('cov-emp'), served, 600);
+    countUp(document.getElementById('cov-total-emp'), totalEmp, 600);
+    countUp(document.getElementById('cov-items'), mItems, 600);
+    setTimeout(function(){
+        var arc=document.getElementById('cov-arc');
+        if(arc){ arc.style.strokeDashoffset=offset; arc.style.stroke=pct>75?'#00897b':pct>40?'#5c6bc0':'#e65100'; }
+    }, 100);
+
+    // ── 3. DAY-OF-WEEK HEATMAP ────────────────────────────────
+    var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], dayCounts=[0,0,0,0,0,0,0];
+    allData.forEach(function(r){ var d=pd(r.issuedOn); if(d) dayCounts[d.getDay()]++; });
+    var maxDay=Math.max.apply(null,dayCounts)||1;
+    var dayColors=['#e53935','#5c6bc0','#00897b','#7b1fa2','#e65100','#0288d1','#558b2f'];
+    var todayDow=now.getDay();
+    document.getElementById('hmap').innerHTML=days.map(function(d,i){
+        var pct=Math.round((dayCounts[i]/maxDay)*100);
+        var alpha=Math.max(.18, pct/100);
+        var isToday=i===todayDow;
+        return '<div class="hmap-day" style="background:'+dayColors[i]+';opacity:'+(isToday?1:Math.max(.3,alpha))+';"'+
+            (isToday?' title="Today"':'')+'>'+
+            '<span class="hmap-val">'+dayCounts[i]+'</span>'+
+            '<span class="hmap-lbl">'+d+'</span>'+
+        '</div>';
+    }).join('');
+
+    // ── 4. TOP RECIPIENTS ─────────────────────────────────────
+    var recMap={};
+    allData.forEach(function(r){
+        var k=r.cardNo+'|'+r.name+'|'+(r.section||'');
+        if(!recMap[k]) recMap[k]={name:r.name,cardNo:r.cardNo,section:r.section||'',qty:0};
+        recMap[k].qty+=(parseInt(r.qty,10)||1);
+    });
+    var topRec=Object.values(recMap).sort(function(a,b){return b.qty-a.qty;}).slice(0,6);
+    var medals=[
+        {bg:'linear-gradient(135deg,#f9a825,#ffca28)',txt:'#5d4037',ico:'🥇'},
+        {bg:'linear-gradient(135deg,#90a4ae,#b0bec5)',txt:'#37474f',ico:'🥈'},
+        {bg:'linear-gradient(135deg,#a1887f,#bcaaa4)',txt:'#3e2723',ico:'🥉'},
+    ];
+    document.getElementById('top-rec').innerHTML=topRec.map(function(r,i){
+        var m=medals[i]||{bg:'var(--sur-c)',txt:'var(--on-sv)',ico:''+(i+1)};
+        return '<div class="trec-row" style="animation-delay:'+(i*55)+'ms;">'+
+            '<div class="trec-medal" style="background:'+m.bg+';color:'+m.txt+';">'+m.ico+'</div>'+
+            '<div class="trec-info">'+
+                '<div class="trec-name">'+r.name+'</div>'+
+                '<div class="trec-sub">'+r.cardNo+' · '+r.section+'</div>'+
+            '</div>'+
+            '<span class="trec-badge">'+r.qty+' items</span>'+
+        '</div>';
+    }).join('');
+
+    // ── 5. CATEGORY SUMMARY ───────────────────────────────────
+    var catColors=['#5c6bc0','#00897b','#ab47bc','#fb8c00','#e53935','#0288d1','#558b2f','#ef5350'];
+    var catMap={};
+    allData.forEach(function(r){
+        // Group by first word/keyword of item name
+        var cat=(r.item||'Other').split(/[_\s(]/)[0];
+        catMap[cat]=(catMap[cat]||0)+(parseInt(r.qty,10)||1);
+    });
+    var cats=Object.keys(catMap).map(function(k){return{n:k,c:catMap[k]};})
+        .sort(function(a,b){return b.c-a.c;}).slice(0,8);
+    var maxCat=cats.length?cats[0].c:1;
+    var totalCat=cats.reduce(function(s,c){return s+c.c;},0);
+
+    document.getElementById('cat-chart').innerHTML=cats.map(function(s,i){
+        var pct=Math.round((s.c/maxCat)*100);
+        var pcTotal=Math.round((s.c/totalCat)*100);
+        return '<div class="cat-row" style="animation-delay:'+(i*50)+'ms;">'+
+            '<div class="cat-dot" style="background:'+catColors[i%catColors.length]+';"></div>'+
+            '<div class="cat-name" title="'+s.n+'">'+s.n+'</div>'+
+            '<div class="cat-bar-wrap"><div class="cat-bar" data-w="'+pct+'" style="background:'+catColors[i%catColors.length]+';"></div></div>'+
+            '<span class="cat-cnt">'+pcTotal+'%</span>'+
+        '</div>';
+    }).join('');
+
+    // Animate cat bars
+    setTimeout(function(){
+        document.querySelectorAll('.cat-bar[data-w]').forEach(function(el){
+            el.style.width=el.getAttribute('data-w')+'%';
+        });
+    }, 100);
+}
 function ftbl(){var q=document.getElementById('tsr').value.toLowerCase().trim();
     tFilt=!q?allData.slice():allData.filter(function(r){return(r.name||'').toLowerCase().includes(q)||(r.cardNo||'').toLowerCase().includes(q)||(r.item||'').toLowerCase().includes(q)||(r.section||'').toLowerCase().includes(q);});
     tPg=1;rTbl();}
