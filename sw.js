@@ -4,7 +4,13 @@ const STATIC_ASSETS = [
   './icon-512.png'
 ];
 
-// Install — only pre-cache icons (small, never change)
+// Accept skip-waiting command from app to activate update immediately
+self.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
+
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(

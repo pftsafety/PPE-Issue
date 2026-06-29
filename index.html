@@ -161,6 +161,26 @@
     .ssub{font-size:12px;color:var(--out);margin-top:3px;}
 
     /* DASHBOARD */
+    /* ── UPDATE BANNER ── */
+    #update-banner{position:absolute;top:0;left:0;right:0;z-index:60;display:none;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(90deg,#1a237e,#3949ab);color:#fff;padding:10px 16px;cursor:pointer;animation:slideDown .35s cubic-bezier(.2,0,0,1);box-shadow:0 4px 16px rgba(0,0,0,.25);}
+    #update-banner:active{filter:brightness(.9);}
+    .upd-text{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;}
+    .upd-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap;}
+    @keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+
+    /* ── SEARCH SUGGESTIONS ── */
+    .sug-wrap{position:relative;}
+    .sug-drop{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:70;background:var(--sur);border:1.5px solid var(--pri);border-radius:12px;overflow:hidden;box-shadow:var(--e3);display:none;animation:fadeUp .2s cubic-bezier(.2,0,0,1);}
+    .sug-drop.open{display:block;}
+    .sug-item{display:flex;align-items:center;gap:10px;padding:10px 13px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--out-v);}
+    .sug-item:last-child{border-bottom:none;}
+    .sug-item:active{background:var(--pri-c);}
+    .sug-ico{width:28px;height:28px;border-radius:50%;background:var(--pri-c);display:flex;align-items:center;justify-content:center;color:var(--on-pri-c);font-size:12px;flex-shrink:0;}
+    .sug-info{flex:1;min-width:0;}
+    .sug-name{font-size:13px;font-weight:500;color:var(--on-s);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .sug-meta{font-size:10px;color:var(--on-sv);margin-top:1px;font-family:var(--fm);}
+    .sug-mark{background:var(--pri-c);color:var(--on-pri-c);border-radius:3px;padding:0 2px;}
+
     /* ── DASHBOARD ── */
     .dsh{margin-top:16px;}
     .dstit{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--on-sv);display:flex;align-items:center;gap:6px;margin-bottom:10px;}
@@ -438,6 +458,10 @@
         </div></div></div>
 
 <div id="ful">
+    <div id="update-banner" onclick="applyUpdate()">
+        <div class="upd-text"><i class="fa-solid fa-arrow-rotate-right"></i>New version available</div>
+        <span class="upd-btn">Update now</span>
+    </div>
     <div id="ptri"><i class="fa-solid fa-arrows-rotate" id="ptri-ico"></i><span id="ptri-lbl">Pull to refresh</span></div>
     <div id="bgl"><div class="bsp"></div><span>Updating…</span></div>
     <div id="qb" onclick="syncNow()"><i class="fa-solid fa-cloud-arrow-up"></i><span id="qbt">1 pending</span></div>
@@ -456,15 +480,21 @@
       <div class="sr">
         <div class="sf">
           <div class="flbl">Card No</div>
-          <div class="fw"><i class="fa-solid fa-id-card fi"></i>
-            <input class="lgi" type="search" id="sc" onkeydown="hsk(event)" placeholder="Card number…" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+          <div class="sug-wrap">
+            <div class="fw"><i class="fa-solid fa-id-card fi"></i>
+              <input class="lgi" type="search" id="sc" onkeydown="hsk(event)" oninput="showSug('sc')" placeholder="Card number…" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+            <div class="sug-drop" id="sug-sc"></div>
+          </div>
         </div>
         <div class="sf">
           <div class="flbl">Name</div>
-          <div class="fw"><i class="fa-solid fa-user fi"></i>
-            <input class="lgi" type="search" id="sn" onkeydown="hsk(event)" placeholder="Employee name…" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+          <div class="sug-wrap">
+            <div class="fw"><i class="fa-solid fa-user fi"></i>
+              <input class="lgi" type="search" id="sn" onkeydown="hsk(event)" oninput="showSug('sn')" placeholder="Employee name…" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+            <div class="sug-drop" id="sug-sn"></div>
+          </div>
         </div>
-        <button class="sbtn" onclick="doSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button class="sbtn" onclick="doSearch();hideSugs()"><i class="fa-solid fa-magnifying-glass"></i></button>
       </div>
       <div class="sctrl">
         <button class="atog" onclick="togAdv()" id="atb"><i class="fa-solid fa-sliders" style="font-size:10px;"></i>Filters<i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:3px;" id="ac"></i></button>
@@ -645,7 +675,7 @@
       <div class="fr"><div class="fl"><i class="fa-solid fa-calendar"></i>Issue Date</div><input class="fi2" type="date" id="adate"></div>
       <div class="fr"><div class="fl"><i class="fa-solid fa-id-card"></i>Card No</div><input class="fi2" type="text" id="acard" placeholder="Card number…" autocomplete="off" autocorrect="off" spellcheck="false"></div>
       <div class="fr"><div class="fl"><i class="fa-solid fa-user"></i>Employee Name</div><input class="fi2" type="text" id="aname" placeholder="Employee name…" autocomplete="off" autocorrect="off" spellcheck="false"></div>
-      <div class="fr"><div class="fl"><i class="fa-solid fa-building"></i>Section</div><input class="fi2" type="text" id="asec" placeholder="Department…" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+      <div class="fr"><div class="fl"><i class="fa-solid fa-building"></i>Section</div><input class="fi2" type="text" id="asec" list="sect-opts" placeholder="Department…" autocomplete="off" autocorrect="off" spellcheck="false"><datalist id="sect-opts"></datalist></div>
       <div class="fdiv"></div>
       <div class="isl"><i class="fa-solid fa-helmet-safety" style="font-size:11px;"></i>PPE Items Issued</div>
       <div id="ail"></div>
@@ -893,6 +923,13 @@ function procStore(data){
     data.forEach(function(r){var c=(r.cardNo||'').toString().trim();if(can[c])r.name=can[c];});
     var dl=document.getElementById('iopts');dl.innerHTML='';
     [...new Set(data.map(function(r){return(r.item||'').toString().trim();}).filter(Boolean))].sort().forEach(function(v){var o=document.createElement('option');o.value=v;dl.appendChild(o);});
+
+    // Populate section/department dropdown
+    var sdl=document.getElementById('sect-opts');
+    if(sdl){
+        sdl.innerHTML='';
+        [...new Set(data.map(function(r){return(r.section||'').toString().trim();}).filter(Boolean))].sort().forEach(function(v){var o=document.createElement('option');o.value=v;sdl.appendChild(o);});
+    }
     updLU(data);try{lsSet(CK,JSON.stringify(data));lsSet(CS,Date.now().toString());}catch(e){}
     allData=data;filtered=data.slice();
 }
@@ -1305,6 +1342,83 @@ function renderCards(){
 }
 function goPg(p){page=p;renderCards();try{document.getElementById('ph').scrollTo({top:0,behavior:'smooth'});}catch(e){}}
 function chgPg(d){page+=d;renderCards();try{document.getElementById('ph').scrollTo({top:0,behavior:'smooth'});}catch(e){}}
+// ── SEARCH SUGGESTIONS ──────────────────────────────────────────
+var _sugTimer=null;
+
+function showSug(fieldId){
+    clearTimeout(_sugTimer);
+    _sugTimer=setTimeout(function(){ _renderSug(fieldId); },140);
+}
+
+function _renderSug(fieldId){
+    var val=(document.getElementById(fieldId).value||'').trim().toLowerCase();
+    var drop=document.getElementById('sug-'+fieldId);
+    if(!drop) return;
+    if(!val){ drop.classList.remove('open'); return; }
+
+    var seen={}, results=[];
+    for(var i=0;i<allData.length&&results.length<6;i++){
+        var r=allData[i];
+        var key=r.cardNo+'|'+r.name;
+        if(seen[key]) continue;
+        var mC=(r.cardNo||'').toLowerCase().includes(val);
+        var mN=(r.name||'').toLowerCase().includes(val);
+        if((fieldId==='sc'&&mC)||(fieldId==='sn'&&mN)){
+            seen[key]=true;
+            results.push({name:r.name,cardNo:r.cardNo,section:r.section||''});
+        }
+    }
+    if(!results.length){ drop.classList.remove('open'); return; }
+
+    function hl(str,q){
+        if(!q||!str) return str||'';
+        var i=str.toLowerCase().indexOf(q);
+        if(i===-1) return str;
+        return str.slice(0,i)+'<mark class="sug-mark">'+str.slice(i,i+q.length)+'</mark>'+str.slice(i+q.length);
+    }
+
+    drop.innerHTML=results.map(function(e){
+        var dN=fieldId==='sc'?e.name:hl(e.name,val);
+        var dC=fieldId==='sn'?e.cardNo:hl(e.cardNo,val);
+        return '<div class="sug-item" onclick="pickSug(\''+e.cardNo.replace(/'/g,"\\'")+'\',\''+e.name.replace(/'/g,"\\'")+'\')">'+
+            '<div class="sug-ico"><i class="fa-solid fa-user" style="font-size:11px;"></i></div>'+
+            '<div class="sug-info"><div class="sug-name">'+dN+'</div>'+
+            '<div class="sug-meta">'+dC+' · '+e.section+'</div></div></div>';
+    }).join('');
+    drop.classList.add('open');
+}
+
+function pickSug(cardNo,name){
+    document.getElementById('sc').value=cardNo;
+    document.getElementById('sn').value=name;
+    hideSugs(); doSearch();
+}
+
+function hideSugs(){
+    ['sug-sc','sug-sn'].forEach(function(id){
+        var el=document.getElementById(id); if(el) el.classList.remove('open');
+    });
+}
+
+document.addEventListener('touchstart',function(e){
+    if(!e.target.closest('.sug-wrap')) hideSugs();
+},{passive:true});
+document.addEventListener('mousedown',function(e){
+    if(!e.target.closest('.sug-wrap')) hideSugs();
+});
+
+// ── SW UPDATE TOAST ──────────────────────────────────────────────
+var _waitingSW=null;
+
+function applyUpdate(){
+    if(_waitingSW) _waitingSW.postMessage({type:'SKIP_WAITING'});
+    else location.reload();
+}
+
+navigator.serviceWorker&&navigator.serviceWorker.addEventListener('controllerchange',function(){
+    location.reload();
+});
+
 function clearSrch(){
     ['sc','sn','sd','si2'].forEach(function(id){document.getElementById(id).value='';});
     filtered=[];searchDone=false;
@@ -1314,7 +1428,28 @@ function clearSrch(){
 }
 </script>
 <script>
-if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').then(function(r){console.log('SW ok',r);}).catch(function(e){console.error('SW err',e);});});}
+if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+        navigator.serviceWorker.register('./sw.js').then(function(reg){
+            // Check for update on every page focus
+            reg.addEventListener('updatefound', function(){
+                var newSW = reg.installing;
+                newSW.addEventListener('statechange', function(){
+                    if(newSW.state === 'installed' && navigator.serviceWorker.controller){
+                        // New version waiting — show banner
+                        _waitingSW = newSW;
+                        var banner = document.getElementById('update-banner');
+                        if(banner) banner.style.display = 'flex';
+                    }
+                });
+            });
+            // Also check when user returns to the tab
+            document.addEventListener('visibilitychange', function(){
+                if(document.visibilityState === 'visible') reg.update();
+            });
+        }).catch(function(e){ console.error('SW err', e); });
+    });
+}
 </script>
 </body>
 </html>
