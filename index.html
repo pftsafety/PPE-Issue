@@ -27,7 +27,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="preconnect" href="https://script.google.com">
+    <link rel="dns-prefetch" href="https://script.google.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     :root{
@@ -161,7 +164,143 @@
     .ssub{font-size:12px;color:var(--out);margin-top:3px;}
 
     /* DASHBOARD */
-    /* ── UPDATE BANNER ── */
+    /* ── WEB VIEW ── */
+    .wv-header{background:var(--sur);border:1px solid var(--out-v);border-radius:14px;padding:12px 13px;box-shadow:var(--e1);margin-bottom:10px;}
+    .wv-title{font-size:15px;font-weight:600;color:var(--on-s);display:flex;align-items:center;gap:7px;margin-bottom:10px;}
+    .wv-title i{color:var(--pri);}
+    .wv-controls{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+    .wv-print-btn,.wv-export-btn{flex-shrink:0;height:38px;border:none;border-radius:10px;cursor:pointer;font-family:var(--f);font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;padding:0 12px;transition:filter .15s;}
+    .wv-print-btn{background:var(--sur-c);color:var(--on-sv);width:38px;padding:0;justify-content:center;}
+    .wv-export-btn{background:var(--pri-c);color:var(--on-pri-c);}
+    .wv-print-btn:active,.wv-export-btn:active{filter:brightness(.9);}
+    .wv-meta{font-size:11px;color:var(--on-sv);}
+    .wv-meta b{color:var(--pri);font-weight:700;}
+
+    .wv-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;border:1px solid var(--out-v);box-shadow:var(--e1);}
+    .wv-table{width:100%;border-collapse:collapse;font-size:12px;min-width:560px;}
+    .wv-th{background:var(--sur-c);padding:10px 11px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--on-sv);border-bottom:2px solid var(--out-v);white-space:nowrap;user-select:none;}
+    .wv-th.sortable{cursor:pointer;transition:background .15s;}
+    .wv-th.sortable:active{background:var(--pri-c);}
+    .wv-th.wv-num{text-align:center;}
+    .wv-th i{font-size:9px;margin-left:4px;opacity:.5;}
+    .wv-th.asc i,.wv-th.desc i{opacity:1;color:var(--pri);}
+    .wv-tr{border-bottom:1px solid var(--out-v);transition:background .1s;animation:fadeUp .2s cubic-bezier(.2,0,0,1) both;}
+    .wv-tr:last-child{border-bottom:none;}
+    .wv-tr:nth-child(even){background:var(--sur-c);}
+    .wv-tr:nth-child(odd){background:var(--sur);}
+    .wv-tr:active{background:var(--pri-c);}
+    .wv-td{padding:9px 11px;color:var(--on-s);vertical-align:middle;}
+    .wv-td.wv-num{text-align:center;}
+    .wv-date{font-family:var(--fm);font-size:11px;color:var(--on-sv);white-space:nowrap;}
+    .wv-card{font-family:var(--fm);font-size:11px;color:var(--pri);}
+    .wv-name{font-weight:500;}
+    .wv-sect{background:var(--pri-c);color:var(--on-pri-c);border-radius:6px;padding:2px 7px;font-size:10px;font-weight:500;white-space:nowrap;}
+    .wv-item{font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .wv-qty{background:var(--sec-c);color:var(--on-sec-c);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;display:inline-block;}
+    .wv-size{background:var(--ter-c);color:var(--ter);border-radius:5px;padding:2px 6px;font-size:10px;font-weight:700;}
+
+    /* Print styles */
+    /* ── RESPONSIVE DESKTOP LAYOUT ── */
+    @media (min-width: 700px) {
+        body { max-width: 100%; height: auto; overflow-x: hidden; overflow-y: auto; }
+
+        /* Fixed UI layer: full width on desktop */
+        #ful { max-width: 100%; }
+        #afab { right: 28px; bottom: 28px; }
+        #update-banner { left: 0; right: 0; max-width: 100%; }
+
+        /* Panels: stack vertically, no horizontal swipe */
+        #pw { flex-direction: column; overflow: visible; scroll-snap-type: none; height: auto; }
+        .panel { flex: none; width: 100%; overflow: visible; }
+
+        /* Tab bar: hidden on desktop — panels shown vertically */
+        #tb { display: none !important; }
+        .shint { display: none !important; }
+
+        /* ── HOME PANEL: 2-column grid ── */
+        #ph .pg {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 0 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+            align-items: start;
+        }
+        #ph .pg > * { grid-column: 1; margin-top: 12px; }
+        #ph .pg > *:first-child { margin-top: 0; }
+        #ph .pg #dss { grid-column: 2; grid-row: 1 / span 20; margin-top: 0; }
+
+        /* Dashboard: 4 KPI cards in a row */
+        .kg { grid-template-columns: repeat(4, 1fr); }
+
+        /* Dashboard stack tweaks */
+        #dss { padding-bottom: 24px; }
+
+        /* ── REGISTER PANEL: full-width table below home ── */
+        #pr { border-top: 2px solid var(--out-v); }
+        #pr .pg {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+
+        /* Register panel header on desktop */
+        .desk-reg-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .desk-reg-title {
+            font-size: 16px; font-weight: 600; color: var(--on-s);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .desk-reg-title i { color: var(--pri); }
+        .desk-reg-actions { display: flex; gap: 8px; align-items: center; }
+        .desk-btn {
+            height: 36px; border: none; border-radius: 10px; cursor: pointer;
+            font-family: var(--f); font-size: 12px; font-weight: 600;
+            display: flex; align-items: center; gap: 6px; padding: 0 14px;
+            transition: filter .15s;
+        }
+        .desk-btn:active { filter: brightness(.9); }
+        .desk-btn-pri { background: var(--pri); color: var(--on-pri); }
+        .desk-btn-sec { background: var(--sur-c); color: var(--on-sv); border: 1px solid var(--out-v); }
+
+        /* Table on desktop: no row cards, full-width table */
+        #trows { display: table; width: 100%; border-collapse: collapse; }
+        .tr { display: table-row; border-radius: 0; animation: none; border-bottom: 1px solid var(--out-v); box-shadow: none; border-left: none; border-right: none; }
+        .tr:hover { background: var(--pri-c); }
+        .tr:nth-child(even) { background: var(--sur-c); }
+        .tr:nth-child(even):hover { background: var(--pri-c); }
+        .trd,.trm,.trr { display: table-cell; padding: 9px 12px; vertical-align: middle; }
+        .trd { font-size: 11px; white-space: nowrap; min-width: 90px; }
+        .trm { width: 100%; }
+        .trr { white-space: nowrap; text-align: right; }
+        .trn { font-size: 13px; }
+        .trmt { font-size: 11px; }
+        .tri { font-size: 12px; margin-top: 0; }
+        .trshb { display: none; } /* hide per-row share on desktop — use profile modal share */
+
+        /* Sortable table header on desktop */
+        #desk-reg-thead { display: table-header-group; }
+        #desk-reg-thead th {
+            background: var(--sur-c); padding: 9px 12px;
+            text-align: left; font-size: 10px; font-weight: 700;
+            letter-spacing: .07em; text-transform: uppercase;
+            color: var(--on-sv); border-bottom: 2px solid var(--out-v);
+            white-space: nowrap; cursor: pointer; user-select: none;
+        }
+        #desk-reg-thead th:hover { background: var(--pri-c); color: var(--on-pri-c); }
+
+        /* Table count/filter row */
+        .th { border-radius: 14px 14px 0 0; border-bottom: none; margin-bottom: 0; }
+        #trows-wrap { border: 1px solid var(--out-v); border-radius: 0 0 14px 14px; overflow: hidden; }
+    }
+
+    @media print {
+        nav, #tb, #ful, .desk-reg-actions, .th, #table-pagination { display: none !important; }
+        body { max-width: 100%; }
+        .tr { break-inside: avoid; }
+    }
     #update-banner{position:absolute;top:0;left:0;right:0;z-index:60;display:none;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(90deg,#1a237e,#3949ab);color:#fff;padding:10px 16px;cursor:pointer;animation:slideDown .35s cubic-bezier(.2,0,0,1);box-shadow:0 4px 16px rgba(0,0,0,.25);}
     #update-banner:active{filter:brightness(.9);}
     .upd-text{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;}
@@ -626,20 +765,47 @@
 
   <div class="panel" id="pr">
    <div class="pg">
+
+    <!-- Desktop header (hidden on mobile via .desk-reg-header) -->
+    <div class="desk-reg-header" style="display:none;" id="desk-reg-hdr">
+      <div class="desk-reg-title"><i class="fa-solid fa-table-list"></i>Full Register</div>
+      <div class="desk-reg-actions">
+        <button class="desk-btn desk-btn-sec" onclick="window.print()"><i class="fa-solid fa-print" style="font-size:12px;"></i>Print</button>
+        <button class="desk-btn desk-btn-pri" onclick="exportCSV()"><i class="fa-solid fa-file-csv" style="font-size:12px;"></i>Export CSV</button>
+      </div>
+    </div>
+
     <div class="th">
       <div class="tfr"><div class="fw" style="flex:1;"><i class="fa-solid fa-magnifying-glass fi" style="font-size:11px;"></i><input class="lgi" type="search" id="tsr" oninput="ftbl()" placeholder="Search name, card, item…" autocomplete="off" style="font-size:14px;"></div></div>
       <div class="tcr"><div class="tto">Showing <b id="tsh">0</b> of <b id="tto2">0</b> entries</div><button class="tcl" onclick="clrTbl()">Clear</button></div>
     </div>
-    <div id="trows"></div>
+    <div id="trows-wrap">
+      <table id="desk-reg-thead-table" style="width:100%;border-collapse:collapse;display:none;">
+        <thead id="desk-reg-thead">
+          <tr>
+            <th onclick="deskSort('issuedOn')">Date <i class="fa-solid fa-sort" id="ds-issuedOn" style="font-size:9px;"></i></th>
+            <th onclick="deskSort('cardNo')">Card No <i class="fa-solid fa-sort" id="ds-cardNo" style="font-size:9px;"></i></th>
+            <th onclick="deskSort('name')">Name <i class="fa-solid fa-sort" id="ds-name" style="font-size:9px;"></i></th>
+            <th onclick="deskSort('section')">Section <i class="fa-solid fa-sort" id="ds-section" style="font-size:9px;"></i></th>
+            <th onclick="deskSort('item')">Item <i class="fa-solid fa-sort" id="ds-item" style="font-size:9px;"></i></th>
+            <th onclick="deskSort('qty')" style="text-align:center;">Qty <i class="fa-solid fa-sort" id="ds-qty" style="font-size:9px;"></i></th>
+            <th style="text-align:center;">Size</th>
+          </tr>
+        </thead>
+      </table>
+      <div id="trows"></div>
+    </div>
+
     <div id="tnr" class="stbox" style="display:none;margin-bottom:10px;"><div class="sticon"><i class="fa-solid fa-filter-circle-xmark"></i></div><div class="stit">No matches</div></div>
     <div id="tpgb" class="pgb" style="display:none;">
       <div class="pit"><b id="tps">0</b>–<b id="tpe">0</b> of <span class="cnt" id="tpt">0</span></div>
       <div class="pbs"><button class="pb" id="tpp" onclick="tCP(-1)"><i class="fa-solid fa-angle-left" style="font-size:10px;"></i>Prev</button><button class="pb" id="tpn" onclick="tCP(1)">Next<i class="fa-solid fa-angle-right" style="font-size:10px;"></i></button></div>
     </div>
+
    </div>
   </div>
 
-</div>
+</div><!-- end panels-wrap -->
 
 <div id="tb">
   <button class="tab active" id="th-tab" onclick="swP(0)"><i class="fa-solid fa-house"></i>Dashboard</button>
@@ -689,11 +855,27 @@
 var API="https://script.google.com/macros/s/AKfycbydwxwb1CYJtjLcWG_OKpcKIBdl4KQ7xeKe12PvJzwOzxu3Mvwu-OU9kvybNTji3iIX/exec";
 var allData=[],filtered=[],page=1,perPage=30,searchDone=false;
 var _opCN=null,_opN=null;
-var CK='ppe_data_v4',CS='ppe_stamp_v4',CA=30*60*1000;
+var CK='ppe_data_v4',CS='ppe_stamp_v4',CA=24*60*60*1000; // 24h — always show cache, refresh silently
 
 function swP(i){var w=document.getElementById('pw');w.scrollTo({left:i*w.offsetWidth,behavior:'smooth'});setTab(i);}
 function onPS(){var w=document.getElementById('pw');setTab(Math.round(w.scrollLeft/(w.offsetWidth||1)));}
 function setTab(i){['th-tab','tr-tab'].forEach(function(id,j){var e=document.getElementById(id);if(e)e.classList.toggle('active',j===i);});}
+
+function exportCSV(){
+    var data = allData; // export all data
+    var q = (document.getElementById('tsr')||{value:''}).value.toLowerCase().trim();
+    if(q) data = data.filter(function(r){return (r.name||'').toLowerCase().includes(q)||(r.cardNo||'').toLowerCase().includes(q)||(r.item||'').toLowerCase().includes(q)||(r.section||'').toLowerCase().includes(q);});
+    var rows=[['Date','Card No','Name','Section','Item','Qty','Size']];
+    data.forEach(function(r){ rows.push([r.issuedOn||'',r.cardNo||'',r.name||'',r.section||'',r.item||'',r.qty||'',r.size||'']); });
+    var csv=rows.map(function(r){ return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(','); }).join('\n');
+    var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    var url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download='PPE_Register_'+new Date().toISOString().slice(0,10)+'.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    toast('✓ CSV downloaded','success');
+}
+function printPage(){ window.print(); }
 
 function openAdd(){
     var t=new Date();
@@ -766,9 +948,10 @@ function shareCard(btn){
     btn.disabled=true;
     btn.innerHTML='<i class="fa-solid fa-spinner fa-spin" style="font-size:11px;"></i>';
 
-    // Build item history from allData directly — no DOM scraping
-    var rows=allData.filter(function(r){ return r.cardNo===cn&&r.name===nm; });
-    if(!rows.length){ btn.disabled=false; btn.innerHTML=orig; toast('No data to share','error'); return; }
+    // Load html2canvas on demand — only when share is triggered
+    function doShare(){
+        var rows=allData.filter(function(r){ return r.cardNo===cn&&r.name===nm; });
+        if(!rows.length){ btn.disabled=false; btn.innerHTML=orig; toast('No data to share','error'); return; }
 
     var sec=rows[0].section||'', itemMap={};
     rows.forEach(function(r){
@@ -839,32 +1022,48 @@ function shareCard(btn){
     document.body.appendChild(w);
     var target=w.querySelector('#__sc__');
 
-    html2canvas(target,{
-        scale:3, backgroundColor:bg,
-        useCORS:true, logging:false, allowTaint:true, foreignObjectRendering:false
-    })
-    .then(function(cv){
-        document.body.removeChild(w);
-        cv.toBlob(function(bl){
+    function runCapture(){
+        html2canvas(target,{
+            scale:3, backgroundColor:bg,
+            useCORS:true, logging:false, allowTaint:true, foreignObjectRendering:false
+        })
+        .then(function(cv){
+            document.body.removeChild(w);
+            cv.toBlob(function(bl){
+                btn.disabled=false; btn.innerHTML=orig;
+                var fn='PPE_'+nm.trim().replace(/\s+/g,'_')+'.jpg';
+                var f=new File([bl],fn,{type:'image/jpeg'});
+                if(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})){
+                    navigator.share({title:'PPE — '+nm, files:[f]}).catch(function(){});
+                } else {
+                    var u=URL.createObjectURL(bl), a=document.createElement('a');
+                    a.href=u; a.download=fn;
+                    document.body.appendChild(a); a.click();
+                    document.body.removeChild(a);
+                    setTimeout(function(){ URL.revokeObjectURL(u); }, 1000);
+                }
+            },'image/jpeg',.95);
+        })
+        .catch(function(){
+            if(w.parentNode) document.body.removeChild(w);
             btn.disabled=false; btn.innerHTML=orig;
-            var fn='PPE_'+nm.trim().replace(/\s+/g,'_')+'.jpg';
-            var f=new File([bl],fn,{type:'image/jpeg'});
-            if(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})){
-                navigator.share({title:'PPE — '+nm, files:[f]}).catch(function(){});
-            } else {
-                var u=URL.createObjectURL(bl), a=document.createElement('a');
-                a.href=u; a.download=fn;
-                document.body.appendChild(a); a.click();
-                document.body.removeChild(a);
-                setTimeout(function(){ URL.revokeObjectURL(u); }, 1000);
-            }
-        },'image/jpeg',.95);
-    })
-    .catch(function(err){
-        if(w.parentNode) document.body.removeChild(w);
-        btn.disabled=false; btn.innerHTML=orig;
-        toast('Share failed','error');
-    });
+            toast('Share failed','error');
+        });
+    }
+
+    // Lazy-load html2canvas only when first needed
+    if(typeof html2canvas === 'function'){
+        runCapture();
+    } else {
+        var s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        s.onload=function(){ runCapture(); };
+        s.onerror=function(){ if(w.parentNode)document.body.removeChild(w); btn.disabled=false; btn.innerHTML=orig; toast('Share failed — check connection','error'); };
+        document.head.appendChild(s);
+    }
+    } // end doShare
+
+    doShare();
 }
 
 function triggerInstall(){if(!window._pwaPrompt)return;window._pwaPrompt.prompt();window._pwaPrompt.userChoice.then(function(r){if(r.outcome==='accepted')document.getElementById('install-banner').style.display='none';window._pwaPrompt=null;});}
@@ -935,16 +1134,32 @@ function procStore(data){
 }
 
 window.onload=function(){
-    initIB();updQUI();if(navigator.onLine&&getQ().length)procQ();
-    try{var raw=lsGet(CK),stamp=parseInt(lsGet(CS)||'0',10);
-        if(raw&&(Date.now()-stamp)<CA){var c=JSON.parse(raw);if(Array.isArray(c)&&c.length){procStore(c);showUI();rDash();rTbl();doFetch(true);return;}}}catch(e){}
+    initIB();updQUI();initDesktop();if(navigator.onLine&&getQ().length)procQ();
+
+    // ── SHOW CACHE IMMEDIATELY (even if stale) ───────────────────
+    // Never make the user wait on the loading screen if we have any data.
+    // Always kick off a silent background refresh regardless of cache age.
+    try{
+        var raw=lsGet(CK);
+        if(raw){
+            var c=JSON.parse(raw);
+            if(Array.isArray(c)&&c.length){
+                procStore(c);showUI();rDash();rTbl();
+                // Warm-up: start background fetch immediately
+                doFetch(true);
+                return;
+            }
+        }
+    }catch(e){}
+
+    // No cache at all — must fetch (first ever load or cache cleared)
     doFetch(false);
 };
 function doFetch(silent){
     var st=!silent?setTimeout(function(){var e=document.getElementById('ssm');if(e)e.style.display='block';},12000):null;
     fetch(API).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
     .then(function(data){if(st)clearTimeout(st);if(!Array.isArray(data))throw new Error((data&&data.error)?data.error:'Error');
-        data.reverse();procStore(data);rDash();rTbl();if(!silent){showUI();}else if(searchDone){doSearch(true);}})
+        data.reverse();procStore(data);rDash();rTbl();initDesktop();if(!silent){showUI();}else if(searchDone){doSearch(true);}})
     .catch(function(err){if(st)clearTimeout(st);if(!silent)showErr(err.message);});
 }
 
@@ -1211,6 +1426,54 @@ var tFilt=[], tPg=1, tPP=40;
 function ftbl(){var q=document.getElementById('tsr').value.toLowerCase().trim();
     tFilt=!q?allData.slice():allData.filter(function(r){return(r.name||'').toLowerCase().includes(q)||(r.cardNo||'').toLowerCase().includes(q)||(r.item||'').toLowerCase().includes(q)||(r.section||'').toLowerCase().includes(q);});
     tPg=1;rTbl();}
+// ── DESKTOP DETECTION & SORT ─────────────────────────────────────
+var _deskSortCol='issuedOn', _deskSortDir=-1;
+
+function isDesktop(){ return window.innerWidth >= 700; }
+
+function initDesktop(){
+    if(!isDesktop()) return;
+    // Show desktop-only elements
+    var hdr=document.getElementById('desk-reg-hdr');
+    if(hdr) hdr.style.display='flex';
+    var thead=document.getElementById('desk-reg-thead-table');
+    if(thead) thead.style.display='table';
+}
+
+function deskSort(col){
+    if(!isDesktop()) return;
+    if(_deskSortCol===col) _deskSortDir*=-1;
+    else { _deskSortCol=col; _deskSortDir=col==='issuedOn'?-1:1; }
+
+    // Update icons
+    ['issuedOn','cardNo','name','section','item','qty'].forEach(function(c){
+        var ic=document.getElementById('ds-'+c);
+        if(!ic) return;
+        if(c!==_deskSortCol){ ic.className='fa-solid fa-sort'; }
+        else { ic.className=_deskSortDir===1?'fa-solid fa-sort-up':'fa-solid fa-sort-down'; ic.style.color='var(--pri)'; }
+    });
+
+    tFilt.sort(function(a,b){
+        var av=a[_deskSortCol]||'', bv=b[_deskSortCol]||'';
+        if(_deskSortCol==='issuedOn'){
+            var da=pd(av), db=pd(bv);
+            return _deskSortDir*((da&&db)?(da>db?1:da<db?-1:0):0);
+        }
+        if(_deskSortCol==='qty') return _deskSortDir*((parseInt(av,10)||0)-(parseInt(bv,10)||0));
+        return _deskSortDir*(av.toString().toLowerCase()<bv.toString().toLowerCase()?-1:av.toString().toLowerCase()>bv.toString().toLowerCase()?1:0);
+    });
+    tPg=1; rTbl();
+}
+
+window.addEventListener('resize', function(){
+    initDesktop();
+    // On resize to mobile: hide desktop headers
+    if(!isDesktop()){
+        var hdr=document.getElementById('desk-reg-hdr'); if(hdr) hdr.style.display='none';
+        var thead=document.getElementById('desk-reg-thead-table'); if(thead) thead.style.display='none';
+    }
+});
+
 function clrTbl(){document.getElementById('tsr').value='';tFilt=allData.slice();tPg=1;rTbl();}
 function tCP(d){tPg+=d;rTbl();document.getElementById('pr').scrollTop=0;}
 function rTbl(){
