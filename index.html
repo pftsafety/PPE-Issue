@@ -496,8 +496,59 @@
     .trshb:disabled{opacity:.4;cursor:default;}
 
     /* MODALS */
-    #pm,#am{position:fixed;inset:0;z-index:80;display:none;align-items:flex-end;}
-    #pm.open,#am.open{display:flex;}
+    #pm,#am,#edit-modal{position:fixed;inset:0;z-index:80;display:none;align-items:flex-end;}
+    #pm.open,#am.open,#edit-modal.open{display:flex;}
+
+    /* ── ACTION SHEET (hidden long-press feature) ── */
+    #act-sheet{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:20px;}
+    #act-sheet.open{display:flex;}
+    .act-card{
+        position:relative;z-index:1;width:100%;max-width:340px;
+        background:var(--sur);border-radius:22px;padding:24px 22px 18px;
+        text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);
+        animation:delPop .25s cubic-bezier(.34,1.56,.64,1);
+    }
+    .act-icon{width:48px;height:48px;border-radius:50%;background:var(--pri-c);
+        display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+    .act-icon i{font-size:18px;color:var(--pri);}
+    .act-title{font-size:15px;font-weight:600;color:var(--on-s);margin-bottom:6px;}
+    .act-detail{font-size:12px;color:var(--on-sv);margin-bottom:18px;line-height:1.7;
+        background:var(--sur-c);border-radius:10px;padding:10px 12px;}
+    .act-actions{display:flex;flex-direction:column;gap:8px;}
+    .act-btn{width:100%;padding:12px;border-radius:14px;border:none;cursor:pointer;
+        font-family:var(--f);font-size:14px;font-weight:600;display:flex;
+        align-items:center;justify-content:center;gap:8px;transition:transform .15s,filter .15s;}
+    .act-btn:active{transform:scale(.97);}
+    .act-btn-edit{background:var(--pri-c);color:var(--on-pri-c);}
+    .act-btn-delete{background:var(--err-c);color:var(--err);}
+    .act-cancel{width:100%;background:none;border:none;padding:12px;margin-top:2px;
+        color:var(--on-sv);font-family:var(--f);font-size:13px;font-weight:600;cursor:pointer;}
+
+    /* ── DELETE CONFIRM (hidden long-press feature) ── */
+    #del-modal{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:20px;}
+    #del-modal.open{display:flex;}
+    .del-card{
+        position:relative;z-index:1;width:100%;max-width:340px;
+        background:var(--sur);border-radius:22px;padding:26px 22px 22px;
+        text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);
+        animation:delPop .25s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes delPop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+    .del-icon{width:52px;height:52px;border-radius:50%;background:var(--err-c);
+        display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+    .del-icon i{font-size:20px;color:var(--err);}
+    .del-title{font-size:16px;font-weight:600;color:var(--on-s);margin-bottom:6px;}
+    .del-detail{font-size:12px;color:var(--on-sv);margin-bottom:22px;line-height:1.7;
+        background:var(--sur-c);border-radius:10px;padding:10px 12px;}
+    .del-actions{display:flex;gap:10px;}
+    .del-btn{flex:1;padding:12px;border-radius:100px;font-family:var(--f);
+        font-size:14px;font-weight:600;cursor:pointer;transition:transform .15s,filter .15s;}
+    .del-btn:active{transform:scale(.96);}
+    .del-btn-cancel{border:1.5px solid var(--out-v);background:var(--sur);color:var(--on-s);}
+    .del-btn-confirm{border:none;background:var(--err);color:#fff;box-shadow:0 4px 14px rgba(179,38,30,.35);}
+    .del-btn-confirm:disabled{opacity:.6;cursor:default;}
+    .prrow{transition:background .2s;}
+    .prrow.pressing{background:var(--err-c);}
     .mbdrop{position:absolute;inset:0;background:rgba(0,0,0,.45);animation:bdIn .25s ease;}
     .ms,.ps{position:relative;z-index:1;width:100%;max-width:480px;margin:0 auto;background:var(--sur-c);border-radius:28px 28px 0 0;box-shadow:0 -4px 32px rgba(0,0,0,.18);padding:0 0 calc(24px + var(--sab));max-height:92vh;overflow-y:auto;animation:sUp .35s cubic-bezier(.2,0,0,1);}
     .mh{width:36px;height:4px;border-radius:99px;background:var(--out-v);margin:12px auto 0;}
@@ -829,6 +880,48 @@
       </div>
       <div class="psl2"><i class="fa-solid fa-clock-rotate-left" style="margin-right:4px;"></i>Complete History</div>
       <div id="pil"></div>
+    </div>
+  </div>
+</div>
+
+<div id="act-sheet">
+  <div class="mbdrop" onclick="actCancel()"></div>
+  <div class="act-card">
+    <div class="act-icon"><i class="fa-solid fa-ellipsis"></i></div>
+    <div class="act-title">Modify this entry?</div>
+    <div class="act-detail" id="act-detail">—</div>
+    <div class="act-actions">
+      <button class="act-btn act-btn-edit" onclick="actGoEdit()"><i class="fa-solid fa-pen"></i> Edit Entry</button>
+      <button class="act-btn act-btn-delete" onclick="actGoDelete()"><i class="fa-solid fa-trash-can"></i> Delete Entry</button>
+    </div>
+    <button class="act-cancel" onclick="actCancel()">Cancel</button>
+  </div>
+</div>
+
+<div id="del-modal">
+  <div class="mbdrop" onclick="closeDelModal()"></div>
+  <div class="del-card">
+    <div class="del-icon"><i class="fa-solid fa-trash-can"></i></div>
+    <div class="del-title">Delete this entry?</div>
+    <div class="del-detail" id="del-detail">—</div>
+    <div class="del-actions">
+      <button class="del-btn del-btn-cancel" onclick="closeDelModal()">Cancel</button>
+      <button class="del-btn del-btn-confirm" id="del-confirm-btn" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="edit-modal">
+  <div class="mbdrop" onclick="closeEditModal()"></div>
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mhdr"><div class="mtit">Edit Entry</div><button class="mcls" onclick="closeEditModal()">✕</button></div>
+    <div class="mbdy">
+      <div class="fr"><div class="fl"><i class="fa-solid fa-calendar"></i>Issue Date</div><input class="fi2" type="date" id="edate"></div>
+      <div class="fr"><div class="fl"><i class="fa-solid fa-helmet-safety"></i>Item Name</div><input class="fi2" type="text" id="eitem" list="iopts" oninput="onEditItemChange(this)" autocomplete="off"></div>
+      <div class="fr"><div class="fl"><i class="fa-solid fa-cubes"></i>Qty</div><input class="fi2" type="number" min="1" id="eqty"></div>
+      <div class="fr" id="esize-row" style="display:none;"><div class="fl"><i class="fa-solid fa-ruler"></i>Size</div><input class="fi2" type="text" id="esize" placeholder="e.g. 7, 8…" autocomplete="off"></div>
+      <button class="subb" id="edit-save-btn" onclick="saveEdit()"><i class="fa-solid fa-floppy-disk" style="font-size:14px;"></i>Save Changes</button>
     </div>
   </div>
 </div>
@@ -1500,19 +1593,204 @@ function openPM(cn,nm){
     var rows=allData.filter(function(r){return r.cardNo===cn&&r.name===nm;});if(!rows.length)return;
     var sec=rows[0].section||'—',im={},tot=0,ld=null;
     rows.forEach(function(r){var q=parseInt(r.qty,10)||1;tot+=q;var it=r.item||'Unknown';
-        if(!im[it])im[it]=[];im[it].push({date:r.issuedOn,qty:r.qty,size:r.size});
+        if(!im[it])im[it]=[];im[it].push({date:r.issuedOn,qty:r.qty,size:r.size,siNo:r.siNo});
         var d=pd(r.issuedOn);if(d&&(!ld||d>ld))ld=d;});
     document.getElementById('pn').textContent=nm;document.getElementById('pc').innerHTML='<i class="fa-solid fa-id-card" style="font-size:10px;"></i> '+cn;
     document.getElementById('pd').textContent=sec;document.getElementById('psi').textContent=tot;
     document.getElementById('pst2').textContent=Object.keys(im).length;document.getElementById('psl2').textContent=ld?fd(ld):'—';
     var h='';Object.keys(im).forEach(function(iNm){var en=im[iNm],tq=en.reduce(function(s,e){return s+(parseInt(e.qty,10)||1);},0);
         var rh=en.map(function(e){var sz=e.size?'<span class="psz">Sz: '+e.size+'</span>':'';
-            return '<div class="prrow"><span class="prdt">'+e.date+'</span><div class="prtags"><span class="pq">'+e.qty+' Qty</span>'+sz+'</div></div>';}).join('');
+            return '<div class="prrow" data-sino="'+(e.siNo||'')+'" data-item="'+iNm.replace(/"/g,'&quot;')+'" data-date="'+e.date+'" data-qty="'+e.qty+'" data-size="'+(e.size||'')+'"><span class="prdt">'+e.date+'</span><div class="prtags"><span class="pq">'+e.qty+' Qty</span>'+sz+'</div></div>';}).join('');
         h+='<div class="pic"><div class="pin"><span>'+iNm+'</span><span class="pito">'+tq+' total</span></div><div class="pirows">'+rh+'</div></div>';});
     document.getElementById('pil').innerHTML=h;
     document.getElementById('pm').classList.add('open');document.body.style.overflow='hidden';_opCN=cn;_opN=nm;
+    initLongPress();
 }
 function closePM(){document.getElementById('pm').classList.remove('open');document.body.style.overflow='';_opCN=null;_opN=null;}
+
+// ── HIDDEN FEATURE: long-press an entry row to edit or delete it ──
+var _pressTimer=null, _pendingEntry=null;
+
+function initLongPress(){
+    var pil=document.getElementById('pil');
+    if(!pil || pil._lpBound) return;
+    pil._lpBound=true;
+
+    function startPress(e){
+        var row=e.target.closest('.prrow');
+        if(!row) return;
+        _pressTimer=setTimeout(function(){
+            if(navigator.vibrate) navigator.vibrate(15);
+            row.classList.add('pressing');
+            openActionSheet(row);
+        },650);
+    }
+    function cancelPress(){ clearTimeout(_pressTimer); }
+
+    pil.addEventListener('touchstart',startPress,{passive:true});
+    pil.addEventListener('touchend',cancelPress,{passive:true});
+    pil.addEventListener('touchmove',cancelPress,{passive:true});
+    pil.addEventListener('touchcancel',cancelPress,{passive:true});
+    pil.addEventListener('mousedown',startPress);
+    pil.addEventListener('mouseup',cancelPress);
+    pil.addEventListener('mouseleave',cancelPress);
+    pil.addEventListener('contextmenu',function(e){ if(e.target.closest('.prrow')) e.preventDefault(); });
+}
+
+// ── Action sheet: Edit / Delete / Cancel ───────────────────────────
+function openActionSheet(row){
+    var siNo=row.getAttribute('data-sino');
+    if(!siNo){ row.classList.remove('pressing'); toast('Cannot modify — no reference ID','error'); return; }
+    _pendingEntry={
+        siNo:siNo,
+        item:row.getAttribute('data-item'),
+        date:row.getAttribute('data-date'),
+        qty:row.getAttribute('data-qty'),
+        size:row.getAttribute('data-size')||'',
+        rowEl:row
+    };
+    document.getElementById('act-detail').innerHTML=
+        '<b>'+_pendingEntry.item+'</b><br>'+_pendingEntry.date+' · '+_pendingEntry.qty+' Qty'+
+        (_pendingEntry.size?' · Sz '+_pendingEntry.size:'');
+    document.getElementById('act-sheet').classList.add('open');
+}
+
+function actCancel(){
+    if(_pendingEntry&&_pendingEntry.rowEl) _pendingEntry.rowEl.classList.remove('pressing');
+    _pendingEntry=null;
+    document.getElementById('act-sheet').classList.remove('open');
+}
+
+function actGoDelete(){
+    document.getElementById('act-sheet').classList.remove('open');
+    openDelModal();
+}
+
+function actGoEdit(){
+    document.getElementById('act-sheet').classList.remove('open');
+    openEditModal();
+}
+
+// ── Delete confirm ──────────────────────────────────────────────────
+function openDelModal(){
+    if(!_pendingEntry) return;
+    document.getElementById('del-detail').innerHTML=
+        '<b>'+_pendingEntry.item+'</b><br>'+_pendingEntry.date+' · '+_pendingEntry.qty+' Qty';
+    document.getElementById('del-modal').classList.add('open');
+}
+
+function closeDelModal(){
+    if(_pendingEntry&&_pendingEntry.rowEl) _pendingEntry.rowEl.classList.remove('pressing');
+    _pendingEntry=null;
+    document.getElementById('del-modal').classList.remove('open');
+}
+
+function confirmDelete(){
+    if(!_pendingEntry||!_pendingEntry.siNo){ toast('Nothing to delete','error'); closeDelModal(); return; }
+    var siNo=_pendingEntry.siNo;
+    var btn=document.getElementById('del-confirm-btn');
+    btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i>';
+
+    fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({action:'delete',siNo:siNo})})
+    .then(function(r){return r.json();})
+    .then(function(res){
+        btn.disabled=false; btn.innerHTML='Delete';
+        if(res.error) throw new Error(res.error);
+
+        allData=allData.filter(function(r){return (r.siNo||'').toString()!==siNo.toString();});
+        try{ lsSet(CK,JSON.stringify(allData)); lsSet(CS,Date.now().toString()); }catch(e){}
+
+        document.getElementById('del-modal').classList.remove('open');
+        var delCN=_opCN, delNM=_opN;
+        _pendingEntry=null;
+
+        toast('✓ Entry deleted','success');
+        rDash(); rTbl(); updLU(allData);
+        if(searchDone) doSearch(true);
+
+        var stillHas=allData.some(function(r){return r.cardNo===delCN&&r.name===delNM;});
+        if(stillHas) openPM(delCN,delNM); else closePM();
+    })
+    .catch(function(err){
+        btn.disabled=false; btn.innerHTML='Delete';
+        toast('Delete failed — '+err.message,'error');
+    });
+}
+
+// ── Edit entry ────────────────────────────────────────────────────
+function onEditItemChange(input){
+    var wrap=document.getElementById('esize-row');
+    if(nsz(input.value)){ wrap.style.display=''; }
+    else { wrap.style.display='none'; document.getElementById('esize').value=''; }
+}
+
+function openEditModal(){
+    if(!_pendingEntry) return;
+    var d=pd(_pendingEntry.date);
+    var ds=d?(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')):'';
+    document.getElementById('edate').value=ds;
+    document.getElementById('eitem').value=_pendingEntry.item||'';
+    document.getElementById('eqty').value=_pendingEntry.qty||'1';
+    document.getElementById('esize').value=_pendingEntry.size||'';
+    onEditItemChange(document.getElementById('eitem'));
+    document.getElementById('edit-modal').classList.add('open');
+    document.body.style.overflow='hidden';
+}
+
+function closeEditModal(){
+    document.getElementById('edit-modal').classList.remove('open');
+    document.body.style.overflow='';
+    if(_pendingEntry&&_pendingEntry.rowEl) _pendingEntry.rowEl.classList.remove('pressing');
+    _pendingEntry=null;
+}
+
+function saveEdit(){
+    if(!_pendingEntry||!_pendingEntry.siNo){ toast('Nothing to edit','error'); closeEditModal(); return; }
+    var date=document.getElementById('edate').value;
+    var item=document.getElementById('eitem').value.trim();
+    var qty=document.getElementById('eqty').value.trim()||'1';
+    var sizeRow=document.getElementById('esize-row');
+    var size=(sizeRow.style.display!=='none')?document.getElementById('esize').value.trim():'';
+
+    if(!date||!item){ toast('Fill in date and item name','error'); return; }
+
+    var siNo=_pendingEntry.siNo;
+    var btn=document.getElementById('edit-save-btn');
+    btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
+
+    fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({action:'edit',siNo:siNo,issuedOn:date,item:item,qty:qty,size:size})})
+    .then(function(r){return r.json();})
+    .then(function(res){
+        btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-floppy-disk" style="font-size:14px;"></i>Save Changes';
+        if(res.error) throw new Error(res.error);
+
+        // Update the matching row directly in allData
+        for(var i=0;i<allData.length;i++){
+            if((allData[i].siNo||'').toString()===siNo.toString()){
+                allData[i].issuedOn=fnd(date);
+                allData[i].item=item;
+                allData[i].qty=qty;
+                allData[i].size=size;
+                break;
+            }
+        }
+        try{ lsSet(CK,JSON.stringify(allData)); lsSet(CS,Date.now().toString()); }catch(e){}
+
+        document.getElementById('edit-modal').classList.remove('open');
+        document.body.style.overflow='';
+        var editCN=_opCN, editNM=_opN;
+        _pendingEntry=null;
+
+        toast('✓ Entry updated','success');
+        rDash(); rTbl(); updLU(allData);
+        if(searchDone) doSearch(true);
+        if(editCN&&editNM) openPM(editCN,editNM);
+    })
+    .catch(function(err){
+        btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-floppy-disk" style="font-size:14px;"></i>Save Changes';
+        toast('Update failed — '+err.message,'error');
+    });
+}
 
 (function setupPTR(){
     var sy=0,cy=0,pull=false,ref=false,TH=70;
