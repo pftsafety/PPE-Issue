@@ -975,6 +975,8 @@ function openAdd(){
     document.getElementById('adate').value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
     ['acard','aname','asec'].forEach(function(id){document.getElementById(id).value='';});
     document.getElementById('ail').innerHTML=''; addIR();
+    var btn=document.getElementById('fsb');
+    btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-floppy-disk" style="font-size:14px;"></i>Save Entry';
     document.getElementById('am').classList.add('open'); document.body.style.overflow='hidden';
 }
 function closeAdd(){document.getElementById('am').classList.remove('open');document.body.style.overflow='';}
@@ -1003,11 +1005,25 @@ function saveEntry(){
         if(it)items.push({item:it,qty:qty||'1',size:sz});
     });
     if(!items.length){toast('Add at least one PPE item','error');return;}
-    var btn=document.getElementById('fsb'),payload={action:'add',issuedOn:dt,cardNo:cn,name:nm,section:sc,items:items};
+    var btn=document.getElementById('fsb');
+    if(btn.disabled) return; // guard against rapid double-tap
+
+    // Unique ID for this submission attempt — stays the same across
+    // offline-queue retries, so the backend can detect and skip a
+    // duplicate if this exact request is ever sent more than once
+    // (e.g. the save succeeded but the response never reached the phone).
+    var clientId=Date.now()+'-'+Math.random().toString(36).slice(2,10);
+    var payload={action:'add',clientId:clientId,issuedOn:dt,cardNo:cn,name:nm,section:sc,items:items};
     items.forEach(function(it){allData.unshift({cardNo:cn,name:nm,section:sc,issuedOn:fnd(dt),item:it.item,qty:it.qty,size:it.size});});
     updLU(allData);try{lsSet(CK,JSON.stringify(allData));lsSet(CS,Date.now().toString());}catch(e){}
     rDash();rTbl();if(searchDone)doSearch(true);
-    if(!navigator.onLine){qAdd(payload);toast('\uD83D\uDCE5 Offline — will sync later','success');closeAdd();return;}
+    if(!navigator.onLine){
+        btn.disabled=true;
+        qAdd(payload);
+        toast('\uD83D\uDCE5 Offline — will sync later','success');
+        closeAdd();
+        return;
+    }
     btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
     fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify(payload)})
     .then(function(r){return r.json();})
