@@ -971,8 +971,12 @@ function exportCSV(){
 function printPage(){ window.print(); }
 
 function openAdd(){
-    var t=new Date();
-    document.getElementById('adate').value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+    // Keep the last used date — only default to today on the very first open
+    var dateField=document.getElementById('adate');
+    if(!dateField.value){
+        var t=new Date();
+        dateField.value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+    }
     ['acard','aname','asec'].forEach(function(id){document.getElementById(id).value='';});
     document.getElementById('ail').innerHTML=''; addIR();
     var btn=document.getElementById('fsb');
@@ -1024,13 +1028,29 @@ function saveEntry(){
         closeAdd();
         return;
     }
-    btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
+    btn.disabled=true;
+    btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
     fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify(payload)})
-    .then(function(r){return r.json();})
-    .then(function(res){btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Entry';
-        if(res.error)throw new Error(res.error);
-        toast('✓ Saved — '+items.length+' row'+(items.length>1?'s':''),'success');closeAdd();})
-    .catch(function(){btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Entry';qAdd(payload);toast('⚠ Queued for retry','error');closeAdd();});
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+        btn.disabled=false;
+        btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Entry';
+        if(res.error) throw new Error(res.error);
+        // Success or deduplicated — either way data is in the sheet
+        toast('✓ Saved — '+items.length+' row'+(items.length>1?'s':''),'success');
+        closeAdd();
+    })
+    .catch(function(err){
+        btn.disabled=false;
+        btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Entry';
+        // Queue the payload for retry — do NOT re-add to local allData,
+        // it is already there from the optimistic update above.
+        // The clientId ensures the server will deduplicate if this payload
+        // was already saved before the network dropped the response.
+        qAdd(payload);
+        toast('⚠ Network error — queued for retry when online','error');
+        closeAdd();
+    });
 }
 function fnd(y){var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],p=y.split('-');return p.length===3?p[2]+'-'+M[+p[1]-1]+'-'+p[0]:y;}
 
@@ -1831,10 +1851,30 @@ function updQUI(){var q=getQ(),b=document.getElementById('fbb'),bn=document.getE
     if(q.length>0){b.textContent=q.length;b.style.display='flex';document.getElementById('qbt').textContent=q.length+' pending — tap to retry';bn.style.display='flex';}
     else{b.style.display='none';bn.style.display='none';}}
 function syncNow(){if(!navigator.onLine){toast('Still offline','error');return;}procQ();}
-function procQ(){var q=getQ();if(!q.length)return;var rem=q.slice(),item=rem.shift();
+function procQ(){
+    var q=getQ();
+    if(!q.length){ updQUI(); return; }
+    var rem=q.slice(), item=rem.shift();
+    toast('Syncing…','success');
     fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify(item)})
-    .then(function(r){return r.json();}).then(function(res){if(res.error)throw new Error(res.error);setQ(rem);updQUI();
-        if(rem.length>0)procQ();else{toast('✓ All synced','success');doFetch(true);}}).catch(function(){updQUI();});}
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+        // Both success and duplicate mean this item is handled — remove from queue
+        if(res.error) throw new Error(res.error);
+        setQ(rem); updQUI();
+        if(rem.length>0){
+            procQ(); // process next item
+        } else {
+            toast('✓ All entries synced','success');
+            doFetch(true);
+        }
+    })
+    .catch(function(err){
+        // Network or server error — leave item in queue, show error
+        toast('Sync failed — will retry when online','error');
+        updQUI();
+    });
+}
 window.addEventListener('online',function(){var q=getQ();if(q.length>0){toast('Back online — syncing…','success');procQ();}});
 
 function togAdv(){
