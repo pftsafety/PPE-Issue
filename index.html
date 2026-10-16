@@ -1009,6 +1009,7 @@ function saveEntry(){
         if(it)items.push({item:it,qty:qty||'1',size:sz});
     });
     if(!items.length){toast('Add at least one PPE item','error');return;}
+    if(items.some(function(x){return !/^[1-9]\d*$/.test(String(x.qty));})){toast('Qty must be a whole number, 1 or more','error');return;}
     var btn=document.getElementById('fsb');
     if(btn.disabled) return; // guard against rapid double-tap
 
@@ -1018,7 +1019,7 @@ function saveEntry(){
     // (e.g. the save succeeded but the response never reached the phone).
     var clientId=Date.now()+'-'+Math.random().toString(36).slice(2,10);
     var payload={action:'add',clientId:clientId,issuedOn:dt,cardNo:cn,name:nm,section:sc,items:items};
-    items.forEach(function(it){allData.unshift({cardNo:cn,name:nm,section:sc,issuedOn:fnd(dt),item:it.item,qty:it.qty,size:it.size});});
+    var optRows=items.map(function(it){var o={cardNo:cn,name:nm,section:sc,issuedOn:fnd(dt),item:it.item,qty:it.qty,size:it.size};allData.unshift(o);return o;});
     updLU(allData);try{lsSet(CK,JSON.stringify(allData));lsSet(CS,Date.now().toString());}catch(e){}
     tPg=1;
     rDash();rTbl();if(searchDone)doSearch(true);
@@ -1037,7 +1038,14 @@ function saveEntry(){
         btn.disabled=false;
         btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Entry';
         if(res.error) throw new Error(res.error);
-        // Success or deduplicated — either way data is in the sheet
+        if(res.siNos&&res.siNos.length===optRows.length){
+            // Attach the real Si Nos so these rows can be edited/deleted at once
+            optRows.forEach(function(o,i){ o.siNo=String(res.siNos[i]); });
+            try{ lsSet(CK,JSON.stringify(allData)); }catch(e){}
+        } else {
+            // Deduplicated (already saved earlier) — reload to get the sheet's truth
+            doFetch(true);
+        }
         toast('✓ Saved — '+items.length+' row'+(items.length>1?'s':''),'success');
         closeAdd();
     })
@@ -1295,13 +1303,15 @@ function doFetch(silent){
 
 /* count-up animation helper */
 function countUp(el, target, duration){
+    if(el._cu){ clearInterval(el._cu); el._cu=null; }
     var start=0, step=Math.ceil(target/40), interval=Math.round(duration/40);
     if(target===0){el.textContent='0';return;}
     var t=setInterval(function(){
         start=Math.min(start+step, target);
         el.textContent=start.toLocaleString();
-        if(start>=target) clearInterval(t);
+        if(start>=target){ clearInterval(t); el._cu=null; }
     }, interval);
+    el._cu=t;
 }
 
 function rDash(){
@@ -1865,9 +1875,12 @@ function updQUI(){var q=getQ(),b=document.getElementById('fbb'),bn=document.getE
     if(q.length>0){b.textContent=q.length;b.style.display='flex';document.getElementById('qbt').textContent=q.length+' pending — tap to retry';bn.style.display='flex';}
     else{b.style.display='none';bn.style.display='none';}}
 function syncNow(){if(!navigator.onLine){toast('Still offline','error');return;}procQ();}
+var _procBusy=false;
 function procQ(){
+    if(_procBusy) return; // one sync chain at a time
     var q=getQ();
     if(!q.length){ updQUI(); return; }
+    _procBusy=true;
     var rem=q.slice(), item=rem.shift();
     toast('Syncing…','success');
     fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify(item)})
@@ -1876,6 +1889,7 @@ function procQ(){
         // Both success and duplicate mean this item is handled — remove from queue
         if(res.error) throw new Error(res.error);
         setQ(rem); updQUI();
+        _procBusy=false;
         if(rem.length>0){
             procQ(); // process next item
         } else {
@@ -1885,6 +1899,7 @@ function procQ(){
     })
     .catch(function(err){
         // Network or server error — leave item in queue, show error
+        _procBusy=false;
         toast('Sync failed — will retry when online','error');
         updQUI();
     });
