@@ -933,8 +933,8 @@
     <div class="mbdy">
       <div class="fr"><div class="fl"><i class="fa-solid fa-calendar"></i>Issue Date</div><input class="fi2" type="date" id="adate"></div>
       <div class="fr"><div class="fl"><i class="fa-solid fa-user"></i>Employee Name</div><input class="fi2" type="text" id="aname" placeholder="Employee name…" autocomplete="off" autocorrect="off" spellcheck="false"></div>
-    <div class="fr"><div class="fl"><i class="fa-solid fa-id-card"></i>Card No</div><input class="fi2" type="text" id="acard" placeholder="Card number…" autocomplete="off" autocorrect="off" spellcheck="false"></div>
-     <div class="fr"><div class="fl"><i class="fa-solid fa-building"></i>Section</div><input class="fi2" type="text" id="asec" list="sect-opts" placeholder="Department…" autocomplete="off" autocorrect="off" spellcheck="false"><datalist id="sect-opts"></datalist></div>
+      <div class="fr"><div class="fl"><i class="fa-solid fa-id-card"></i>Card No</div><input class="fi2" type="text" id="acard" placeholder="Card number…" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+      <div class="fr"><div class="fl"><i class="fa-solid fa-building"></i>Section</div><input class="fi2" type="text" id="asec" list="sect-opts" placeholder="Department…" autocomplete="off" autocorrect="off" spellcheck="false"><datalist id="sect-opts"></datalist></div>
       <div class="fdiv"></div>
       <div class="isl"><i class="fa-solid fa-helmet-safety" style="font-size:11px;"></i>PPE Items Issued</div>
       <div id="ail"></div>
@@ -1020,6 +1020,7 @@ function saveEntry(){
     var payload={action:'add',clientId:clientId,issuedOn:dt,cardNo:cn,name:nm,section:sc,items:items};
     items.forEach(function(it){allData.unshift({cardNo:cn,name:nm,section:sc,issuedOn:fnd(dt),item:it.item,qty:it.qty,size:it.size});});
     updLU(allData);try{lsSet(CK,JSON.stringify(allData));lsSet(CS,Date.now().toString());}catch(e){}
+    tPg=1;
     rDash();rTbl();if(searchDone)doSearch(true);
     if(!navigator.onLine){
         btn.disabled=true;
@@ -1552,9 +1553,30 @@ function rDashExtra(){
 
 var tFilt=[], tPg=1, tPP=40;
 
-function ftbl(){var q=document.getElementById('tsr').value.toLowerCase().trim();
-    tFilt=!q?allData.slice():allData.filter(function(r){return(r.name||'').toLowerCase().includes(q)||(r.cardNo||'').toLowerCase().includes(q)||(r.item||'').toLowerCase().includes(q)||(r.section||'').toLowerCase().includes(q);});
-    tPg=1;rTbl();}
+var _deskSortActive=false;
+
+// Comparator shared by the desktop column sort and the register list
+function cmpRows(col,dir){
+    return function(a,b){
+        var av=a[col]||'', bv=b[col]||'';
+        if(col==='issuedOn'){ var da=pd(av), db=pd(bv); return dir*((da&&db)?(da>db?1:da<db?-1:0):0); }
+        if(col==='qty') return dir*((parseInt(av,10)||0)-(parseInt(bv,10)||0));
+        var x=av.toString().toLowerCase(), y=bv.toString().toLowerCase();
+        return dir*(x<y?-1:x>y?1:0);
+    };
+}
+
+// Always rebuild the register list from allData, applying the current
+// search text and sort. Never reuse an old copy — that copy is what
+// hid newly saved, edited or deleted entries from the register.
+function buildTFilt(){
+    var q=(document.getElementById('tsr')||{value:''}).value.toLowerCase().trim();
+    var base=!q?allData.slice():allData.filter(function(r){return(r.name||'').toLowerCase().includes(q)||(r.cardNo||'').toLowerCase().includes(q)||(r.item||'').toLowerCase().includes(q)||(r.section||'').toLowerCase().includes(q);});
+    if(_deskSortActive) base.sort(cmpRows(_deskSortCol,_deskSortDir));
+    tFilt=base;
+}
+
+function ftbl(){tPg=1;rTbl();}
 // ── DESKTOP DETECTION & SORT ─────────────────────────────────────
 var _deskSortCol='issuedOn', _deskSortDir=-1;
 
@@ -1582,15 +1604,7 @@ function deskSort(col){
         else { ic.className=_deskSortDir===1?'fa-solid fa-sort-up':'fa-solid fa-sort-down'; ic.style.color='var(--pri)'; }
     });
 
-    tFilt.sort(function(a,b){
-        var av=a[_deskSortCol]||'', bv=b[_deskSortCol]||'';
-        if(_deskSortCol==='issuedOn'){
-            var da=pd(av), db=pd(bv);
-            return _deskSortDir*((da&&db)?(da>db?1:da<db?-1:0):0);
-        }
-        if(_deskSortCol==='qty') return _deskSortDir*((parseInt(av,10)||0)-(parseInt(bv,10)||0));
-        return _deskSortDir*(av.toString().toLowerCase()<bv.toString().toLowerCase()?-1:av.toString().toLowerCase()>bv.toString().toLowerCase()?1:0);
-    });
+    _deskSortActive=true;
     tPg=1; rTbl();
 }
 
@@ -1603,10 +1617,10 @@ window.addEventListener('resize', function(){
     }
 });
 
-function clrTbl(){document.getElementById('tsr').value='';tFilt=allData.slice();tPg=1;rTbl();}
+function clrTbl(){document.getElementById('tsr').value='';tPg=1;rTbl();}
 function tCP(d){tPg+=d;rTbl();document.getElementById('pr').scrollTop=0;}
 function rTbl(){
-    if(!tFilt.length&&allData.length)tFilt=allData.slice();
+    buildTFilt();
     var rows=document.getElementById('trows'),tnr=document.getElementById('tnr'),tpg=document.getElementById('tpgb');
     var tot=tFilt.length;document.getElementById('tsh').textContent=tot;document.getElementById('tto2').textContent=allData.length;
     if(!tot){rows.innerHTML='';tnr.style.display='';tpg.style.display='none';return;}
